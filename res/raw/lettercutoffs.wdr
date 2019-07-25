@@ -1,0 +1,9 @@
+letterwidths:
+{
+	standard: 11
+	=: 8
+	_: 7
+	[: 18
+	]: 18
+	': 25
+}

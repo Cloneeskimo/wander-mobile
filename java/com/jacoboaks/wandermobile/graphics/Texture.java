@@ -15,7 +15,8 @@ import java.io.InputStream;
 public class Texture {
 
     //Data
-    int id[];
+    private int id[];
+    private int width, height;
 
     //Constructor
     public Texture(int resourceID) {
@@ -33,6 +34,10 @@ public class Texture {
                         "unable to close InputStream");
             }
         }
+
+        //set width and height
+        this.width = bmp.getWidth();
+        this.height = bmp.getHeight();
 
         //generate gl texture and bind it
         this.id = new int[1];
@@ -54,6 +59,8 @@ public class Texture {
         bmp.recycle();
     }
 
-    //Accessor
-    public int getID() { return id[0]; }
+    //Accessors
+    public int getID() { return this.id[0]; }
+    public int getWidth() { return this.width; }
+    public int getHeight() { return this.height; }
 }

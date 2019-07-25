@@ -106,7 +106,7 @@ public class WorldLogic implements GameLogic {
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         //create font
-        this.font = new Font(R.drawable.letters, 10, 10, ' ');
+        this.font = new Font(R.drawable.letters, R.raw.lettercutoffs,10, 10, ' ');
     }
 
     /**

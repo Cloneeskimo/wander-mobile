@@ -1,6 +1,9 @@
 package com.jacoboaks.wandermobile.graphics;
 
+import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
+
+import java.util.Map;
 
 /**
  * Font Class
@@ -11,22 +14,42 @@ public class Font {
 
     //Data
     Texture fontSheet;
-    int charsPerRow, charsPerColumn;
     char startingChar;
+    int charsPerRow, charsPerColumn;
+    int standardLetterCutoff;
+    Map<Character, Integer> letterCutoffs;
 
     /**
      * Constructor
-     * @param resourceID the resource ID of the fontsheet
+     * @param fontResourceID the resource ID of the fontsheet
+     * @param letterCutoffResourceID the resource ID of the letter cutoff file
      * @param charsPerRow how many characters there are per row of the font sheet
      * @param charsPerColumn how many characters there are per column of the font sheet
      * @param startingChar the character at the beginning of the font sheet. The least this value will
      *                     be is 0. The max this value will be is 127.
      */
-    public Font(int resourceID, int charsPerRow, int charsPerColumn, char startingChar) {
-        this.fontSheet = new Texture(resourceID);
+    public Font(int fontResourceID, int letterCutoffResourceID, int charsPerRow, int charsPerColumn, char startingChar) {
+        this.fontSheet = new Texture(fontResourceID);
         this.charsPerRow = charsPerRow;
         this.charsPerColumn = charsPerColumn;
         this.startingChar = (char)Math.min(Math.max(0, startingChar), 127);
+        this.initLetterCutoffs(letterCutoffResourceID);
+    }
+
+    /**
+     * @purpose is to read and parse the letetr cutoffs file
+     * @param letterCutoffResourceID the resource ID of the letter cutoff file
+     */
+    private void initLetterCutoffs(int letterCutoffResourceID) {
+
+        //read data and set default standard cutoff
+        Node data = Node.readNode(letterCutoffResourceID);
+        this.standardLetterCutoff = 0;
+
+        //parse children
+        for (Node child : data.getChildren()) {
+            this.letterCutoffs.put(child.getName().charAt(0), Integer.parseInt(child.getValue()));
+        }
     }
 
     /**

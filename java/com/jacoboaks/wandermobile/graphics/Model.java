@@ -18,7 +18,6 @@ public class Model {
 
     //Static Data
     private static final int COORDS_PER_VERTEX = 3;
-    public static final float STANDARD_SQUARE_SIZE = 0.5f;
 
     //Data
     private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
@@ -84,28 +83,6 @@ public class Model {
     }
 
     /**
-     * @param x the x factor by which to translate the model
-     * @param y the y factor by which to translate the model
-     * @purpose is to translate the entire model. should not be used for moving objects regularly
-     */
-    public void translate(float x, float y, float z) {
-
-        //reset world coordinates array
-        float[] oldModelCoords = this.modelCoords;
-        this.modelCoords = new float[oldModelCoords.length];
-
-        //transform each according to x and y value
-        for (int coord = 0; coord < this.modelCoords.length / COORDS_PER_VERTEX; coord++) {
-            this.modelCoords[coord * 3] = oldModelCoords[coord * 3] + x;
-            this.modelCoords[coord * 3 + 1] = oldModelCoords[coord * 3 + 1] + y;
-            this.modelCoords[coord * 3 + 2] = oldModelCoords[coord * 3 + 2] + z;
-        }
-
-        //update buffers
-        this.updateBuffers();
-    }
-
-    /**
      * @returns whether or not this model is textured;
      */
     public boolean isTextured() {
@@ -147,6 +124,7 @@ public class Model {
     }
 
     //Standard Square Data
+    public static final float STANDARD_SQUARE_SIZE = 0.5f;
     public static final float[] STD_SQUARE_MODEL_COORDS = new float[]{
             -STANDARD_SQUARE_SIZE / 2f, -STANDARD_SQUARE_SIZE / 2f, 0f,
             STANDARD_SQUARE_SIZE / 2f, -STANDARD_SQUARE_SIZE / 2f, 0f,

@@ -2,12 +2,15 @@ package com.jacoboaks.wandermobile.util;
 
 import android.util.Log;
 
+import com.jacoboaks.wandermobile.MainActivity;
 import com.jacoboaks.wandermobile.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class Util {
 
@@ -58,5 +61,39 @@ public final class Util {
             throw Util.fatalError("Util.java", "inputStreamToString(InputStream)",
                     "unable to read from InputStream: " + e.getMessage());
         }
+    }
+
+    /**
+     * @purpose is to convert a string to a string list by adding breaks every time the given
+     * character appears in the string
+     * @param value the string to split
+     * @param newLine the character to split by
+     * @return the list of strings split from the given string
+     */
+    public final static List<String> stringToStringList(String value, char newLine) {
+
+        //create list
+        List<String> result = new ArrayList<>();
+        int beginning = 0;
+        for (int i = 0; i < value.length(); i++) {
+            if (value.charAt(i) == newLine) {
+                result.add(value.substring(beginning, i));
+                beginning = i + 1;
+            }
+        }
+
+        //return list
+        return result;
+    }
+
+    /**
+     * @purpose is to convert a resource file to a list of strings to be parsed
+     * @param resourceID the id of the resource to be read
+     * @return the list of string available for parsing
+     */
+    public final static List<String> readResourceFile(int resourceID) {
+        InputStream stream = MainActivity.context.getResources().openRawResource(resourceID);
+        String data = Util.inputStreamToString(stream);
+        return stringToStringList(data, '\n');
     }
 }
