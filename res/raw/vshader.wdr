@@ -1,0 +1,46 @@
+
+//set float precision
+precision mediump float;
+
+//projection uniforms
+uniform float aspectRatio;
+uniform int aspectRatioAction;
+
+//object uniforms
+uniform float x;
+uniform float y;
+
+//camera uniforms
+uniform float camx;
+uniform float camy;
+uniform float camzoom;
+
+//attributes
+attribute vec4 position;
+attribute vec2 texCoord;
+
+//output
+varying vec2 texCoordF;
+
+//main function
+void main() {
+
+    //simply pass through texture coordinate
+    texCoordF = texCoord;
+
+    //apply camera position
+    vec4 transformedPosition = vec4(position.x - camx, position.y - camy, position.zw);
+
+    //apply vertex position
+    transformedPosition = vec4(transformedPosition.x + x, transformedPosition.y + y, transformedPosition.zw);
+
+    //apply projection
+    if (aspectRatioAction == 1) transformedPosition.y = transformedPosition.y * aspectRatio;
+    else transformedPosition.x = transformedPosition.x / aspectRatio;
+
+    //apply camera zoom
+    transformedPosition = vec4(transformedPosition.x * camzoom, transformedPosition.y * camzoom, transformedPosition.zw);
+
+    //set final vertex position
+    gl_Position = transformedPosition;
+}
