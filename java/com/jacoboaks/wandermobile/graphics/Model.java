@@ -7,6 +7,7 @@ import com.jacoboaks.wandermobile.util.Color;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 /**
@@ -24,15 +25,15 @@ public class Model {
     private Material material;
     private float[] modelCoords;
     private float[] textureCoords;
-    private short[] drawPath;
+    private int[] drawPath;
 
     //Buffer Data
     private FloatBuffer vertexBuffer;
     private FloatBuffer textureCoordsBuffer;
-    private ShortBuffer drawPathBuffer;
+    private IntBuffer drawPathBuffer;
 
     //Full Constructor
-    public Model(float[] modelCoords, float[] textureCoords, short[] drawPath, Material material) {
+    public Model(float[] modelCoords, float[] textureCoords, int[] drawPath, Material material) {
         this.modelCoords = modelCoords;
         this.textureCoords = textureCoords;
         this.drawPath = drawPath;
@@ -75,11 +76,20 @@ public class Model {
         GLES20.glUniform1i(shaderProgram.getUniformIndex("colorOverride"), this.material.isColorOverrided() ? 1 : 0);
 
         //draw the object
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawPath.length, GLES20.GL_UNSIGNED_SHORT, this.drawPathBuffer);
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawPath.length, GLES20.GL_UNSIGNED_INT, this.drawPathBuffer);
 
         //disable attribute arrays
         GLES20.glDisableVertexAttribArray(positionHandle);
         GLES20.glDisableVertexAttribArray(textureCoordHandle);
+    }
+
+    /**
+     * @purpose is to scale by the given factor
+     * @param factor the factor by which to scale the model
+     */
+    public void scale(float factor) {
+        for (int i = 0; i < this.modelCoords.length; i++) this.modelCoords[i] = this.modelCoords[i] * factor;
+        this.updateBuffers();
     }
 
     /**
@@ -114,23 +124,35 @@ public class Model {
         this.textureCoordsBuffer.position(0);
 
         //create byte buffer for draw list
-        byteBuffer = ByteBuffer.allocateDirect(this.drawPath.length * 2);
+        byteBuffer = ByteBuffer.allocateDirect(this.drawPath.length * 4);
         byteBuffer.order(ByteOrder.nativeOrder());
 
-        //conver to short buffer and store vertcies
-        this.drawPathBuffer = byteBuffer.asShortBuffer();
+        //convert to int buffer and store vertcies
+        this.drawPathBuffer = byteBuffer.asIntBuffer();
         this.drawPathBuffer.put(this.drawPath);
         this.drawPathBuffer.position(0);
     }
 
+    //Accessor
+    public Material getMaterial() { return this.material; }
+
     //Standard Square Data
-    public static final float STANDARD_SQUARE_SIZE = 0.5f;
-    public static final float[] STD_SQUARE_MODEL_COORDS = new float[]{
-            -STANDARD_SQUARE_SIZE / 2f, -STANDARD_SQUARE_SIZE / 2f, 0f,
-            STANDARD_SQUARE_SIZE / 2f, -STANDARD_SQUARE_SIZE / 2f, 0f,
-            -STANDARD_SQUARE_SIZE / 2f, STANDARD_SQUARE_SIZE / 2f, 0f,
-            STANDARD_SQUARE_SIZE / 2f, STANDARD_SQUARE_SIZE / 2f, 0f};
-    public static final float[] STD_SQUARE_TEX_COORDS = new float[]{0.0f, 1.0f, 1.0f, 1.0f,
-            0.0f, 0.0f, 1.0f, 0.0f};
-    public static final short[] STD_SQUARE_DRAW_ORDER = new short[]{0, 1, 2, 1, 3, 2};
+    public static final float STD_SQUARE_SIZE = 0.5f;
+    public static final float[] STD_SQUARE_MODEL_COORDS() {
+        return new float[]{
+                -STD_SQUARE_SIZE / 2f, -STD_SQUARE_SIZE / 2f, 0f, //top left
+                -STD_SQUARE_SIZE / 2f, STD_SQUARE_SIZE / 2f, 0f,  //bottom left
+                STD_SQUARE_SIZE / 2f, -STD_SQUARE_SIZE / 2f, 0f,  //top right
+                STD_SQUARE_SIZE / 2f, STD_SQUARE_SIZE / 2f, 0f};  //bottom right
+    }
+    public static final float[] STD_SQUARE_TEX_COORDS() {
+        return new float[]{
+                0.0f, 1.0f, //top left
+                0.0f, 0.0f, //bottom left
+                1.0f, 1.0f, //top right
+                1.0f, 0.0f}; //bottom right
+    }
+    public static final int[] STD_SQUARE_DRAW_ORDER() {
+        return new int[]{0, 1, 2, 2, 1, 3};
+    }
 }

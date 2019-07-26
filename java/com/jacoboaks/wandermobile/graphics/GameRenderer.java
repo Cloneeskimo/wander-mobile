@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import com.jacoboaks.wandermobile.game.gamelogic.GameLogic;
+import com.jacoboaks.wandermobile.game.gamelogic.WorldLogic;
 import com.jacoboaks.wandermobile.util.Util;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -87,17 +88,24 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         this.frameCount++;
         while (System.currentTimeMillis() - this.lastSecond >= 1000) {
             this.FPS = this.frameCount;
+            this.onFPSUpdate();
             this.frameCount = 0;
             this.lastSecond += 1000;
-
-            //log FPS
-            if (Util.DEBUG) Log.i(Util.getLogTag("GameRenderer.java",
-                    "onDrawFrame(GL10)"), "FPS: " + this.FPS);
         }
 
         //update logic
         this.logic.update(System.currentTimeMillis() - this.lastCycle);
         this.lastCycle = System.currentTimeMillis();
+    }
+
+    /**
+     * @purpose is to react to any FPS updates
+     */
+    private void onFPSUpdate() {
+        if (this.logic instanceof WorldLogic) {
+            WorldLogic wlogic = (WorldLogic)this.logic;
+            wlogic.onFPSUpdate(this.FPS);
+        }
     }
 
     /**

@@ -1,0 +1,32 @@
+
+//set float precision
+precision mediump float;
+
+//uniforms
+uniform vec4 color;
+uniform sampler2D textureSampler;
+uniform int colorOverride;
+uniform int isTextured;
+
+//input
+varying vec2 texCoordF;
+
+//main function
+void main() {
+
+    //create final color variable
+    vec4 finalColor = color;
+
+    //apply texture if there is one
+    if (isTextured == 1) {
+
+        //apply with color override if there is one
+        if (colorOverride == 1) {
+            finalColor = texture2D(textureSampler, texCoordF) * color;
+        }
+        else finalColor = texture2D(textureSampler, texCoordF);
+    }
+
+    //set as official color
+    gl_FragColor = finalColor;
+}

@@ -3,6 +3,7 @@ package com.jacoboaks.wandermobile.graphics;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -33,6 +34,7 @@ public class Font {
         this.charsPerRow = charsPerRow;
         this.charsPerColumn = charsPerColumn;
         this.startingChar = (char)Math.min(Math.max(0, startingChar), 127);
+        this.letterCutoffs = new HashMap<>();
         this.initLetterCutoffs(letterCutoffResourceID);
     }
 
@@ -48,15 +50,18 @@ public class Font {
 
         //parse children
         for (Node child : data.getChildren()) {
-            this.letterCutoffs.put(child.getName().charAt(0), Integer.parseInt(child.getValue()));
+            if (child.getName().toUpperCase().equals("STANDARD")) this.standardLetterCutoff = Integer.parseInt(child.getValue());
+            else if (child.getName().toUpperCase().equals("COLON")) this.letterCutoffs.put(':', Integer.parseInt(child.getValue()));
+            else this.letterCutoffs.put(child.getName().charAt(0), Integer.parseInt(child.getValue()));
         }
     }
 
     /**
      * @param toGet the character whose texture coordinates to receive
+     * @param cutoff whether to incorporate cutoff into the texture coordinates
      * @return the texture coordinates for given character if using this font (for a standard square model)
      */
-    public float[] getCharacterTextureCoordinates(char toGet) {
+    public float[] getCharacterTextureCoordinates(char toGet, boolean cutoff) {
 
         //check if invalid char
         if (toGet < 0 || toGet > 127) Util.fatalError("Font.java",
@@ -70,14 +75,33 @@ public class Font {
         float fractionOfCol = 1 / (float)charsPerColumn;
 
         //calculate texture coordinates
-        return new float[] {
-                (float)column / charsPerRow, (float)row / charsPerColumn + fractionOfCol,
-                (float)column / charsPerRow + fractionOfRow, (float)row / charsPerColumn + fractionOfCol,
-                (float)column / charsPerRow, (float)row / charsPerColumn,
-                (float)column / charsPerRow + fractionOfRow, (float)row / charsPerColumn
+        float texCoords[] = new float[] {
+                (float)column / charsPerRow, (float)row / charsPerColumn + fractionOfCol, //top left
+                (float)column / charsPerRow, (float)row / charsPerColumn, //bottom left
+                (float)column / charsPerRow + fractionOfRow, (float)row / charsPerColumn + fractionOfCol, //top right
+                (float)column / charsPerRow + fractionOfRow, (float)row / charsPerColumn //bottom right
         };
+
+        //account for cutoff
+        if (cutoff) {
+            float cutoffFactor = (float)getCharacterCutoff(toGet) / (float)this.fontSheet.getWidth();
+            texCoords[0] += cutoffFactor;
+            texCoords[2] += cutoffFactor;
+            texCoords[4] -= cutoffFactor;
+            texCoords[6] -= cutoffFactor;
+        }
+
+        //return final coordinates
+        return texCoords;
     }
 
     //Accessor
     public Texture getFontSheet() { return this.fontSheet; }
+    public float getCharacterHeight() { return (float)this.fontSheet.getHeight() / (float)this.charsPerColumn; }
+    public float getCharacterWidth() { return (float)this.fontSheet.getWidth() / (float)this.charsPerRow; }
+    public int getCharacterCutoff(char c) {
+        Integer cutoff = this.letterCutoffs.get(c);
+        if (cutoff == null) cutoff = this.standardLetterCutoff;
+        return cutoff;
+    }
 }

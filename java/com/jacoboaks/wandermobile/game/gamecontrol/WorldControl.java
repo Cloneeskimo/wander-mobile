@@ -1,5 +1,6 @@
 package com.jacoboaks.wandermobile.game.gamecontrol;
 
+import android.opengl.GLES10;
 import android.view.MotionEvent;
 
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
@@ -48,6 +49,7 @@ public class WorldControl {
             //get touch location
             float x = e.getX();
             float y = e.getY();
+
             x /= ((float)width / 2);
             x -= 1f;
             y /= ((float)height / 2);

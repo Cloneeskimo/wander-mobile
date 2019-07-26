@@ -1,9 +1,15 @@
-letterwidths:
+lettercutoffs:
 {
-	standard: 11
-	=: 8
-	_: 7
-	[: 18
-	]: 18
-	': 25
+	standard: 10
+	=: 7
+	_: 6
+	[: 17
+	]: 17
+	': 24
+	colon: 24
+	;: 24
+	.: 24
+	a: 12
+	b: 12
+	c: 12
 }

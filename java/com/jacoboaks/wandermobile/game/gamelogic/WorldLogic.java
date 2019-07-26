@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 
 import com.jacoboaks.wandermobile.R;
+import com.jacoboaks.wandermobile.game.HUD;
 import com.jacoboaks.wandermobile.game.gamecontrol.WorldControl;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
+import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.graphics.Camera;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
@@ -14,9 +16,7 @@ import com.jacoboaks.wandermobile.graphics.Model;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
 import com.jacoboaks.wandermobile.graphics.Texture;
 import com.jacoboaks.wandermobile.util.Color;
-import com.jacoboaks.wandermobile.util.Coord;
 import com.jacoboaks.wandermobile.util.Node;
-import com.jacoboaks.wandermobile.util.Util;
 
 import java.util.Random;
 
@@ -31,6 +31,7 @@ public class WorldLogic implements GameLogic {
     private ShaderProgram shaderProgram;
     private Camera camera;
     private Font font;
+    private HUD hud;
 
     //Other Data
     private WorldControl control;
@@ -57,69 +58,81 @@ public class WorldLogic implements GameLogic {
     }
 
     /**
-     * @purpose is to initialize game items and the camera
-     */
-    private void initObjects() {
-
-        //create player game item
-        Material material = new Material(new Texture(R.drawable.obama));
-        Model square = new Model(Model.STD_SQUARE_MODEL_COORDS,
-                Model.STD_SQUARE_TEX_COORDS, Model.STD_SQUARE_DRAW_ORDER, material);
-        this.gameItems = new GameItem[95];
-        this.gameItems[0] = new GameItem(square, 0f, 0f);
-
-        //create characters
-        Random rand = new Random();
-        for (int i = 33; i < 127; i++) {
-
-            float[] textureCoordinates = this.font.getCharacterTextureCoordinates((char)i);
-            Material mat = new Material(this.font.getFontSheet(), new Color(
-                    (float)rand.nextInt(100) / 100,
-                    (float)rand.nextInt(100) / 100,
-                    (float)rand.nextInt(100) / 100, 1.0f), true);
-            Model mod = new Model(Model.STD_SQUARE_MODEL_COORDS, textureCoordinates,
-                    Model.STD_SQUARE_DRAW_ORDER, mat);
-            this.gameItems[i - 32] = new GameItem(mod, (float)i * 0.5f - 23.5f, 1f);
-        }
-    }
-
-    /**
      * @purpose is to initialize all of the graphical components of the logic
      * @param width the width of the surface
      * @param height the height of the surface
      */
     private void initGraphics(int width, int height) {
 
-        //save width, height, and aspect ratio
+        //save width, height, and aspect ratio, create camera
         this.width = width;
         this.height = height;
         this.aspectRatio = (float) width / (float) height;
         this.aspectRatioAction = (aspectRatio < 1.0f);
-
-        //create camera
         this.camera = new Camera(0.0f, 0.0f, 1.0f);
 
-        //initialize shader program
-        this.initShaderProgram(width, height);
-
-        //set clear color
-        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-
-        //create font
+        //initialize shader program, set clear color, create font
+        this.initShaderProgram();
+        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         this.font = new Font(R.drawable.letters, R.raw.lettercutoffs,10, 10, ' ');
+
+        //create HUD
+        this.hud = new HUD(this.aspectRatio, this.aspectRatioAction);
+    }
+
+    /**
+     * @purpose is to initialize game items and the camera
+     */
+    private void initObjects() {
+
+        //create player game item
+        Material material = new Material(new Texture(R.drawable.obama));
+        Model square = new Model(Model.STD_SQUARE_MODEL_COORDS(),
+                Model.STD_SQUARE_TEX_COORDS(), Model.STD_SQUARE_DRAW_ORDER(), material);
+        this.gameItems = new GameItem[95];
+        this.gameItems[0] = new GameItem(square, 0f, 0f);
+
+        //create characters
+        Random rand = new Random();
+        float offset = this.gameItems.length * Model.STD_SQUARE_SIZE / 2;
+        for (int i = 33; i < 127; i++) {
+
+            float[] textureCoordinates = this.font.getCharacterTextureCoordinates((char)i, false);
+            Material mat = new Material(this.font.getFontSheet(), new Color(
+                    (float)rand.nextInt(100) / 100,
+                    (float)rand.nextInt(100) / 100,
+                    (float)rand.nextInt(100) / 100, 1.0f), true);
+            Model mod = new Model(Model.STD_SQUARE_MODEL_COORDS(), textureCoordinates,
+                    Model.STD_SQUARE_DRAW_ORDER(), mat);
+            mod.scale(0.5f);
+            this.gameItems[i - 32] = new GameItem(mod, (float)(i - 33) * Model.STD_SQUARE_SIZE / 2, 1f);
+        }
+
+        //add hud elements
+        Material textMaterial = new Material(this.font.getFontSheet(), new Color(0.6f, 0.6f, 0.6f, 1.0f), true);
+
+        //fps label
+        TextItem fpsLabel = new TextItem(this.font, "FPS: ", textMaterial, 0f, -1.0f);
+        fpsLabel.scale(0.15f);
+        fpsLabel.moveY(0.02f + fpsLabel.getHeight() / 2);
+        this.hud.addItem(fpsLabel, 0.02f, -1f, true);
+
+        //wander title
+        TextItem title = new TextItem(this.font, "WANDER MOBILE", textMaterial, 0f, 1.0f);
+        title.scale(0.25f);
+        title.moveY(-title.getHeight() / 2);
+        this.hud.addItem(title, 0.02f, -1, true);
     }
 
     /**
      * @purpose is to initialize the shader program
-     * @param width width of the surface
-     * @param height height of the surface
      */
-    private void initShaderProgram(int width, int height) {
+    private void initShaderProgram() {
 
         //create shader program, load shaders, and link them.
         this.shaderProgram = new ShaderProgram();
-        this.shaderProgram.loadShader(R.raw.vshader, GLES20.GL_VERTEX_SHADER);
-        this.shaderProgram.loadShader(R.raw.fshader, GLES20.GL_FRAGMENT_SHADER);
+        this.shaderProgram.loadShader(R.raw.worldvshader, GLES20.GL_VERTEX_SHADER);
+        this.shaderProgram.loadShader(R.raw.worldfshader, GLES20.GL_FRAGMENT_SHADER);
         this.shaderProgram.link();
 
         //register shader program uniforms
@@ -147,6 +160,15 @@ public class WorldLogic implements GameLogic {
         this.camera.setX(Float.parseFloat(this.savedInstanceData.getString("worldlogic_camerax")));;
         this.camera.setY(Float.parseFloat(this.savedInstanceData.getString("worldlogic_cameray")));;
         this.camera.setZoom(Float.parseFloat(this.savedInstanceData.getString("worldlogic_camerazoom")));
+    }
+
+    /**
+     * @purpose is to update any FPS tracker or any logic based on FPS
+     * @param FPS
+     */
+    public void onFPSUpdate(float FPS) {
+        TextItem fpsCounter = (TextItem)this.hud.getItem(0);
+        fpsCounter.setText("FPS: " + Float.toString(FPS));
     }
 
     /**
@@ -214,6 +236,9 @@ public class WorldLogic implements GameLogic {
 
         //unbind shader program
         this.shaderProgram.unbind();
+
+        //render hud
+        this.hud.render();
     }
 
     /**

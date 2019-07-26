@@ -96,4 +96,28 @@ public final class Util {
         String data = Util.inputStreamToString(stream);
         return stringToStringList(data, '\n');
     }
+
+    /**
+     * @purpose is to convert a float list to an array
+     * @param list the list to convert
+     * @return the converted list
+     */
+    public static float[] flistToArray(List<Float> list) {
+        int size = list != null ? list.size() : 0;
+        float[] a = new float[size];
+        for (int i = 0; i < size; i++) a[i] = list.get(i);
+        return a;
+    }
+
+    /**
+     * @purpose is to convert a integer list to an array
+     * @param list the list to convert
+     * @return the converted list
+     */
+    public static int[] ilistToArray(List<Integer> list) {
+        int size = list != null ? list.size() : 0;
+        int[] a = new int[size];
+        for (int i = 0; i < size; i++) a[i] = list.get(i);
+        return a;
+    }
 }

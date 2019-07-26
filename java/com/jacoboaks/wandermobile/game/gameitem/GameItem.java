@@ -80,4 +80,5 @@ public class GameItem {
         this.vx = this.vy = 0;
         if (stopImpendingMovement) this.resetImpendingMovement();
     }
+    public void scale(float factor) { this.model.scale(factor); }
 }
