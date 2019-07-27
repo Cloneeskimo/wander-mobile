@@ -4,17 +4,12 @@ import android.opengl.GLES20;
 import android.util.Log;
 
 import com.jacoboaks.wandermobile.MainActivity;
-import com.jacoboaks.wandermobile.R;
 import com.jacoboaks.wandermobile.util.Util;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 /**
  * ShaderProgram Class

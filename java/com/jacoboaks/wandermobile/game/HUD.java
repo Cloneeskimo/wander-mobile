@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @purpose is to hold many gameitems to be rendered overtop of the world
+ * @purpose is to hold many GameItems to be rendered over top of the world
  */
 public class HUD {
 

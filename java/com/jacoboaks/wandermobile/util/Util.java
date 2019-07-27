@@ -3,12 +3,9 @@ package com.jacoboaks.wandermobile.util;
 import android.util.Log;
 
 import com.jacoboaks.wandermobile.MainActivity;
-import com.jacoboaks.wandermobile.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 

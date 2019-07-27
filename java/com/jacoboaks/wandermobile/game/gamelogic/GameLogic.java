@@ -14,7 +14,7 @@ import com.jacoboaks.wandermobile.util.Node;
  * @method input(MotionEvent) is called whenever a MotionEvent from the GameView needs handled
  * @method scaleInput(float) is called whenever a specifically scale event needs handled
  * @method update(float) is called every cycle
- * @method draw() is called every cycle after update
+ * @method render() is called every cycle after update
  * @method requestData() is called whenever the logic will need to be restored later -
  * the returned node should contain all important information to be reinstated after init(int, int)
  * is called later on.
@@ -27,6 +27,6 @@ public interface GameLogic {
     boolean input(MotionEvent e);
     boolean scaleInput(float factor);
     void update(float dt);
-    void draw();
+    void render();
     Node requestData();
 }

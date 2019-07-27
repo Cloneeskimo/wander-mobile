@@ -62,7 +62,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         this.update();
 
         //draw
-        this.draw();
+        this.render();
     }
 
     /**
@@ -109,15 +109,15 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     }
 
     /**
-     * @purpose is to clear the screen and subsequently draw the game logic elements
+     * @purpose is to clear the screen and subsequently render the game logic elements
      */
-    private void draw() {
+    private void render() {
 
         //clear the screen
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
         //draw any objects pertaining to the game logic
-        this.logic.draw();
+        this.logic.render();
     }
 
     /**

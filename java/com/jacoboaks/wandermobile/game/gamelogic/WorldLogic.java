@@ -4,16 +4,16 @@ import android.opengl.GLES20;
 import android.os.Bundle;
 import android.view.MotionEvent;
 
+import com.jacoboaks.wandermobile.MainActivity;
 import com.jacoboaks.wandermobile.R;
 import com.jacoboaks.wandermobile.game.HUD;
+import com.jacoboaks.wandermobile.game.World;
 import com.jacoboaks.wandermobile.game.gamecontrol.WorldControl;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
-import com.jacoboaks.wandermobile.graphics.Camera;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
 import com.jacoboaks.wandermobile.graphics.Model;
-import com.jacoboaks.wandermobile.graphics.ShaderProgram;
 import com.jacoboaks.wandermobile.graphics.Texture;
 import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Node;
@@ -25,17 +25,15 @@ public class WorldLogic implements GameLogic {
     //Surface Data
     private int width, height;
     private float aspectRatio;
-
-    //Graphical Data
     private boolean aspectRatioAction; //true (ratio < 1) -> multiply y by aspect ratio; false (ratio >= 1) -> divide x by aspect ratio
-    private ShaderProgram shaderProgram;
-    private Camera camera;
-    private Font font;
-    private HUD hud;
 
-    //Other Data
+    //Logic Data
+    private World world;
+    private HUD hud;
     private WorldControl control;
-    private GameItem[] gameItems;
+    private Font font;
+
+    //Saved Data
     private Bundle savedInstanceData;
 
     /**
@@ -48,7 +46,8 @@ public class WorldLogic implements GameLogic {
 
         //initialize graphics and objects
         this.initGraphics(width, height);
-        this.initObjects();
+        this.initWorld();
+        this.initHUD();
 
         //create controls
         this.control = new WorldControl();
@@ -69,32 +68,28 @@ public class WorldLogic implements GameLogic {
         this.height = height;
         this.aspectRatio = (float) width / (float) height;
         this.aspectRatioAction = (aspectRatio < 1.0f);
-        this.camera = new Camera(0.0f, 0.0f, 1.0f);
 
-        //initialize shader program, set clear color, create font
-        this.initShaderProgram();
+        //set clear color and create font
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         this.font = new Font(R.drawable.letters, R.raw.lettercutoffs,10, 10, ' ');
-
-        //create HUD
-        this.hud = new HUD(this.aspectRatio, this.aspectRatioAction);
     }
 
     /**
-     * @purpose is to initialize game items and the camera
+     * @purpose is to create and populate the world
      */
-    private void initObjects() {
+    private void initWorld() {
+
+        //create world
+        this.world = new World(this.aspectRatio, this.aspectRatioAction);
 
         //create player game item
         Material material = new Material(new Texture(R.drawable.obama));
         Model square = new Model(Model.STD_SQUARE_MODEL_COORDS(),
                 Model.STD_SQUARE_TEX_COORDS(), Model.STD_SQUARE_DRAW_ORDER(), material);
-        this.gameItems = new GameItem[95];
-        this.gameItems[0] = new GameItem(square, 0f, 0f);
+        this.world.addGameItem(new GameItem(square, 0f, 0f));
 
         //create characters
         Random rand = new Random();
-        float offset = this.gameItems.length * Model.STD_SQUARE_SIZE / 2;
         for (int i = 33; i < 127; i++) {
 
             float[] textureCoordinates = this.font.getCharacterTextureCoordinates((char)i, false);
@@ -105,11 +100,20 @@ public class WorldLogic implements GameLogic {
             Model mod = new Model(Model.STD_SQUARE_MODEL_COORDS(), textureCoordinates,
                     Model.STD_SQUARE_DRAW_ORDER(), mat);
             mod.scale(0.5f);
-            this.gameItems[i - 32] = new GameItem(mod, (float)(i - 33) * Model.STD_SQUARE_SIZE / 2, 1f);
+            this.world.addGameItem(new GameItem(mod, (float)(i - 33) * Model.STD_SQUARE_SIZE / 2, 1f));
         }
+    }
 
-        //add hud elements
-        Material textMaterial = new Material(this.font.getFontSheet(), new Color(0.6f, 0.6f, 0.6f, 1.0f), true);
+    /**
+     * @purpose is to create and populate the HUD for this logic
+     */
+    private void initHUD() {
+
+        //create HUD
+        this.hud = new HUD(this.aspectRatio, this.aspectRatioAction);
+
+        //create hud text material
+        Material textMaterial = new Material(font.getFontSheet(), new Color(0.6f, 0.6f, 0.6f, 1.0f), true);
 
         //fps label
         TextItem fpsLabel = new TextItem(this.font, "FPS: ", textMaterial, 0f, -1.0f);
@@ -118,35 +122,11 @@ public class WorldLogic implements GameLogic {
         this.hud.addItem(fpsLabel, 0.02f, -1f, true);
 
         //wander title
-        TextItem title = new TextItem(this.font, "WANDER MOBILE", textMaterial, 0f, 1.0f);
+        TextItem title = new TextItem(this.font, "WANDER MOBILE " + MainActivity.WANDER_VERSION
+                + "B" + MainActivity.WANDER_BUILD, textMaterial, 0f, 1.0f);
         title.scale(0.25f);
         title.moveY(-title.getHeight() / 2);
         this.hud.addItem(title, 0.02f, -1, true);
-    }
-
-    /**
-     * @purpose is to initialize the shader program
-     */
-    private void initShaderProgram() {
-
-        //create shader program, load shaders, and link them.
-        this.shaderProgram = new ShaderProgram();
-        this.shaderProgram.loadShader(R.raw.worldvshader, GLES20.GL_VERTEX_SHADER);
-        this.shaderProgram.loadShader(R.raw.worldfshader, GLES20.GL_FRAGMENT_SHADER);
-        this.shaderProgram.link();
-
-        //register shader program uniforms
-        this.shaderProgram.registerUniform("aspectRatio");
-        this.shaderProgram.registerUniform("aspectRatioAction");
-        this.shaderProgram.registerUniform("x");
-        this.shaderProgram.registerUniform("y");
-        this.shaderProgram.registerUniform("camx");
-        this.shaderProgram.registerUniform("camy");
-        this.shaderProgram.registerUniform("camzoom");
-        this.shaderProgram.registerUniform("color");
-        this.shaderProgram.registerUniform("textureSampler");
-        this.shaderProgram.registerUniform("colorOverride");
-        this.shaderProgram.registerUniform("isTextured");
     }
 
     /**
@@ -155,16 +135,14 @@ public class WorldLogic implements GameLogic {
     private void instateLoadedData() {
 
         //load saved data
-        this.gameItems[0].setX(Float.parseFloat(this.savedInstanceData.getString("worldlogic_squarex")));
-        this.gameItems[0].setY(Float.parseFloat(this.savedInstanceData.getString("worldlogic_squarey")));
-        this.camera.setX(Float.parseFloat(this.savedInstanceData.getString("worldlogic_camerax")));;
-        this.camera.setY(Float.parseFloat(this.savedInstanceData.getString("worldlogic_cameray")));;
-        this.camera.setZoom(Float.parseFloat(this.savedInstanceData.getString("worldlogic_camerazoom")));
+        this.world.instateLoadedData(this.savedInstanceData);
+        this.world.getItem(0).setX(Float.parseFloat(this.savedInstanceData.getString("worldlogic_squarex")));
+        this.world.getItem(0).setY(Float.parseFloat(this.savedInstanceData.getString("worldlogic_squarey")));
     }
 
     /**
      * @purpose is to update any FPS tracker or any logic based on FPS
-     * @param FPS
+     * @param FPS the current FPS
      */
     public void onFPSUpdate(float FPS) {
         TextItem fpsCounter = (TextItem)this.hud.getItem(0);
@@ -187,57 +165,31 @@ public class WorldLogic implements GameLogic {
      * @return whether or not the MotionEvent was handled in any way
      */
     @Override
-    public boolean input(MotionEvent e) { return this.control.input(e, this.gameItems, this.camera, this.width, this.height); }
+    public boolean input(MotionEvent e) { return this.control.input(e, this.world.getGameItems(),
+            this.world.getCamera(), this.width, this.height); }
 
     /**
      * @purpose is to handle specifically scale events
      * @param factor the factor by which the user has scaled
      */
     @Override
-    public boolean scaleInput(float factor) { return this.control.scaleInput(factor, camera, gameItems); }
+    public boolean scaleInput(float factor) { return this.control.scaleInput(factor,
+            this.world.getCamera(), this.world.getGameItems()); }
 
     /**
      * @purpose is the update the components of this logic
      * @param dt the time, in milliseconds, since the last update
      */
     @Override
-    public void update(float dt) {
-
-        //update game items
-        for (GameItem gameItem : this.gameItems) gameItem.update(dt);
-    }
+    public void update(float dt) { this.world.update(dt); }
 
     /**
      * @purpose is to draw any graphical components to the screen.
      * @called after update every cycle
      */
     @Override
-    public void draw() {
-
-        //draw shapes
-        this.shaderProgram.bind();
-
-        //update aspect ratio and aspect ratio action
-        GLES20.glUniform1fv(this.shaderProgram.getUniformIndex("aspectRatio"), 1,
-                new float[] { aspectRatio }, 0);
-        GLES20.glUniform1iv(this.shaderProgram.getUniformIndex("aspectRatioAction"), 1,
-                new int[] { this.aspectRatioAction ? 1 : 0 }, 0);
-
-        //update camera properties
-        GLES20.glUniform1fv(this.shaderProgram.getUniformIndex("camx"), 1,
-                new float[] { this.camera.getX() }, 0);
-        GLES20.glUniform1fv(this.shaderProgram.getUniformIndex("camy"), 1,
-                new float[] { this.camera.getY() }, 0);
-        GLES20.glUniform1fv(this.shaderProgram.getUniformIndex("camzoom"), 1,
-                new float[] { this.camera.getZoom() }, 0);
-
-        //draw game items
-        for (GameItem gameItem: this.gameItems) gameItem.draw(this.shaderProgram);
-
-        //unbind shader program
-        this.shaderProgram.unbind();
-
-        //render hud
+    public void render() {
+        this.world.render();
         this.hud.render();
     }
 
@@ -252,11 +204,9 @@ public class WorldLogic implements GameLogic {
 
         //add data to node and return it
         Node data = new Node("worldlogic");
-        data.addChild(new Node("squarex", Float.toString(this.gameItems[0].getX())));
-        data.addChild(new Node("squarey", Float.toString(this.gameItems[0].getY())));
-        data.addChild(new Node("camerax", Float.toString(this.camera.getX())));
-        data.addChild(new Node("cameray", Float.toString(this.camera.getY())));
-        data.addChild(new Node("camerazoom", Float.toString(this.camera.getZoom())));
+        data.addChild(new Node("squarex", Float.toString(this.world.getItem(0).getX())));
+        data.addChild(new Node("squarey", Float.toString(this.world.getItem(0).getY())));
+        this.world.requestData(data);
         return data;
     }
 }

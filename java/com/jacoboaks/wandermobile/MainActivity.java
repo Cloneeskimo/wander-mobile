@@ -18,6 +18,10 @@ import com.jacoboaks.wandermobile.util.Node;
  */
 public class MainActivity extends AppCompatActivity {
 
+    //Game Version/Build
+    public final static String WANDER_VERSION = "0.0";
+    public final static int WANDER_BUILD = 2;
+
     //Static Data
     public static Context context; //public reference to context for resource loading
     private static Bundle savedBundle;

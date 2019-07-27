@@ -2,13 +2,10 @@ package com.jacoboaks.wandermobile.graphics;
 
 import android.opengl.GLES20;
 
-import com.jacoboaks.wandermobile.util.Color;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
 
 /**
  * Model Class

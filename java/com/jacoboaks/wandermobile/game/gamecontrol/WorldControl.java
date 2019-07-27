@@ -1,11 +1,12 @@
 package com.jacoboaks.wandermobile.game.gamecontrol;
 
-import android.opengl.GLES10;
 import android.view.MotionEvent;
 
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.graphics.Camera;
 import com.jacoboaks.wandermobile.util.Coord;
+
+import java.util.List;
 
 /**
  * WorldControl Class
@@ -41,7 +42,7 @@ public class WorldControl {
      * @param height the height of the surface
      * @return whether the input was handled in any way
      */
-    public boolean input(MotionEvent e, GameItem[] gameItems, Camera camera, int width, int height) {
+    public boolean input(MotionEvent e, List<GameItem> gameItems, Camera camera, int width, int height) {
 
         //handle touch
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
@@ -59,11 +60,11 @@ public class WorldControl {
 
             //check which quadrant they touched and change square velocity accordingly
             if (absY > absX) { //up or down
-                if (y >= 0.0f) gameItems[0].setIvy(-0.03f);
-                else gameItems[0].setIvy(0.03f);
+                if (y >= 0.0f) gameItems.get(0).setIvy(-0.03f);
+                else gameItems.get(0).setIvy(0.03f);
             } else { //right or left
-                if (x >= 0.0f) gameItems[0].setIvx(0.03f);
-                else gameItems[0].setIvx(-0.03f);
+                if (x >= 0.0f) gameItems.get(0).setIvx(0.03f);
+                else gameItems.get(0).setIvx(-0.03f);
             }
 
             //return that input was handled
@@ -111,7 +112,7 @@ public class WorldControl {
 
                 //pan the camera and stop player movement if a substantial pan is being made
                 if (this.substantialPanningDetected) {
-                    gameItems[0].stopMoving(true);
+                    gameItems.get(0).stopMoving(true);
                     camera.pan(width, height, previousPos, this.fingerPos);
                 }
             }
@@ -128,10 +129,10 @@ public class WorldControl {
      * @purpose is to reset panning and any movement when a finger is lifted from the screen
      * @param gameItems
      */
-    private void fingerLifted(GameItem[] gameItems) {
+    private void fingerLifted(List<GameItem> gameItems) {
 
         //stop moving
-        gameItems[0].stopMoving(true);
+        gameItems.get(0).stopMoving(true);
         listenForPanning = false;
         this.fingerPos = null;
         this.substantialPanningDetected = false;
@@ -147,9 +148,9 @@ public class WorldControl {
      * @param gameItems the list of game items in use by the WorldLogic
      * @return
      */
-    public boolean scaleInput(float factor, Camera camera, GameItem[] gameItems) {
+    public boolean scaleInput(float factor, Camera camera, List<GameItem> gameItems) {
         camera.zoom(factor);
-        gameItems[0].stopMoving(true);
+        gameItems.get(0).stopMoving(true);
         this.listenForPanning = false;
         this.currentlyScaling = true;
         return true;
