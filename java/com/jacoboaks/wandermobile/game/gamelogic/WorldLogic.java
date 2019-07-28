@@ -90,7 +90,15 @@ public class WorldLogic implements GameLogic {
 
         //create characters
         Random rand = new Random();
+        float x = 0;
+        float y = 1;
         for (int i = 33; i < 127; i++) {
+
+            //update x and y
+            if (i == 80) {
+                y = 2;
+                x = 0;
+            }
 
             float[] textureCoordinates = this.font.getCharacterTextureCoordinates((char)i, false);
             Material mat = new Material(this.font.getFontSheet(), new Color(
@@ -100,7 +108,9 @@ public class WorldLogic implements GameLogic {
             Model mod = new Model(Model.STD_SQUARE_MODEL_COORDS(), textureCoordinates,
                     Model.STD_SQUARE_DRAW_ORDER(), mat);
             mod.scale(0.5f);
-            this.world.addGameItem(new GameItem(mod, (float)(i - 33) * Model.STD_SQUARE_SIZE / 2, 1f));
+            this.world.addGameItem(new GameItem(mod, x, y));
+
+            x += Model.STD_SQUARE_SIZE / 2;
         }
     }
 
@@ -123,7 +133,7 @@ public class WorldLogic implements GameLogic {
 
         //wander title
         TextItem title = new TextItem(this.font, "WANDER MOBILE " + MainActivity.WANDER_VERSION
-                + "B" + MainActivity.WANDER_BUILD, textMaterial, 0f, 1.0f);
+                + "b" + MainActivity.WANDER_BUILD, textMaterial, 0f, 1.0f);
         title.scale(0.25f);
         title.moveY(-title.getHeight() / 2);
         this.hud.addItem(title, 0.02f, -1, true);
