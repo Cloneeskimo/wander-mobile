@@ -132,7 +132,7 @@ public class WorldLogic implements GameLogic {
         this.hud.addItem(fpsLabel, 0.02f, -1f, true);
 
         //wander title
-        TextItem title = new TextItem(this.font, "WANDER MOBILE " + MainActivity.WANDER_VERSION
+        TextItem title = new TextItem(this.font, "Wander Mobile " + MainActivity.WANDER_VERSION
                 + "b" + MainActivity.WANDER_BUILD, textMaterial, 0f, 1.0f);
         title.scale(0.25f);
         title.moveY(-title.getHeight() / 2);
