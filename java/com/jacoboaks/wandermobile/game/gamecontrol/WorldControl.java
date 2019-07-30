@@ -5,6 +5,7 @@ import android.view.MotionEvent;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.game.gameitem.Tile;
 import com.jacoboaks.wandermobile.graphics.Camera;
+import com.jacoboaks.wandermobile.graphics.FollowingCamera;
 import com.jacoboaks.wandermobile.util.Coord;
 
 import java.util.List;
@@ -43,7 +44,7 @@ public class WorldControl {
      * @param height the height of the surface
      * @return whether the input was handled in any way
      */
-    public boolean input(MotionEvent e, List<GameItem> gameItems, Camera camera, int width, int height) {
+    public boolean input(MotionEvent e, List<GameItem> gameItems, FollowingCamera camera, int width, int height) {
 
         //handle touch
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
@@ -60,9 +61,11 @@ public class WorldControl {
             float absX = Math.abs(x);
             float absY = Math.abs(y);
 
-            //get player handle and check if they're moving already - if so, ignore input
+            //get player handle
             Tile player = (Tile)gameItems.get(0);
-            if (!player.isMoving()) {
+
+            //ignore input if player is moving or camera is panning
+            if (!player.isMoving() && !camera.isRepanning()) {
 
                 //check which quadrant they touched and change square velocity accordingly
                 if (absY > absX) { //up or down
@@ -82,6 +85,7 @@ public class WorldControl {
 
             //report finger lift
             this.fingerLifted(gameItems);
+            camera.fingerReleased();
 
             //return that input was handled
             return true;

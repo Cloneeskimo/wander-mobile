@@ -83,11 +83,11 @@ public class WorldLogic implements GameLogic {
      */
     private void initWorld() {
 
-        //create world
-        this.world = new World(this.aspectRatio, this.aspectRatioAction);
-
         //create player game item
         Tile playerTile = new Tile(this.font, 'J', new Color(0.62f, 0.0f, 0.1f, 1.0f), 0, 0);
+
+        //create world and add player
+        this.world = new World(this.aspectRatio, this.aspectRatioAction, playerTile);
         this.world.addGameItem(playerTile);
 
         //add other tiles

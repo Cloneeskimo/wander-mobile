@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.jacoboaks.wandermobile.R;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.graphics.Camera;
+import com.jacoboaks.wandermobile.graphics.FollowingCamera;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
@@ -25,18 +26,18 @@ public class World {
     //Data
     private List<GameItem> gameItems;
     private ShaderProgram shaderProgram;
-    private Camera camera;
+    private FollowingCamera camera;
 
     /**
      * @purpose is to construct this World
      * @param aspectRatio the aspect ratio of the surface
      * @param aspectRatioAction the aspect ration action given the current aspect ratio (explained in data)
      */
-    public World(float aspectRatio, boolean aspectRatioAction) {
+    public World(float aspectRatio, boolean aspectRatioAction, GameItem cameraFollowee) {
         this.aspectRatio = aspectRatio;
         this.aspectRatioAction = aspectRatioAction;
         this.initShaderProgram();
-        this.initObjects();
+        this.initObjects(cameraFollowee);
     }
 
     /**
@@ -77,15 +78,18 @@ public class World {
     /**
      * @purpose is to initialize the game objects
      */
-    private void initObjects() {
+    private void initObjects(GameItem cameraFollowee) {
 
-        //create camera and gameitems array
-        this.camera = new Camera(0.0f, 0.0f, 1.0f);
+        //create gameitems array
+        this.camera = new FollowingCamera(0.2f, cameraFollowee, false);
         this.gameItems = new ArrayList<>();
     }
 
     //Update Method
-    public void update(float dt) { for (GameItem gameItem : this.gameItems) gameItem.update(dt); }
+    public void update(float dt) {
+        for (GameItem gameItem : this.gameItems) gameItem.update(dt);
+        this.camera.update(dt);
+    }
 
     //Render Method
     public void render() {
@@ -127,7 +131,7 @@ public class World {
 
     //Accessors
     public List<GameItem> getGameItems() { return this.gameItems; }
-    public Camera getCamera() { return this.camera; }
+    public FollowingCamera getCamera() { return this.camera; }
 
     //Mutator
     public void addGameItem(GameItem item) { this.gameItems.add(item); }

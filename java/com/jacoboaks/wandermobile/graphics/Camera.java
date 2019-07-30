@@ -32,7 +32,7 @@ public class Camera {
     }
 
     //Update Method
-    public void update() {
+    public void update(float dt) {
         this.x += this.vx;
         this.y += this.vy;
     }
@@ -41,6 +41,8 @@ public class Camera {
      * @purpose is to pan the factor based a deltaX and deltaY defined in screen space
      * @param width the width of the screen
      * @param height the height of the screen
+     * @param oldPos the old world position
+     * @param newPos the new world position to pan to
      */
     public void pan(float width, float height, Coord oldPos, Coord newPos) {
 
