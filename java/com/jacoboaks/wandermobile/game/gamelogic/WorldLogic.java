@@ -21,6 +21,9 @@ import com.jacoboaks.wandermobile.util.Node;
 
 import java.util.Random;
 
+/**
+ * @purpose is to implement the logic for Wander when in the main game world
+ */
 public class WorldLogic implements GameLogic {
 
     //Surface Data

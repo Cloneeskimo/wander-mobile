@@ -14,6 +14,8 @@ import java.util.Map;
 /**
  * ShaderProgram Class
  * @purpose is to maintain a GLES SL shader program for use when rendering
+ * @note all uniforms must be registered in order to easily get their index using the methods of
+ * this class
  */
 public class ShaderProgram {
 

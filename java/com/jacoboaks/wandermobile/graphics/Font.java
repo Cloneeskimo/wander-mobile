@@ -95,7 +95,7 @@ public class Font {
         return texCoords;
     }
 
-    //Accessor
+    //Accessors
     public Texture getFontSheet() { return this.fontSheet; }
     public float getCharacterHeight() { return (float)this.fontSheet.getHeight() / (float)this.charsPerColumn; }
     public float getCharacterWidth() { return (float)this.fontSheet.getWidth() / (float)this.charsPerRow; }

@@ -25,7 +25,7 @@ public final class Util {
     }
 
     /**
-     * @purpose is to log an error and return
+     * @purpose is to log a fatal error and return an appropriate exception to throw
      * @param sourceFile the name of the source code file from which this method is called
      * @param method the name of the method from which this method is called
      * @param error the error message
@@ -37,6 +37,11 @@ public final class Util {
         return new RuntimeException(logTag + ": " + error);
     }
 
+    /**
+     * @purpose is to convert an InputStream to a String
+     * @param stream the stream to convert
+     * @return the converted string
+     */
     public final static String inputStreamToString(InputStream stream) {
 
         //convert to ByteArrayOutputStream

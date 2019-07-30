@@ -12,13 +12,19 @@ import com.jacoboaks.wandermobile.util.Util;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * @purpose is to represent an OpenGL texture
+ */
 public class Texture {
 
     //Data
     private int id[];
     private int width, height;
 
-    //Constructor
+    /**
+     * @purpose is to construct this texture
+     * @param resourceID the resource ID of the image to use for this texture
+     */
     public Texture(int resourceID) {
 
         //load texture into bitmap

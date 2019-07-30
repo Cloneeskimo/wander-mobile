@@ -9,41 +9,53 @@ import com.jacoboaks.wandermobile.util.Coord;
 
 /**
  * @purpose is to represent a specific type of GameItem which is a tile existing in the grid world.
- * Coordinates should be manipulated using world position rather than direction position as it
- * represents the place in the grid seperate of the model sizes.
+ * Coordinates should be manipulated using grid position rather than direct position as it
+ * represents the place in the grid separate of the model sizes.
  */
 public class Tile extends GameItem {
 
     //Static Data
-    public static final float STD_MOVE_ANIMATION_SPEED = 0.03f;
+    public static final float STD_MOVE_ANIMATION_SPEED = 0.025f;
     private static final float IMPENDING_MOVEMENT_TIME = 180f;
 
     //Data
-    private int wx, wy; //world position
-    private int iwx, iwy; //delta impending world position
-    private float impendingMovementTime; //time until and impending move is undergone
-    private float tgtX = 0, tgtY = 0; //target x and y (of movement animation)
+    private int gx, gy; //grid position
+    private int igx, igy; //delta impending grid position
+    private float impendingMovementTime; //time until an impending move is undergone
+    private float tgtX = 0, tgtY = 0; //target x and y (of movement animation) - in world coordinates
     private boolean symbolTile; //whether or not this tile is a symbol tile (true) or texture (false)
-    private boolean movementAnimation = false; //whether or not the tile is currently undergoing a moving animation
+    private boolean isMoving = false; //whether or not the tile is currently undergoing a moving animation
     private char symbol; //symbol of the tile
 
-    //Symbol Constructor
-    public Tile(Font font, char symbol, Color color, int x, int y) {
+    /**
+     * @purpose is to construct this Tile using a colored character
+     * @param font the font to draw the character from
+     * @param symbol the character to represent this tile
+     * @param color the color of the character
+     * @param gx the grid x coordinate
+     * @param gy the grid y coordinate
+     */
+    public Tile(Font font, char symbol, Color color, int gx, int gy) {
         super(new Model(Model.STD_SQUARE_MODEL_COORDS(), font.getCharacterTextureCoordinates(symbol, false),
                 Model.STD_SQUARE_DRAW_ORDER(), new Material(font.getFontSheet(), color, true)),
-                (float)x * Model.STD_SQUARE_SIZE, (float)y * Model.STD_SQUARE_SIZE);
-        this.wx = wx;
-        this.wy = wy;
+                (float)gx * Model.STD_SQUARE_SIZE, (float)gy * Model.STD_SQUARE_SIZE);
+        this.gx = gx;
+        this.gy = gy;
         this.symbolTile = true;
         this.symbol = symbol;
     }
 
-    //Texture Constructor
-    public Tile(Texture texture, int x, int y) {
+    /**
+     * @purpose is to construct this Tile using a texture
+     * @param texture the texture to use
+     * @param gx the grid x coordinate
+     * @param gy the grid y coordinate
+     */
+    public Tile(Texture texture, int gx, int gy) {
         super(new Model(Model.STD_SQUARE_MODEL_COORDS(), Model.STD_SQUARE_TEX_COORDS(), Model.STD_SQUARE_DRAW_ORDER(),
-                new Material(texture)), (float)x * Model.STD_SQUARE_SIZE, (float)y * Model.STD_SQUARE_SIZE);
-        this.wx = wx;
-        this.wy = wy;
+                new Material(texture)), (float)gx * Model.STD_SQUARE_SIZE, (float)gy * Model.STD_SQUARE_SIZE);
+        this.gx = gx;
+        this.gy = gy;
         this.symbolTile = false;
         this.symbol = 0;
     }
@@ -57,13 +69,13 @@ public class Tile extends GameItem {
         if (this.impendingMovementTime > 0) {
             this.impendingMovementTime -= dt;
             if (this.impendingMovementTime <= 0) {
-                this.moveWorldPos(this.iwx, this.iwy);
+                this.moveGridPos(this.igx, this.igy);
                 this.resetImpendingMovement();
             }
         }
 
-        //stop move animations
-        if (this.movementAnimation) {
+        //if this tile is undergoing the movement animation
+        if (this.isMoving) {
 
             //check if destination reached
             boolean destinationReached = false;
@@ -82,42 +94,42 @@ public class Tile extends GameItem {
                 this.vx = this.vy = 0;
                 this.x = this.tgtX;
                 this.y = this.tgtY;
-                this.movementAnimation = false;
+                this.isMoving = false;
             }
         }
     }
 
     //Single-Axis Moving Animation Methods
-    public void moveWorldX(int dwx) { this.moveWorldPos(dwx, 0); }
-    public void moveWorldY(int dwy) { this.moveWorldPos(0, dwy); }
+    public void moveGridX(int dgx) { this.moveGridPos(dgx, 0); }
+    public void moveGridY(int dgy) { this.moveGridPos(0, dgy); }
 
     /**
      * @purpose is to begin a movement animation to the given world position
-     * @param dwx the amount of world x to move by
-     * @param dwy the amount of world y to move by
+     * @param dgx the amount of world x to move by
+     * @param dgy the amount of world y to move by
      */
-    public void moveWorldPos(int dwx, int dwy) {
+    public void moveGridPos(int dgx, int dgy) {
 
         //set target x and target y
-        this.tgtX = this.x + (dwx * Model.STD_SQUARE_SIZE);
-        this.tgtY = this.y + (dwy * Model.STD_SQUARE_SIZE);
+        this.tgtX = this.x + (dgx * Model.STD_SQUARE_SIZE);
+        this.tgtY = this.y + (dgy * Model.STD_SQUARE_SIZE);
 
         //set velocity
-        this.vx = Tile.STD_MOVE_ANIMATION_SPEED * (float)dwx;
-        this.vy = Tile.STD_MOVE_ANIMATION_SPEED * (float)dwy;
+        this.vx = Tile.STD_MOVE_ANIMATION_SPEED * (float)dgx;
+        this.vy = Tile.STD_MOVE_ANIMATION_SPEED * (float)dgy;
 
         //set moving flag to true
-        this.movementAnimation = true;
+        this.isMoving = true;
     }
 
     /**
      * @purpose is to register an impending movement
-     * @param dwx the delta world x for the impending movement
-     * @param dwy the delta world y for the impending movement
+     * @param dgx the delta grid x for the impending movement
+     * @param dgy the delta grid y for the impending movement
      */
-    public void impendingMove(int dwx, int dwy) {
-        this.iwx = dwx;
-        this.iwy = dwy;
+    public void impendingMove(int dgx, int dgy) {
+        this.igx = dgx;
+        this.igy = dgy;
         this.impendingMovementTime = Tile.IMPENDING_MOVEMENT_TIME;
     }
 
@@ -125,7 +137,7 @@ public class Tile extends GameItem {
      * @purpose is to reset any impending movement for this game item
      */
     public void resetImpendingMovement() {
-        this.iwx = this.iwy = 0;
+        this.igx = this.igy = 0;
         this.impendingMovementTime = 0f;
     }
 
@@ -134,20 +146,20 @@ public class Tile extends GameItem {
      */
     @Override
     public void stopMoving() {
-        if (this.movementAnimation) return; //ignore if already undergoing a movement
+        if (this.isMoving) return; //ignore if already undergoing a movement
         super.stopMoving();
         this.resetImpendingMovement();
     }
 
     //Mutators
-    public void setWorldX(int wx) { this.wx = wx; }
-    public void setWorldY(int wy) { this.wy = wy; }
-    public void setWorldPosition(int wx, int wy) { this.wx = (int)wx; this.wy = (int)wy; }
+    public void setGridX(int gx) { this.gx = gx; }
+    public void setGridY(int gy) { this.gy = gy; }
+    public void setGridPosition(int gx, int gy) { this.gx = (int)gx; this.gy = (int)gy; }
 
     //Accessors
-    public int getWorldX() { return this.wx; }
-    public int getWorldY() { return this.wy; }
-    public Coord getWorldPosition() { return new Coord(this.wx, this.wy); }
+    public int getGridX() { return this.gx; }
+    public int getGridY() { return this.gy; }
+    public Coord getGridPosition() { return new Coord(this.gx, this.gy); }
     public char getSymbol() { return this.symbol; }
-    public boolean isMoving() { return this.movementAnimation; }
+    public boolean isMoving() { return this.isMoving; }
 }

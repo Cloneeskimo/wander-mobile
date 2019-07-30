@@ -1,7 +1,7 @@
 package com.jacoboaks.wandermobile.util;
 
 /**
- * @purpose is to represent a 4-component color
+ * @purpose is to represent a 4-component color (rgba)
  */
 public class Color {
 
@@ -11,12 +11,20 @@ public class Color {
     private float b;
     private float a;
 
-    //Default Constructor
+    /**
+     * @purpose is to construct this color as the default color: white
+     */
     public Color() {
         this(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
-    //Full Constructor
+    /**
+     * @purpose is to construct this color with the given rgba values
+     * @param r the red value
+     * @param g the green value
+     * @param b the blue value
+     * @param a the alpha value
+     */
     public Color(float r, float g, float b, float a) {
         this.r = r;
         this.g = g;
@@ -36,10 +44,4 @@ public class Color {
     public void setG(float g) { this.g = g; }
     public void setB(float b) { this.b = b; }
     public void setA(float a) { this.a = a; }
-
-    //Delta Mutators
-    public void dR(float dR) { this.r += dR; }
-    public void dG(float dG) { this.g += dG; }
-    public void dB(float dB) { this.b += dB; }
-    public void dA(float dA) { this.a += dA; }
 }

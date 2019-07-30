@@ -9,18 +9,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @purpose is to model text as a game item. the model position is as follows: the x coordinate
+ * @purpose is to model text as a GameItem. the model position is as follows: the x coordinate
  * //represents the leftmost edge of the text; the y coordinate represents the middle line of
  * the text.
  */
 public class TextItem extends GameItem {
 
     //Data
-    Font font;
-    String text;
-    float width, height, scale;
+    Font font; //the font used for the text
+    String text; //the text
+    float width, height, scale; //the width, height, and scale of the text
 
-    //Constructor
+    /**
+     * @purpose is to construct this TextItem
+     * @param font the font to be used for the text
+     * @param text the text to be written
+     * @param material the material to use for the text model
+     * @param x the x position
+     * @param y the y position
+     */
     public TextItem(Font font, String text, Material material, float x, float y) {
         super(new Model(new float[] {}, new float[] {}, new int[] {}, material), x, y);
         this.font = font;

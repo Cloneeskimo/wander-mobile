@@ -57,9 +57,14 @@ public class Camera {
         this.moveY(newp.y - oldp.y);
     }
 
+    /**
+     * @purpose is to convert screen coordinates to world coordinates
+     * @param width the width of the surface
+     * @param height the height of the screen
+     * @param screen the screen coordinates to convert
+     * @return the converted coordinates
+     */
     public Coord screenToWorldCoords(float width, float height, Coord screen) {
-
-//        System.out.println("screen coords: " + screen.x + ", " + screen.y);
 
         //convert to normalized device coordinates
         screen.x /= width / 2;
@@ -67,22 +72,16 @@ public class Camera {
         screen.x--;
         screen.y--;
 
-//        System.out.println("normalized coords: " + screen.x + ", " + screen.y);
-
         //convert to projected coordinates by adjusting for aspect ratio
         float aspectRatio = width / height;
         if (aspectRatio < 1) screen.y /= aspectRatio;
         else screen.x *= aspectRatio;
-
-//        System.out.println("projected coords: " + screen.x + ", " + screen.y);
 
         //convert to world coordinates by adjusting for zoom and adding camera position
         screen.x /= this.zoom;
         screen.y /= this.zoom;
         screen.x += this.x;
         screen.y -= this.y;
-
-//        System.out.println("world coords: " + screen.x + ", " + screen.y);
 
         //return adjusted coord
         return screen;

@@ -23,9 +23,9 @@ public class WorldControl {
 
     //Data
     private Coord fingerPos; //the current finger position. set to null if the finger leaves the screen
-    private boolean substantialPanningDetected;
-    private boolean listenForPanning;
-    private boolean currentlyScaling;
+    private boolean substantialPanningDetected; //whether or not substantial panning has been detected
+    private boolean listenForPanning; //whether or not panning should be listened for
+    private boolean currentlyScaling; //whether or not the user is currently scaling
 
     //Default Constructor
     public WorldControl() {

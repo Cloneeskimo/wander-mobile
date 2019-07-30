@@ -5,14 +5,22 @@ import android.opengl.GLES20;
 import com.jacoboaks.wandermobile.graphics.Model;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
 
+/**
+ * @purpose is to represent a single game item with a model, position, and velocity
+ */
 public class GameItem {
 
     //Data
-    Model model;
-    float x, y; //position
+    Model model; //model
+    float x, y; //world position
     float vx = 0, vy = 0; //velocity
 
-    //Constructor
+    /**
+     * @purpose is to construct this GameItem
+     * @param model the model to represent the GameItem
+     * @param x the world x position
+     * @param y the world y position
+     */
     public GameItem(Model model, float x, float y) {
         this.model = model;
         this.x = x;
@@ -22,7 +30,7 @@ public class GameItem {
     //Update Method
     public void update(float dt) {
 
-        //movement
+        //update position with velocity
         this.x += this.vx;
         this.y += this.vy;
     }

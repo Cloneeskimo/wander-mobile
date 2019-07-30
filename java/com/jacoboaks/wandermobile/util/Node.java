@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @purpose is to serve as a medium of data transfer using a tree-like structure
+ * @purpose is to serve as a medium of data transfer using a tree-like data structure
  */
 public class Node {
 
@@ -19,48 +19,64 @@ public class Node {
     private String value;
     private List<Node> children;
 
-    //Full Constructor
+    /**
+     * @purpose is to construct this Node by giving it all of its properties upfront
+     * @param name the name of the node
+     * @param value the value of the node
+     * @param children the list of the node's children
+     */
     public Node(String name, String value, List<Node> children) {
         this.name = name;
         this.value = value;
         this.children = children;
     }
 
-    //Single Child Constructor
-    public Node(String name, String data, Node child) {
-        this(name, data, new ArrayList<Node>());
+    /**
+     * @purpose is to construct this Node by giving it a name, its data, and a single child
+     * @param name the name of the node
+     * @param value the value of the node
+     * @param child the single child of the node
+     */
+    public Node(String name, String value, Node child) {
+        this(name, value, new ArrayList<Node>());
         this.children.add(child);
     }
 
-    //No Child Constructor
+    /**
+     * @purpose is to construct this Node without giving it any children
+     * @param name the name of the node
+     * @param value the value of the node
+     */
     public Node(String name, String value) {
         this.name = name;
         this.value = value;
     }
 
-    //Name Constructor
+    /**
+     * @purpose is to construct this Node by solely giving it a name
+     * @param name the name of the node
+     */
     public Node(String name) {
         this.name = name;
     }
 
-    //Default Constructor
+    /**
+     * @purpose is to construct this Node without setting any of its properties initiailly
+     */
     public Node() {}
 
     //Children Manipulation Methods
     public List<Node> getChildren() { return this.children; }
     public int getChildCount() { return this.children.size(); }
-
     public void addChild(Node child) {
         if (this.children == null) this.children = new ArrayList<>();
         this.children.add(child);
     }
-
     public void addChildren(List<Node> children) {
         if (this.children == null) this.children = new ArrayList<>();
         if (children == null) return;
         for (Node child : children) this.children.add(child);
     }
-
     public Node getChild(int index) {
         if (index > this.children.size()) {
             throw Util.fatalError("Node.java", "getChild(int",
@@ -68,7 +84,6 @@ public class Node {
         }
         return this.children.get(index);
     }
-
     public Node getChild(String name) {
         for (Node child : this.children) if (child.getName().equals(name)) return child;
         throw Util.fatalError("Node.java", "getChild(String)",
@@ -90,12 +105,23 @@ public class Node {
     public void setValue(String value) { this.value = value; }
     public void setName(String name) { this.name = name; }
 
-    //Bundle Conversion Methods
+    /**
+     * @purpose is convert a node to an Android Bundle
+     * @param bundle the bundle to store the node data in
+     * @param node the node to convert
+     * @return the bundle with the node data now in it
+     */
     public static Bundle nodeToBundle(Bundle bundle, Node node) {
         nodeToBundleR(bundle, "", node);
         return bundle;
     }
 
+    /**
+     * @purpose is to recursively traverse a node and put its contents into the given Android Bundle
+     * @param bundle the bundle to put the node data in
+     * @param preface the preface for the bundle data naming (maintains the structure of the node)
+     * @param node the node whose data to deposit into the bundle
+     */
     private static void nodeToBundleR(Bundle bundle, String preface, Node node) {
         bundle.putString(preface + node.getName(), node.getValue());
         if (node.hasChildren())
@@ -103,7 +129,6 @@ public class Node {
                 nodeToBundleR(bundle, preface + node.getName() + "_", child);
     }
 
-    //File Reading Methods
     /**
      * @purpose is to read a node from a file
      * @param resourceID the resourceID to read the node from

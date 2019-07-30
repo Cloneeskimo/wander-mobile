@@ -29,7 +29,13 @@ public class Model {
     private FloatBuffer textureCoordsBuffer;
     private IntBuffer drawPathBuffer;
 
-    //Full Constructor
+    /**
+     * @purpose is to construct this Model
+     * @param modelCoords the model coordinates for this Model
+     * @param textureCoords the texture coordinates for this Model
+     * @param drawPath the draw path (or indices) for this Model
+     * @param material the material to use when rendering this Model
+     */
     public Model(float[] modelCoords, float[] textureCoords, int[] drawPath, Material material) {
         this.modelCoords = modelCoords;
         this.textureCoords = textureCoords;

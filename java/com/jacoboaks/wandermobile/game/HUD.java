@@ -21,7 +21,11 @@ public class HUD {
     private boolean aspectRatioAction; //true (ratio < 1) -> multiply y by aspect ratio; false (ratio >= 1) -> divide x by aspect ratio
     private ShaderProgram shaderProgram;
 
-    //Constructor
+    /**
+     * @purpose is to construct this HUD
+     * @param aspectRatio the aspect ration of the surface
+     * @param aspectRatioAction the aspect ratio action given the current aspect ratio (explained in data)
+     */
     public HUD(float aspectRatio, boolean aspectRatioAction) {
         this.aspectRatio = aspectRatio;
         this.aspectRatioAction = aspectRatioAction;
@@ -29,6 +33,9 @@ public class HUD {
         this.initShaderProgram();
     }
 
+    /**
+     * @purpose is to initialize the HUD's shader program
+     */
     private void initShaderProgram() {
 
         //create shader program, load shaders, and link them.
@@ -82,6 +89,7 @@ public class HUD {
         this.gameItems.add(item);
     }
 
+    //Render Method
     public void render() {
 
         //draw shapes
@@ -100,7 +108,7 @@ public class HUD {
         this.shaderProgram.unbind();
     }
 
-    //Accessors
+    //Accessor
     public GameItem getItem(int index) {
         if (index >= gameItems.size() || index < 0) Util.fatalError("HUD.java", "getItem(int)",
                 "index '" + index + "' is out of range.");

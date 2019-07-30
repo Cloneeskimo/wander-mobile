@@ -20,14 +20,18 @@ public class World {
 
     //Surface Data
     float aspectRatio;
-    boolean aspectRatioAction;
+    boolean aspectRatioAction; //true (ratio < 1) -> multiply y by aspect ratio; false (ratio >= 1) -> divide x by aspect ratio
 
     //Data
     private List<GameItem> gameItems;
     private ShaderProgram shaderProgram;
     private Camera camera;
 
-    //Constructor
+    /**
+     * @purpose is to construct this World
+     * @param aspectRatio the aspect ratio of the surface
+     * @param aspectRatioAction the aspect ration action given the current aspect ratio (explained in data)
+     */
     public World(float aspectRatio, boolean aspectRatioAction) {
         this.aspectRatio = aspectRatio;
         this.aspectRatioAction = aspectRatioAction;
