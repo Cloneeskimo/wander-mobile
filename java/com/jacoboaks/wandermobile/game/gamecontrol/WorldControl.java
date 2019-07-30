@@ -3,6 +3,7 @@ package com.jacoboaks.wandermobile.game.gamecontrol;
 import android.view.MotionEvent;
 
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
+import com.jacoboaks.wandermobile.game.gameitem.Tile;
 import com.jacoboaks.wandermobile.graphics.Camera;
 import com.jacoboaks.wandermobile.util.Coord;
 
@@ -51,6 +52,7 @@ public class WorldControl {
             float x = e.getX();
             float y = e.getY();
 
+            //calculate absolute value of x and y of touch in normalized coords
             x /= ((float)width / 2);
             x -= 1f;
             y /= ((float)height / 2);
@@ -58,13 +60,18 @@ public class WorldControl {
             float absX = Math.abs(x);
             float absY = Math.abs(y);
 
-            //check which quadrant they touched and change square velocity accordingly
-            if (absY > absX) { //up or down
-                if (y >= 0.0f) gameItems.get(0).setIvy(-0.03f);
-                else gameItems.get(0).setIvy(0.03f);
-            } else { //right or left
-                if (x >= 0.0f) gameItems.get(0).setIvx(0.03f);
-                else gameItems.get(0).setIvx(-0.03f);
+            //get player handle and check if they're moving already - if so, ignore input
+            Tile player = (Tile)gameItems.get(0);
+            if (!player.isMoving()) {
+
+                //check which quadrant they touched and change square velocity accordingly
+                if (absY > absX) { //up or down
+                    if (y >= 0.0f) player.impendingMove(0, -1);
+                    else player.impendingMove(0, 1);
+                } else { //right or left
+                    if (x >= 0.0f) player.impendingMove(1, 0);
+                    else player.impendingMove(-1, 0);
+                }
             }
 
             //return that input was handled
@@ -112,7 +119,7 @@ public class WorldControl {
 
                 //pan the camera and stop player movement if a substantial pan is being made
                 if (this.substantialPanningDetected) {
-                    gameItems.get(0).stopMoving(true);
+                    gameItems.get(0).stopMoving();
                     camera.pan(width, height, previousPos, this.fingerPos);
                 }
             }
@@ -132,7 +139,8 @@ public class WorldControl {
     private void fingerLifted(List<GameItem> gameItems) {
 
         //stop moving
-        gameItems.get(0).stopMoving(true);
+        Tile player = (Tile)gameItems.get(0);
+        player.stopMoving();
         listenForPanning = false;
         this.fingerPos = null;
         this.substantialPanningDetected = false;
@@ -150,7 +158,8 @@ public class WorldControl {
      */
     public boolean scaleInput(float factor, Camera camera, List<GameItem> gameItems) {
         camera.zoom(factor);
-        gameItems.get(0).stopMoving(true);
+        Tile player = (Tile)gameItems.get(0);
+        player.stopMoving();
         this.listenForPanning = false;
         this.currentlyScaling = true;
         return true;

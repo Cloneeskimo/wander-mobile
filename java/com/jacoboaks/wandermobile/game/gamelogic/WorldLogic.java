@@ -11,6 +11,7 @@ import com.jacoboaks.wandermobile.game.World;
 import com.jacoboaks.wandermobile.game.gamecontrol.WorldControl;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
+import com.jacoboaks.wandermobile.game.gameitem.Tile;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
 import com.jacoboaks.wandermobile.graphics.Model;
@@ -83,34 +84,17 @@ public class WorldLogic implements GameLogic {
         this.world = new World(this.aspectRatio, this.aspectRatioAction);
 
         //create player game item
-        Material material = new Material(new Texture(R.drawable.obama));
-        Model square = new Model(Model.STD_SQUARE_MODEL_COORDS(),
-                Model.STD_SQUARE_TEX_COORDS(), Model.STD_SQUARE_DRAW_ORDER(), material);
-        this.world.addGameItem(new GameItem(square, 0f, 0f));
+        Tile playerTile = new Tile(this.font, 'J', new Color(0.62f, 0.0f, 0.1f, 1.0f), 0, 0);
+        this.world.addGameItem(playerTile);
 
-        //create characters
-        Random rand = new Random();
-        float x = 0;
-        float y = 1;
-        for (int i = 33; i < 127; i++) {
-
-            //update x and y
-            if (i == 80) {
-                y = 2;
-                x = 0;
-            }
-
-            float[] textureCoordinates = this.font.getCharacterTextureCoordinates((char)i, false);
-            Material mat = new Material(this.font.getFontSheet(), new Color(
-                    (float)rand.nextInt(100) / 100,
-                    (float)rand.nextInt(100) / 100,
-                    (float)rand.nextInt(100) / 100, 1.0f), true);
-            Model mod = new Model(Model.STD_SQUARE_MODEL_COORDS(), textureCoordinates,
-                    Model.STD_SQUARE_DRAW_ORDER(), mat);
-            mod.scale(0.5f);
-            this.world.addGameItem(new GameItem(mod, x, y));
-
-            x += Model.STD_SQUARE_SIZE / 2;
+        //add other tiles
+        for (int x = -5; x < 6; x++) {
+            this.world.addGameItem(new Tile(this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), x, -5));
+            this.world.addGameItem(new Tile(this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), x, 5));
+        }
+        for (int y = -4; y < 5; y++) {
+            this.world.addGameItem(new Tile(this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), -5, y));
+            this.world.addGameItem(new Tile(this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), 5, y));
         }
     }
 
