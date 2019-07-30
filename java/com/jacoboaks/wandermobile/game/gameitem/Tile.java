@@ -19,6 +19,7 @@ public class Tile extends GameItem {
     private static final float IMPENDING_MOVEMENT_TIME = 180f;
 
     //Data
+    private String name; //name of the tile
     private int gx, gy; //grid position
     private int igx, igy; //delta impending grid position
     private float impendingMovementTime; //time until an impending move is undergone
@@ -29,13 +30,14 @@ public class Tile extends GameItem {
 
     /**
      * @purpose is to construct this Tile using a colored character
+     * @param name the name of this tile
      * @param font the font to draw the character from
      * @param symbol the character to represent this tile
      * @param color the color of the character
      * @param gx the grid x coordinate
      * @param gy the grid y coordinate
      */
-    public Tile(Font font, char symbol, Color color, int gx, int gy) {
+    public Tile(String name, Font font, char symbol, Color color, int gx, int gy) {
         super(new Model(Model.STD_SQUARE_MODEL_COORDS(), font.getCharacterTextureCoordinates(symbol, false),
                 Model.STD_SQUARE_DRAW_ORDER(), new Material(font.getFontSheet(), color, true)),
                 (float)gx * Model.STD_SQUARE_SIZE, (float)gy * Model.STD_SQUARE_SIZE);
@@ -47,11 +49,12 @@ public class Tile extends GameItem {
 
     /**
      * @purpose is to construct this Tile using a texture
+     * @param name the name of this tile
      * @param texture the texture to use
      * @param gx the grid x coordinate
      * @param gy the grid y coordinate
      */
-    public Tile(Texture texture, int gx, int gy) {
+    public Tile(String name, Texture texture, int gx, int gy) {
         super(new Model(Model.STD_SQUARE_MODEL_COORDS(), Model.STD_SQUARE_TEX_COORDS(), Model.STD_SQUARE_DRAW_ORDER(),
                 new Material(texture)), (float)gx * Model.STD_SQUARE_SIZE, (float)gy * Model.STD_SQUARE_SIZE);
         this.gx = gx;
@@ -157,9 +160,10 @@ public class Tile extends GameItem {
     public void setGridPosition(int gx, int gy) { this.gx = (int)gx; this.gy = (int)gy; }
 
     //Accessors
+    public boolean isMoving() { return this.isMoving; }
+    public char getSymbol() { return this.symbol; }
     public int getGridX() { return this.gx; }
     public int getGridY() { return this.gy; }
+    public String getName() { return this.name; }
     public Coord getGridPosition() { return new Coord(this.gx, this.gy); }
-    public char getSymbol() { return this.symbol; }
-    public boolean isMoving() { return this.isMoving; }
 }

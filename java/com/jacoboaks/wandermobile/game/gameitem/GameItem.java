@@ -36,7 +36,7 @@ public class GameItem {
     }
 
     //Draw Method
-    public void draw(ShaderProgram shaderProgram) {
+    public void render(ShaderProgram shaderProgram) {
 
         //set x and y uniforms
         GLES20.glUniform1fv(shaderProgram.getUniformIndex("x"), 1,
@@ -45,7 +45,7 @@ public class GameItem {
                 new float[] { y }, 0);
 
         //draw model
-        this.model.draw(shaderProgram);
+        this.model.render(shaderProgram);
     }
 
     //Accessors

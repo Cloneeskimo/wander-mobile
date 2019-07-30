@@ -45,7 +45,7 @@ public class Model {
     }
 
     //Draw Method
-    public void draw(ShaderProgram shaderProgram) {
+    public void render(ShaderProgram shaderProgram) {
 
         //enable texture if model is textured
         if (this.isTextured()) {

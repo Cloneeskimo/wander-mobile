@@ -102,7 +102,7 @@ public class HUD {
                 new int[] { this.aspectRatioAction ? 1 : 0 }, 0);
 
         //draw game items
-        for (GameItem gameItem: this.gameItems) gameItem.draw(this.shaderProgram);
+        for (GameItem gameItem: this.gameItems) gameItem.render(this.shaderProgram);
 
         //unbind shader program
         this.shaderProgram.unbind();

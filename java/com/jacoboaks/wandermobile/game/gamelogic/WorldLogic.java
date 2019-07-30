@@ -6,20 +6,21 @@ import android.view.MotionEvent;
 
 import com.jacoboaks.wandermobile.MainActivity;
 import com.jacoboaks.wandermobile.R;
+import com.jacoboaks.wandermobile.game.Area;
 import com.jacoboaks.wandermobile.game.HUD;
 import com.jacoboaks.wandermobile.game.World;
 import com.jacoboaks.wandermobile.game.gamecontrol.WorldControl;
-import com.jacoboaks.wandermobile.game.gameitem.GameItem;
+import com.jacoboaks.wandermobile.game.gameitem.Entity;
+import com.jacoboaks.wandermobile.game.gameitem.StaticTile;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.game.gameitem.Tile;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
-import com.jacoboaks.wandermobile.graphics.Model;
-import com.jacoboaks.wandermobile.graphics.Texture;
 import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Node;
 
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @purpose is to implement the logic for Wander when in the main game world
@@ -83,22 +84,23 @@ public class WorldLogic implements GameLogic {
      */
     private void initWorld() {
 
-        //create player game item
-        Tile playerTile = new Tile(this.font, 'J', new Color(0.62f, 0.0f, 0.1f, 1.0f), 0, 0);
+        //create player
+        Entity player = new Entity("Player", this.font, 'J', new Color(0.62f, 0.0f, 0.1f, 1.0f), 0, 0);
 
-        //create world and add player
-        this.world = new World(this.aspectRatio, this.aspectRatioAction, playerTile);
-        this.world.addGameItem(playerTile);
-
-        //add other tiles
+        //create area
+        List<StaticTile> staticTiles = new ArrayList<>();
         for (int x = -5; x < 6; x++) {
-            this.world.addGameItem(new Tile(this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), x, -5));
-            this.world.addGameItem(new Tile(this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), x, 5));
+            staticTiles.add(new StaticTile("Trees", this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), x, -5, 0));
+            staticTiles.add(new StaticTile("Trees", this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), x, 5, 0));
         }
         for (int y = -4; y < 5; y++) {
-            this.world.addGameItem(new Tile(this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), -5, y));
-            this.world.addGameItem(new Tile(this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), 5, y));
+            staticTiles.add(new StaticTile("Trees", this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), -5, y, 0));
+            staticTiles.add(new StaticTile("Trees", this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), 5, y, 0));
         }
+        Area area = new Area("Deep Woods", staticTiles, new ArrayList<Entity>());
+
+        //create world
+        this.world = new World(this.aspectRatio, this.aspectRatioAction, area, player);
     }
 
     /**
@@ -133,8 +135,8 @@ public class WorldLogic implements GameLogic {
 
         //load saved data
         this.world.instateLoadedData(this.savedInstanceData);
-        this.world.getItem(0).setX(Float.parseFloat(this.savedInstanceData.getString("worldlogic_squarex")));
-        this.world.getItem(0).setY(Float.parseFloat(this.savedInstanceData.getString("worldlogic_squarey")));
+        this.world.getPlayer().setX(Float.parseFloat(this.savedInstanceData.getString("worldlogic_playerx")));
+        this.world.getPlayer().setY(Float.parseFloat(this.savedInstanceData.getString("worldlogic_playery")));
     }
 
     /**
@@ -162,7 +164,7 @@ public class WorldLogic implements GameLogic {
      * @return whether or not the MotionEvent was handled in any way
      */
     @Override
-    public boolean input(MotionEvent e) { return this.control.input(e, this.world.getGameItems(),
+    public boolean input(MotionEvent e) { return this.control.input(e, this.world.getPlayer(),
             this.world.getCamera(), this.width, this.height); }
 
     /**
@@ -171,7 +173,7 @@ public class WorldLogic implements GameLogic {
      */
     @Override
     public boolean scaleInput(float factor) { return this.control.scaleInput(factor,
-            this.world.getCamera(), this.world.getGameItems()); }
+            this.world.getCamera(), this.world.getPlayer()); }
 
     /**
      * @purpose is the update the components of this logic
@@ -201,8 +203,8 @@ public class WorldLogic implements GameLogic {
 
         //add data to node and return it
         Node data = new Node("worldlogic");
-        data.addChild(new Node("squarex", Float.toString(this.world.getItem(0).getX())));
-        data.addChild(new Node("squarey", Float.toString(this.world.getItem(0).getY())));
+        data.addChild(new Node("playerx", Float.toString(this.world.getPlayer().getX())));
+        data.addChild(new Node("playery", Float.toString(this.world.getPlayer().getY())));
         this.world.requestData(data);
         return data;
     }

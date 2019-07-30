@@ -4,10 +4,13 @@ import android.opengl.GLES20;
 import android.os.Bundle;
 
 import com.jacoboaks.wandermobile.R;
+import com.jacoboaks.wandermobile.game.gameitem.Entity;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
-import com.jacoboaks.wandermobile.graphics.Camera;
+import com.jacoboaks.wandermobile.game.gameitem.StaticTile;
+import com.jacoboaks.wandermobile.game.gameitem.Tile;
 import com.jacoboaks.wandermobile.graphics.FollowingCamera;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
+import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
 
@@ -24,7 +27,8 @@ public class World {
     boolean aspectRatioAction; //true (ratio < 1) -> multiply y by aspect ratio; false (ratio >= 1) -> divide x by aspect ratio
 
     //Data
-    private List<GameItem> gameItems;
+    private Entity player;
+    private Area area;
     private ShaderProgram shaderProgram;
     private FollowingCamera camera;
 
@@ -33,11 +37,15 @@ public class World {
      * @param aspectRatio the aspect ratio of the surface
      * @param aspectRatioAction the aspect ration action given the current aspect ratio (explained in data)
      */
-    public World(float aspectRatio, boolean aspectRatioAction, GameItem cameraFollowee) {
-        this.aspectRatio = aspectRatio;
-        this.aspectRatioAction = aspectRatioAction;
+    public World(float aspectRatio, boolean aspectRatioAction, Area area, Entity player) {
+
+        //initialize graphics and shader program
+        this.initGraphics(aspectRatio, aspectRatioAction, player);
         this.initShaderProgram();
-        this.initObjects(cameraFollowee);
+
+        //set area and player references
+        this.area = area;
+        this.player = player;
     }
 
     /**
@@ -76,18 +84,18 @@ public class World {
     }
 
     /**
-     * @purpose is to initialize the game objects
+     * @purpose is to initialize the graphical components of this World
      */
-    private void initObjects(GameItem cameraFollowee) {
-
-        //create gameitems array
+    private void initGraphics(float aspectRatio, boolean aspectRatioAction, GameItem cameraFollowee) {
+        this.aspectRatio = aspectRatio;
+        this.aspectRatioAction = aspectRatioAction;
         this.camera = new FollowingCamera(0.2f, cameraFollowee, false);
-        this.gameItems = new ArrayList<>();
     }
 
     //Update Method
     public void update(float dt) {
-        for (GameItem gameItem : this.gameItems) gameItem.update(dt);
+        this.area.update(dt);
+        this.player.update(dt);
         this.camera.update(dt);
     }
 
@@ -111,30 +119,17 @@ public class World {
         GLES20.glUniform1fv(this.shaderProgram.getUniformIndex("camzoom"), 1,
                 new float[] { this.camera.getZoom() }, 0);
 
-        //draw game items
-        for (GameItem gameItem: this.gameItems) gameItem.draw(this.shaderProgram);
+        //render area and player
+        this.area.render(this.shaderProgram);
+        this.player.render(this.shaderProgram);
 
         //unbind shader program
         this.shaderProgram.unbind();
     }
 
-    /**
-     * @purpose is to return a game item based off of an index
-     * @param index the index of the game item
-     * @return the game item at the given index
-     */
-    public GameItem getItem(int index) {
-        if (index < 0 || index >= this.gameItems.size()) Util.fatalError("World.java",
-                "getGameItem(int)", "invalid index ;" + index + "' given");
-        return this.gameItems.get(index);
-    }
-
     //Accessors
-    public List<GameItem> getGameItems() { return this.gameItems; }
+    public Entity getPlayer() { return this.player; }
     public FollowingCamera getCamera() { return this.camera; }
-
-    //Mutator
-    public void addGameItem(GameItem item) { this.gameItems.add(item); }
 
     /**
      * @purpose is to compile all important data into a node to be put into a bundle before

@@ -2,6 +2,7 @@ package com.jacoboaks.wandermobile.game.gamecontrol;
 
 import android.view.MotionEvent;
 
+import com.jacoboaks.wandermobile.game.gameitem.Entity;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.game.gameitem.Tile;
 import com.jacoboaks.wandermobile.graphics.Camera;
@@ -38,13 +39,13 @@ public class WorldControl {
     /**
      * @purpose is to act off of any input given to WorldLogic
      * @param e the input event to respond to
-     * @param gameItems the list of game items in use by the WorldLogic
+     * @param player the player
      * @param camera the camera in use by the WorldLogic
      * @param width the width of the surface
      * @param height the height of the surface
      * @return whether the input was handled in any way
      */
-    public boolean input(MotionEvent e, List<GameItem> gameItems, FollowingCamera camera, int width, int height) {
+    public boolean input(MotionEvent e, Entity player, FollowingCamera camera, int width, int height) {
 
         //handle touch
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
@@ -60,9 +61,6 @@ public class WorldControl {
             y -= 1f;
             float absX = Math.abs(x);
             float absY = Math.abs(y);
-
-            //get player handle
-            Tile player = (Tile)gameItems.get(0);
 
             //ignore input if player is moving or camera is panning
             if (!player.isMoving() && !camera.isRepanning()) {
@@ -84,7 +82,7 @@ public class WorldControl {
         } else if (e.getAction() == MotionEvent.ACTION_UP) {
 
             //report finger lift
-            this.fingerLifted(gameItems);
+            this.fingerLifted(player);
             camera.fingerReleased();
 
             //return that input was handled
@@ -123,7 +121,7 @@ public class WorldControl {
 
                 //pan the camera and stop player movement if a substantial pan is being made
                 if (this.substantialPanningDetected) {
-                    gameItems.get(0).stopMoving();
+                    player.stopMoving();
                     camera.pan(width, height, previousPos, this.fingerPos);
                 }
             }
@@ -138,12 +136,11 @@ public class WorldControl {
 
     /**
      * @purpose is to reset panning and any movement when a finger is lifted from the screen
-     * @param gameItems
+     * @param player the player
      */
-    private void fingerLifted(List<GameItem> gameItems) {
+    private void fingerLifted(Entity player) {
 
         //stop moving
-        Tile player = (Tile)gameItems.get(0);
         player.stopMoving();
         listenForPanning = false;
         this.fingerPos = null;
@@ -157,12 +154,11 @@ public class WorldControl {
      * @purpose is to specifically handle and scale input events
      * @param factor the factor by which scaling has occured
      * @param camera the camera in us by the WorldLogic
-     * @param gameItems the list of game items in use by the WorldLogic
+     * @param player the player
      * @return
      */
-    public boolean scaleInput(float factor, Camera camera, List<GameItem> gameItems) {
+    public boolean scaleInput(float factor, Camera camera, Entity player) {
         camera.zoom(factor);
-        Tile player = (Tile)gameItems.get(0);
         player.stopMoving();
         this.listenForPanning = false;
         this.currentlyScaling = true;
