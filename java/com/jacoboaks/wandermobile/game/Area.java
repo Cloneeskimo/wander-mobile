@@ -2,7 +2,9 @@ package com.jacoboaks.wandermobile.game;
 
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
 import com.jacoboaks.wandermobile.game.gameitem.StaticTile;
+import com.jacoboaks.wandermobile.game.gameitem.Tile;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
+import com.jacoboaks.wandermobile.util.Coord;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +49,32 @@ public class Area {
     public void render(ShaderProgram shaderProgram) {
         for (StaticTile staticTile : this.staticTiles) staticTile.render(shaderProgram);
         for (Entity entity : this.entities) entity.render(shaderProgram);
+    }
+
+    /**
+     * @returns the tile (or entity if there is one) at the given grid position. will return
+     * null if there is none there
+     */
+    public Tile getTile(int gx, int gy) {
+
+        //create tile and position coordinate
+        Tile t = null;
+        Coord pos = new Coord();
+
+        //search static tiles
+        for (StaticTile st : this.staticTiles) {
+            pos = st.getGridPosition();
+            if ((int)pos.x == gx && (int)pos.y == gy) t = st;
+        }
+
+        //search entities
+        for (Entity e : this.entities) {
+            pos = e.getGridPosition();
+            if ((int)pos.x == gx && (int)pos.y == gy) t = e;
+        }
+
+        //return tile
+        return t;
     }
 
     /**

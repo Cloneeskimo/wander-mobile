@@ -14,6 +14,7 @@ public abstract class GameItem {
     Model model; //model
     float x, y; //world position
     float vx = 0, vy = 0; //velocity
+    boolean visible; //visibility
 
     /**
      * @purpose is to construct this GameItem
@@ -25,6 +26,7 @@ public abstract class GameItem {
         this.model = model;
         this.x = x;
         this.y = y;
+        this.visible = true;
     }
 
     //Update Method
@@ -37,6 +39,9 @@ public abstract class GameItem {
 
     //Draw Method
     public void render(ShaderProgram shaderProgram) {
+
+        //return if invisible
+        if (!this.visible) return;
 
         //set x and y uniforms
         GLES20.glUniform1fv(shaderProgram.getUniformIndex("x"), 1,
@@ -51,12 +56,14 @@ public abstract class GameItem {
     //Accessors
     public float getX() { return this.x; }
     public float getY() { return this.y; }
+    public Model getModel() { return this.model; }
     public abstract float getWidth();
     public abstract float getHeight();
 
     //Mutators
     public void setX(float x) { this.x = x; }
     public void setY(float y) { this.y = y; }
+    public void setVisibility(boolean visibility) { this.visible = visibility; }
     public void moveX(float dx) { this.x += dx; }
     public void moveY(float dy) { this.y += dy; }
     public void setVx(float vx) { this.vx = vx; }

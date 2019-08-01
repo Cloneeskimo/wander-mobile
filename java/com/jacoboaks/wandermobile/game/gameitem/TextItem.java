@@ -119,8 +119,8 @@ public class TextItem extends GameItem {
 
     //Mutators
     public void setText(String text) {
-        this.updateModel(text);
         this.text = text;
+        this.updateModel(text);
     }
 
     /**

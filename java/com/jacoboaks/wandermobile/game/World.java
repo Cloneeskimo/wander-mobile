@@ -7,6 +7,7 @@ import com.jacoboaks.wandermobile.R;
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.game.gameitem.StaticTile;
+import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.game.gameitem.Tile;
 import com.jacoboaks.wandermobile.graphics.FollowingCamera;
 import com.jacoboaks.wandermobile.graphics.Model;
@@ -37,13 +38,14 @@ public class World {
     private FollowingCamera camera;
     private boolean tileSelected = false;
     private Tile selectionTile;
+    private HUD hud;
 
     /**
      * @purpose is to construct this World
      * @param aspectRatio the aspect ratio of the surface
      * @param aspectRatioAction the aspect ration action given the current aspect ratio (explained in data)
      */
-    public World(float aspectRatio, boolean aspectRatioAction, Area area, Entity player) {
+    public World(float aspectRatio, boolean aspectRatioAction, Area area, Entity player, HUD hud) {
 
         //initialize graphics and shader program
         this.initGraphics(aspectRatio, aspectRatioAction, player);
@@ -53,6 +55,9 @@ public class World {
         this.area = area;
         this.player = player;
         this.selectionTile = new Tile("Selection", new Texture(R.drawable.selected), 0, 0);
+
+        //set hud reference
+        this.hud = hud;
     }
 
     /**
@@ -147,8 +152,13 @@ public class World {
     public void registerTap(float x, float y, int w, int h) {
 
         //check if there is already a selected tile
-        if (this.tileSelected) this.tileSelected = false;
-        else { //respond to tap
+        if (this.tileSelected) {
+            this.tileSelected = false;
+            this.hud.getItem(3).setVisibility(false);
+            this.hud.getItem(4).setVisibility(false);
+            this.hud.getItem(5).setVisibility(false);
+            this.hud.getItem(6).setVisibility(false);
+        } else { //respond to tap
 
             Coord position = new Coord(x, y);
             Transformation.screenToGrid(position, w, h, this.camera);
@@ -156,6 +166,46 @@ public class World {
             //set selection position
             this.tileSelected = true;
             this.selectionTile.setGridPosition((int)position.x, (int)position.y);
+            this.registerSelection((int)position.x, (int)position.y);
+        }
+    }
+
+    /**
+     * @purpose is to register a selected tile and update the hud
+     * @param gx the grid x of the tile
+     * @param gy the grid y of the tile
+     */
+    private void registerSelection(int gx, int gy) {
+
+        //get selected tile
+        Tile selectedTile = this.area.getTile(gx, gy);
+
+        //check if player
+        if (selectedTile == null) {
+            Coord playerPos = this.player.getGridPosition();
+            if (playerPos.x == gx && playerPos.y == gy) selectedTile = this.player;
+        }
+
+        //check if null
+        if (selectedTile != null) {
+
+            //set basic hud info
+            this.hud.getItem(3).setVisibility(true);
+            TextItem ti = (TextItem)this.hud.getItem(4);
+            ti.setVisibility(true);
+            ti.setText(selectedTile.getName());
+            ti.getModel().getMaterial().setColor(selectedTile.getModel().getMaterial().getColor());
+
+            //check if entity
+            if (selectedTile instanceof Entity) {
+                Entity e = (Entity)selectedTile;
+                ti = (TextItem)this.hud.getItem(5);
+                ti.setVisibility(true);
+                ti.setText("Level: " + e.getLevel());
+                ti = (TextItem)this.hud.getItem(6);
+                ti.setVisibility(true);
+                ti.setText("HP: " + e.getHealth() + "/" + e.getMaxHealth());
+            }
         }
     }
 

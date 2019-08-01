@@ -41,6 +41,9 @@ public class Material {
         this(null, color, false);
     }
 
+    //Mutator
+    public void setColor(Color color) { this.color = color; }
+
     //Accessors
     public boolean isTextured() { return this.texture != null; }
     public boolean isColorOverrided() { return this.colorOverride; }

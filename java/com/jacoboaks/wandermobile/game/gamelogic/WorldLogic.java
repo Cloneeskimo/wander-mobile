@@ -51,8 +51,8 @@ public class WorldLogic implements GameLogic {
 
         //initialize graphics and objects
         this.initGraphics(width, height);
-        this.initWorld();
         this.initHUD();
+        this.initWorld();
 
         //create controls
         this.control = new WorldControl();
@@ -80,12 +80,66 @@ public class WorldLogic implements GameLogic {
     }
 
     /**
+     * @purpose is to create and populate the HUD for this logic
+     */
+    private void initHUD() {
+
+        //create HUD
+        this.hud = new HUD(this.aspectRatio, this.aspectRatioAction);
+
+        //create hud text material
+        Material textMaterial = new Material(font.getFontSheet(), new Color(1.0f, 1.0f, 1.0f, 1.0f), true);
+
+        //fps label
+        TextItem fpsLabel = new TextItem(this.font, "FPS: ", textMaterial, 0f, 0f);
+        fpsLabel.scale(0.13f);
+        this.hud.addItem(fpsLabel, HUD.Placement.BOTTOM_LEFT, 0.02f);
+
+        //fps counter
+        TextItem fpsCounter = new TextItem(this.font, "calculating...", textMaterial, 0f, 0f);
+        fpsCounter.scale(0.13f);
+        this.hud.addItem(fpsCounter, HUD.Placement.RIGHT_OF_LAST, 0f);
+
+        //wander title
+        TextItem title = new TextItem(this.font, "Wander Mobile v" + MainActivity.WANDER_VERSION
+                + "b" + MainActivity.WANDER_BUILD, textMaterial, 0f, 0f);
+        title.scale(0.2f);
+        this.hud.addItem(title, HUD.Placement.TOP_LEFT, 0.02f);
+
+        //selection
+        TextItem selection = new TextItem(this.font, "Selection:", textMaterial, 0f, 0f);
+        selection.scale(0.19f);
+        selection.setVisibility(false);
+        this.hud.addItem(selection, HUD.Placement.BELOW_LAST, 0.13f);
+
+        //selection name
+        Material selectionNameMaterial = new Material(font.getFontSheet(), new Color(1.0f, 1.0f, 1.0f, 1.0f), true);
+        TextItem selectionName = new TextItem(this.font, "", selectionNameMaterial, 0f, 0f);
+        selectionName.scale(0.155f);
+        selectionName.setVisibility(false);
+        this.hud.addItem(selectionName, HUD.Placement.BELOW_LAST, 0.02f);
+
+        //entity selection level
+        TextItem selectionLevel = new TextItem(this.font, "", selectionNameMaterial, 0f, 0f);
+        selectionLevel.scale(0.126f);
+        selectionLevel.setVisibility(false);
+        this.hud.addItem(selectionLevel, HUD.Placement.BELOW_LAST, 0.02f);
+
+        //entity selection health
+        Material healthMaterial = new Material(font.getFontSheet(), new Color(0.8f, 0.1f, 0.1f, 1.0f), true);
+        TextItem entitySelectionHealth = new TextItem(this.font, "", healthMaterial, 0f, 0f);
+        entitySelectionHealth.scale(0.126f);
+        entitySelectionHealth.setVisibility(false);
+        this.hud.addItem(entitySelectionHealth, HUD.Placement.BELOW_LAST, 0.02f);
+    }
+
+    /**
      * @purpose is to create and populate the world
      */
     private void initWorld() {
 
         //create player
-        Entity player = new Entity("Player", this.font, 'J', new Color(0.62f, 0.0f, 0.1f, 1.0f), 0, 0);
+        Entity player = new Entity("Svenske", this.font, 'S', new Color(0.62f, 0.0f, 0.1f, 1.0f), 0, 0);
 
         //create area
         List<StaticTile> staticTiles = new ArrayList<>();
@@ -97,38 +151,14 @@ public class WorldLogic implements GameLogic {
             staticTiles.add(new StaticTile("Trees", this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), -5, y, 0));
             staticTiles.add(new StaticTile("Trees", this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), 5, y, 0));
         }
-        Area area = new Area("Deep Woods", staticTiles, new ArrayList<Entity>());
+        List<Entity> entities = new ArrayList<>();
+        Entity spider = new Entity("Forest Spider", this.font, 'f', new Color(0.9f, 0.1f, 0.1f, 1.0f), -2, 3);
+        spider.setEntityInto(27, 27, 4);
+        entities.add(spider);
+        Area area = new Area("Deep Woods", staticTiles, entities);
 
         //create world
-        this.world = new World(this.aspectRatio, this.aspectRatioAction, area, player);
-    }
-
-    /**
-     * @purpose is to create and populate the HUD for this logic
-     */
-    private void initHUD() {
-
-        //create HUD
-        this.hud = new HUD(this.aspectRatio, this.aspectRatioAction);
-
-        //create hud text material
-        Material textMaterial = new Material(font.getFontSheet(), new Color(1.0f, 1.0f, 1.0f, 1.0f), true);
-
-        //wander title
-        TextItem title = new TextItem(this.font, "Wander Mobile v" + MainActivity.WANDER_VERSION
-                + "b" + MainActivity.WANDER_BUILD, textMaterial, 0f, 0f);
-        title.scale(0.2f);
-        this.hud.addItem(title, HUD.Placement.TOP_LEFT, 0.01f);
-
-        //fps label
-        TextItem fpsLabel = new TextItem(this.font, "FPS: ", textMaterial, 0f, 0f);
-        fpsLabel.scale(0.13f);
-        this.hud.addItem(fpsLabel, HUD.Placement.BOTTOM_LEFT, 0.01f);
-
-        //fps counter
-        TextItem fpsCounter = new TextItem(this.font, "calculating...", textMaterial, 0f, 0f);
-        fpsCounter.scale(0.13f);
-        this.hud.addItem(fpsCounter, HUD.Placement.RIGHT_OF_LAST, 0f);
+        this.world = new World(this.aspectRatio, this.aspectRatioAction, area, player, this.hud);
     }
 
     /**
@@ -147,7 +177,7 @@ public class WorldLogic implements GameLogic {
      * @param FPS the current FPS
      */
     public void onFPSUpdate(float FPS) {
-        TextItem fpsCounter = (TextItem)this.hud.getItem(2);
+        TextItem fpsCounter = (TextItem)this.hud.getItem(1);
         fpsCounter.setText(Float.toString(FPS));
     }
 

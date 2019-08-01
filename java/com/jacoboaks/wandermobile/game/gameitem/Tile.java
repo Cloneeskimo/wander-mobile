@@ -43,6 +43,7 @@ public class Tile extends GameItem {
                 (float)gx * Model.STD_SQUARE_SIZE, (float)gy * Model.STD_SQUARE_SIZE);
         this.symbolTile = true;
         this.symbol = symbol;
+        this.name = name;
     }
 
     /**
@@ -57,6 +58,7 @@ public class Tile extends GameItem {
                 new Material(texture)), (float)gx * Model.STD_SQUARE_SIZE, (float)gy * Model.STD_SQUARE_SIZE);
         this.symbolTile = false;
         this.symbol = 0;
+        this.name = name;
     }
 
     //Update Method
