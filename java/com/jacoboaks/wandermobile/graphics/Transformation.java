@@ -108,6 +108,10 @@ public class Transformation {
     public static void gridToWorld(Coord coords) {
         coords.x *= Model.STD_SQUARE_SIZE;
         coords.y *= Model.STD_SQUARE_SIZE;
+        if (coords.x < 0) coords.x += (Model.STD_SQUARE_SIZE / 2);
+        else coords.x -= (Model.STD_SQUARE_SIZE / 2);
+        if (coords.y < 0) coords.y += (Model.STD_SQUARE_SIZE / 2);
+        else coords.y -= (Model.STD_SQUARE_SIZE / 2);
     }
 
     /**

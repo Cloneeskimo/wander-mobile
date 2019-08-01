@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @purpose is to model text as a GameItem. the model position is as follows: the x coordinate
- * //represents the leftmost edge of the text; the y coordinate represents the middle line of
- * the text.
+ * @purpose is to model text as a GameItem. the model position is as follows: the coordinates
+ * represent the top-left position of the text as opposed to a normal GameItem where they would
+ * normally represent the middle of the item
  */
 public class TextItem extends GameItem {
 
@@ -59,14 +59,14 @@ public class TextItem extends GameItem {
 
             //top left vertex
             modelCoords.add(x); //x
-            modelCoords.add(-Model.STD_SQUARE_SIZE * this.scale / 2); //y
+            modelCoords.add(-Model.STD_SQUARE_SIZE * this.scale); //y
             modelCoords.add(0f); //z
             textureCoords.add(texCoords[0]); //x
             textureCoords.add(texCoords[1]); //y
 
             //bottom left
             modelCoords.add(x); //x
-            modelCoords.add(Model.STD_SQUARE_SIZE * this.scale / 2); //y
+            modelCoords.add(0f); //y
             modelCoords.add(0f); //z
             textureCoords.add(texCoords[2]); //x
             textureCoords.add(texCoords[3]); //y
@@ -79,14 +79,14 @@ public class TextItem extends GameItem {
 
             //top right
             modelCoords.add(x); //x
-            modelCoords.add(-Model.STD_SQUARE_SIZE * this.scale / 2); //y
+            modelCoords.add(-Model.STD_SQUARE_SIZE * this.scale); //y
             modelCoords.add(0f); //z
             textureCoords.add(texCoords[4]); //x
             textureCoords.add(texCoords[5]); //y
 
             //bottom right
             modelCoords.add(x); //x
-            modelCoords.add(Model.STD_SQUARE_SIZE * this.scale / 2); //y
+            modelCoords.add(0f); //y
             modelCoords.add(0f); //z
             textureCoords.add(texCoords[6]); //x
             textureCoords.add(texCoords[7]); //y

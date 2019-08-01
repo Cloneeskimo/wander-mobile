@@ -8,7 +8,7 @@ import com.jacoboaks.wandermobile.graphics.ShaderProgram;
 /**
  * @purpose is to represent a single game item with a model, position, and velocity
  */
-public class GameItem {
+public abstract class GameItem {
 
     //Data
     Model model; //model
@@ -51,6 +51,8 @@ public class GameItem {
     //Accessors
     public float getX() { return this.x; }
     public float getY() { return this.y; }
+    public abstract float getWidth();
+    public abstract float getHeight();
 
     //Mutators
     public void setX(float x) { this.x = x; }

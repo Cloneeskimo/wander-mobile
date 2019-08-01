@@ -99,6 +99,22 @@ public class Tile extends GameItem {
     }
 
     /**
+     * @return the width of the Tile
+     */
+    @Override
+    public float getWidth() {
+        return Model.STD_SQUARE_SIZE;
+    }
+
+    /**
+     * @return the height of the tile
+     */
+    @Override
+    public float getHeight() {
+        return Model.STD_SQUARE_SIZE;
+    }
+
+    /**
      * @purpose is to begin a movement animation to the given world position
      * @param dgx the amount of grid x to move by (delta x)
      * @param dgy the amount of grid y to move by

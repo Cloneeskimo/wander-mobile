@@ -13,6 +13,7 @@ import com.jacoboaks.wandermobile.game.gamecontrol.WorldControl;
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
 import com.jacoboaks.wandermobile.game.gameitem.StaticTile;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
+import com.jacoboaks.wandermobile.game.gameitem.Tile;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
 import com.jacoboaks.wandermobile.util.Color;
@@ -113,18 +114,21 @@ public class WorldLogic implements GameLogic {
         //create hud text material
         Material textMaterial = new Material(font.getFontSheet(), new Color(1.0f, 1.0f, 1.0f, 1.0f), true);
 
-        //fps label
-        TextItem fpsLabel = new TextItem(this.font, "FPS: ", textMaterial, 0f, -1.0f);
-        fpsLabel.scale(0.15f);
-        fpsLabel.moveY(0.02f + fpsLabel.getHeight() / 2);
-        this.hud.addItem(fpsLabel, 0.02f, -1f, true);
-
         //wander title
-        TextItem title = new TextItem(this.font, "Wander Mobile " + MainActivity.WANDER_VERSION
-                + "b" + MainActivity.WANDER_BUILD, textMaterial, 0f, 1.0f);
-        title.scale(0.25f);
-        title.moveY(-title.getHeight() / 2);
-        this.hud.addItem(title, 0.02f, -1, true);
+        TextItem title = new TextItem(this.font, "Wander Mobile v" + MainActivity.WANDER_VERSION
+                + "b" + MainActivity.WANDER_BUILD, textMaterial, 0f, 0f);
+        title.scale(0.2f);
+        this.hud.addItem(title, HUD.Placement.TOP_LEFT, 0.01f);
+
+        //fps label
+        TextItem fpsLabel = new TextItem(this.font, "FPS: ", textMaterial, 0f, 0f);
+        fpsLabel.scale(0.13f);
+        this.hud.addItem(fpsLabel, HUD.Placement.BOTTOM_LEFT, 0.01f);
+
+        //fps counter
+        TextItem fpsCounter = new TextItem(this.font, "calculating...", textMaterial, 0f, 0f);
+        fpsCounter.scale(0.13f);
+        this.hud.addItem(fpsCounter, HUD.Placement.RIGHT_OF_LAST, 0f);
     }
 
     /**
@@ -143,8 +147,8 @@ public class WorldLogic implements GameLogic {
      * @param FPS the current FPS
      */
     public void onFPSUpdate(float FPS) {
-        TextItem fpsCounter = (TextItem)this.hud.getItem(0);
-        fpsCounter.setText("FPS: " + Float.toString(FPS));
+        TextItem fpsCounter = (TextItem)this.hud.getItem(2);
+        fpsCounter.setText(Float.toString(FPS));
     }
 
     /**
