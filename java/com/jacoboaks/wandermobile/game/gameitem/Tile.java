@@ -4,6 +4,7 @@ import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
 import com.jacoboaks.wandermobile.graphics.Model;
 import com.jacoboaks.wandermobile.graphics.Texture;
+import com.jacoboaks.wandermobile.graphics.Transformation;
 import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Coord;
 
@@ -16,11 +17,10 @@ public class Tile extends GameItem {
 
     //Static Data
     public static final float STD_MOVE_ANIMATION_SPEED = 0.025f;
-    private static final float IMPENDING_MOVEMENT_TIME = 180f;
+    public static final float IMPENDING_MOVEMENT_TIME = 180f;
 
     //Data
     private String name; //name of the tile
-    private int gx, gy; //grid position
     private int igx, igy; //delta impending grid position
     private float impendingMovementTime; //time until an impending move is undergone
     private float tgtX = 0, tgtY = 0; //target x and y (of movement animation) - in world coordinates
@@ -41,8 +41,6 @@ public class Tile extends GameItem {
         super(new Model(Model.STD_SQUARE_MODEL_COORDS(), font.getCharacterTextureCoordinates(symbol, false),
                 Model.STD_SQUARE_DRAW_ORDER(), new Material(font.getFontSheet(), color, true)),
                 (float)gx * Model.STD_SQUARE_SIZE, (float)gy * Model.STD_SQUARE_SIZE);
-        this.gx = gx;
-        this.gy = gy;
         this.symbolTile = true;
         this.symbol = symbol;
     }
@@ -57,8 +55,6 @@ public class Tile extends GameItem {
     public Tile(String name, Texture texture, int gx, int gy) {
         super(new Model(Model.STD_SQUARE_MODEL_COORDS(), Model.STD_SQUARE_TEX_COORDS(), Model.STD_SQUARE_DRAW_ORDER(),
                 new Material(texture)), (float)gx * Model.STD_SQUARE_SIZE, (float)gy * Model.STD_SQUARE_SIZE);
-        this.gx = gx;
-        this.gy = gy;
         this.symbolTile = false;
         this.symbol = 0;
     }
@@ -102,20 +98,18 @@ public class Tile extends GameItem {
         }
     }
 
-    //Single-Axis Moving Animation Methods
-    public void moveGridX(int dgx) { this.moveGridPos(dgx, 0); }
-    public void moveGridY(int dgy) { this.moveGridPos(0, dgy); }
-
     /**
      * @purpose is to begin a movement animation to the given world position
-     * @param dgx the amount of world x to move by
-     * @param dgy the amount of world y to move by
+     * @param dgx the amount of grid x to move by (delta x)
+     * @param dgy the amount of grid y to move by
      */
     public void moveGridPos(int dgx, int dgy) {
 
         //set target x and target y
-        this.tgtX = this.x + (dgx * Model.STD_SQUARE_SIZE);
-        this.tgtY = this.y + (dgy * Model.STD_SQUARE_SIZE);
+        Coord dpos = new Coord(dgx, dgy);
+        Transformation.gridToWorld(dpos);
+        this.tgtX = this.x + dpos.x;
+        this.tgtY = this.y + dpos.y;
 
         //set velocity
         this.vx = Tile.STD_MOVE_ANIMATION_SPEED * (float)dgx;
@@ -154,16 +148,22 @@ public class Tile extends GameItem {
         this.resetImpendingMovement();
     }
 
-    //Mutators
-    public void setGridX(int gx) { this.gx = gx; }
-    public void setGridY(int gy) { this.gy = gy; }
-    public void setGridPosition(int gx, int gy) { this.gx = (int)gx; this.gy = (int)gy; }
+    //Mutator
+    public void setGridPosition(int gx, int gy) {
+        Coord position = new Coord(gx, gy);
+        Transformation.gridToWorld(position);
+        this.x = position.x;
+        this.y = position.y;
+    }
 
     //Accessors
     public boolean isMoving() { return this.isMoving; }
+    public boolean hasImpendingMovement() { return this.impendingMovementTime > 0.01f; }
     public char getSymbol() { return this.symbol; }
-    public int getGridX() { return this.gx; }
-    public int getGridY() { return this.gy; }
     public String getName() { return this.name; }
-    public Coord getGridPosition() { return new Coord(this.gx, this.gy); }
+    public Coord getGridPosition() {
+        Coord position = new Coord(this.x, this.y);
+        Transformation.worldToGrid(position);
+        return position;
+    }
 }

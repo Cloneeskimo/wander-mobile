@@ -9,8 +9,12 @@ import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.game.gameitem.StaticTile;
 import com.jacoboaks.wandermobile.game.gameitem.Tile;
 import com.jacoboaks.wandermobile.graphics.FollowingCamera;
+import com.jacoboaks.wandermobile.graphics.Model;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
+import com.jacoboaks.wandermobile.graphics.Texture;
+import com.jacoboaks.wandermobile.graphics.Transformation;
 import com.jacoboaks.wandermobile.util.Color;
+import com.jacoboaks.wandermobile.util.Coord;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
 
@@ -31,6 +35,8 @@ public class World {
     private Area area;
     private ShaderProgram shaderProgram;
     private FollowingCamera camera;
+    private boolean tileSelected = false;
+    private Tile selectionTile;
 
     /**
      * @purpose is to construct this World
@@ -46,6 +52,7 @@ public class World {
         //set area and player references
         this.area = area;
         this.player = player;
+        this.selectionTile = new Tile("Selection", new Texture(R.drawable.selected), 0, 0);
     }
 
     /**
@@ -123,8 +130,33 @@ public class World {
         this.area.render(this.shaderProgram);
         this.player.render(this.shaderProgram);
 
+        //render selection if tile selected
+        if (this.tileSelected) this.selectionTile.render(this.shaderProgram);
+
         //unbind shader program
         this.shaderProgram.unbind();
+    }
+
+    /**
+     * @purpose is to register a single tap on the world - user is either selecting or deselecting a tile
+     * @param x the screen x position of the tap
+     * @param y the screen y position of the tap
+     * @param w the width of the screen
+     * @param h the height of the screen
+     */
+    public void registerTap(float x, float y, int w, int h) {
+
+        //check if there is already a selected tile
+        if (this.tileSelected) this.tileSelected = false;
+        else { //respond to tap
+
+            Coord position = new Coord(x, y);
+            Transformation.screenToGrid(position, w, h, this.camera);
+
+            //set selection position
+            this.tileSelected = true;
+            this.selectionTile.setGridPosition((int)position.x, (int)position.y);
+        }
     }
 
     //Accessors

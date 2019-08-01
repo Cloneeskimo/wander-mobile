@@ -114,5 +114,4 @@ public class HUD {
                 "index '" + index + "' is out of range.");
         return this.gameItems.get(index);
     }
-
 }

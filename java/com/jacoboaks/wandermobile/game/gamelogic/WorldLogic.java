@@ -13,7 +13,6 @@ import com.jacoboaks.wandermobile.game.gamecontrol.WorldControl;
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
 import com.jacoboaks.wandermobile.game.gameitem.StaticTile;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
-import com.jacoboaks.wandermobile.game.gameitem.Tile;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
 import com.jacoboaks.wandermobile.util.Color;
@@ -75,8 +74,8 @@ public class WorldLogic implements GameLogic {
         this.aspectRatioAction = (aspectRatio < 1.0f);
 
         //set clear color and create font
-        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        this.font = new Font(R.drawable.letters, R.raw.lettercutoffs,10, 10, ' ');
+        GLES20.glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
+        this.font = new Font(R.drawable.font, R.raw.fontcutoffs,10, 10, ' ');
     }
 
     /**
@@ -112,7 +111,7 @@ public class WorldLogic implements GameLogic {
         this.hud = new HUD(this.aspectRatio, this.aspectRatioAction);
 
         //create hud text material
-        Material textMaterial = new Material(font.getFontSheet(), new Color(0.6f, 0.6f, 0.6f, 1.0f), true);
+        Material textMaterial = new Material(font.getFontSheet(), new Color(1.0f, 1.0f, 1.0f, 1.0f), true);
 
         //fps label
         TextItem fpsLabel = new TextItem(this.font, "FPS: ", textMaterial, 0f, -1.0f);
@@ -164,8 +163,7 @@ public class WorldLogic implements GameLogic {
      * @return whether or not the MotionEvent was handled in any way
      */
     @Override
-    public boolean input(MotionEvent e) { return this.control.input(e, this.world.getPlayer(),
-            this.world.getCamera(), this.width, this.height); }
+    public boolean input(MotionEvent e) { return this.control.input(e, this.world, this.width, this.height); }
 
     /**
      * @purpose is to handle specifically scale events

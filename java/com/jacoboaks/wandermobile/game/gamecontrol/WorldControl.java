@@ -2,6 +2,7 @@ package com.jacoboaks.wandermobile.game.gamecontrol;
 
 import android.view.MotionEvent;
 
+import com.jacoboaks.wandermobile.game.World;
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.game.gameitem.Tile;
@@ -28,6 +29,8 @@ public class WorldControl {
     private boolean substantialPanningDetected; //whether or not substantial panning has been detected
     private boolean listenForPanning; //whether or not panning should be listened for
     private boolean currentlyScaling; //whether or not the user is currently scaling
+    private boolean justScaledOrPanned; //whether or not the user has just scaled or panned
+    private float touchDownTime = 0;
 
     //Default Constructor
     public WorldControl() {
@@ -39,13 +42,12 @@ public class WorldControl {
     /**
      * @purpose is to act off of any input given to WorldLogic
      * @param e the input event to respond to
-     * @param player the player
-     * @param camera the camera in use by the WorldLogic
+     * @param world the world to change with the input
      * @param width the width of the surface
      * @param height the height of the surface
      * @return whether the input was handled in any way
      */
-    public boolean input(MotionEvent e, Entity player, FollowingCamera camera, int width, int height) {
+    public boolean input(MotionEvent e, World world, int width, int height) {
 
         //handle touch
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
@@ -63,15 +65,15 @@ public class WorldControl {
             float absY = Math.abs(y);
 
             //ignore input if player is moving or camera is panning
-            if (!player.isMoving() && !camera.isRepanning()) {
+            if (!world.getPlayer().isMoving() && !world.getCamera().isRepanning()) {
 
                 //check which quadrant they touched and change square velocity accordingly
                 if (absY > absX) { //up or down
-                    if (y >= 0.0f) player.impendingMove(0, -1);
-                    else player.impendingMove(0, 1);
+                    if (y >= 0.0f) world.getPlayer().impendingMove(0, -1);
+                    else world.getPlayer().impendingMove(0, 1);
                 } else { //right or left
-                    if (x >= 0.0f) player.impendingMove(1, 0);
-                    else player.impendingMove(-1, 0);
+                    if (x >= 0.0f) world.getPlayer().impendingMove(1, 0);
+                    else world.getPlayer().impendingMove(-1, 0);
                 }
             }
 
@@ -81,9 +83,16 @@ public class WorldControl {
         //handle release
         } else if (e.getAction() == MotionEvent.ACTION_UP) {
 
+            //see if user was trying to tap
+            if (this.justScaledOrPanned) {
+                this.justScaledOrPanned = false;
+            } else if (world.getPlayer().hasImpendingMovement()) { //register tap if user wasn't trying to move
+                world.registerTap(e.getX(), e.getY(), width, height);
+            }
+
             //report finger lift
-            this.fingerLifted(player);
-            camera.fingerReleased();
+            this.fingerLifted(world.getPlayer());
+            world.getCamera().fingerReleased();
 
             //return that input was handled
             return true;
@@ -121,8 +130,9 @@ public class WorldControl {
 
                 //pan the camera and stop player movement if a substantial pan is being made
                 if (this.substantialPanningDetected) {
-                    player.stopMoving();
-                    camera.pan(width, height, previousPos, this.fingerPos);
+                    this.justScaledOrPanned = true;
+                    world.getPlayer().stopMoving();
+                    world.getCamera().pan(width, height, previousPos, this.fingerPos);
                 }
             }
 
@@ -162,6 +172,7 @@ public class WorldControl {
         player.stopMoving();
         this.listenForPanning = false;
         this.currentlyScaling = true;
+        this.justScaledOrPanned = true;
         return true;
     }
 }
