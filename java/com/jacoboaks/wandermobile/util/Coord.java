@@ -1,7 +1,7 @@
 package com.jacoboaks.wandermobile.util;
 
 /**
- * @purpose is to represent a 2 component coordinate - essentially this class is a vector2f
+ * Represents a 2 component coordinate - this class is essentially a vector2f.
  */
 public class Coord {
 
@@ -10,7 +10,7 @@ public class Coord {
     public float y;
 
     /**
-     * @purpose is to construct this coordinate with the given x and y values
+     * Constructs this Coord with the given x and y values.
      * @param x the x value
      * @param y the y value
      */
@@ -25,7 +25,7 @@ public class Coord {
     }
 
     /**
-     * @purpose is to construct this coordinate at 0, 0
+     * Constructs this coordinate at (0, 0).
      */
     public Coord() {
         this(0, 0);

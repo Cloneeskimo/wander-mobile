@@ -13,24 +13,20 @@ import com.jacoboaks.wandermobile.game.gamecontrol.WorldControl;
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
 import com.jacoboaks.wandermobile.game.gameitem.StaticTile;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
-import com.jacoboaks.wandermobile.game.gameitem.Tile;
 import com.jacoboaks.wandermobile.graphics.Font;
+import com.jacoboaks.wandermobile.graphics.GameRenderer;
 import com.jacoboaks.wandermobile.graphics.Material;
 import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Node;
+import com.jacoboaks.wandermobile.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @purpose is to implement the logic for Wander when in the main game world
+ * Contains the logic for the world navigation of the game.
  */
 public class WorldLogic implements GameLogic {
-
-    //Surface Data
-    private int width, height;
-    private float aspectRatio;
-    private boolean aspectRatioAction; //true (ratio < 1) -> multiply y by aspect ratio; false (ratio >= 1) -> divide x by aspect ratio
 
     //Logic Data
     private World world;
@@ -41,16 +37,12 @@ public class WorldLogic implements GameLogic {
     //Saved Data
     private Bundle savedInstanceData;
 
-    /**
-     * @called whenever the surface is created
-     * @param width width of the new surface
-     * @param height height of the new surface
-     */
+    //Initialization Method
     @Override
-    public void init(int width, int height) {
+    public void init() {
 
         //initialize graphics and objects
-        this.initGraphics(width, height);
+        this.initGraphics();
         this.initHUD();
         this.initWorld();
 
@@ -62,17 +54,9 @@ public class WorldLogic implements GameLogic {
     }
 
     /**
-     * @purpose is to initialize all of the graphical components of the logic
-     * @param width the width of the surface
-     * @param height the height of the surface
+     * Initializes the graphical components of the logic.
      */
-    private void initGraphics(int width, int height) {
-
-        //save width, height, and aspect ratio, create camera
-        this.width = width;
-        this.height = height;
-        this.aspectRatio = (float) width / (float) height;
-        this.aspectRatioAction = (aspectRatio < 1.0f);
+    private void initGraphics() {
 
         //set clear color and create font
         GLES20.glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
@@ -80,12 +64,12 @@ public class WorldLogic implements GameLogic {
     }
 
     /**
-     * @purpose is to create and populate the HUD for this logic
+     * Initializes the HUD of the logic.
      */
     private void initHUD() {
 
         //create HUD
-        this.hud = new HUD(this.aspectRatio, this.aspectRatioAction);
+        this.hud = new HUD(GameRenderer.surfaceAspectRatio, GameRenderer.surfaceAspectRatioAction);
 
         //create hud text material
         Material textMaterial = new Material(font.getFontSheet(), new Color(1.0f, 1.0f, 1.0f, 1.0f), true);
@@ -134,7 +118,7 @@ public class WorldLogic implements GameLogic {
     }
 
     /**
-     * @purpose is to create and populate the world
+     * Initialized the world of the logic.
      */
     private void initWorld() {
 
@@ -158,22 +142,22 @@ public class WorldLogic implements GameLogic {
         Area area = new Area("Deep Woods", staticTiles, entities);
 
         //create world
-        this.world = new World(this.aspectRatio, this.aspectRatioAction, area, player, this.hud);
+        this.world = new World(area, player, this.hud);
     }
 
     /**
-     * @purpose is to instate and saved bundle data from a previous instance of this logic
+     * Reinstates saved bundle data from a previous instance of this logic.
      */
     private void instateLoadedData() {
 
         //load saved data
         this.world.instateLoadedData(this.savedInstanceData);
-        this.world.getPlayer().setX(Float.parseFloat(this.savedInstanceData.getString("worldlogic_playerx")));
-        this.world.getPlayer().setY(Float.parseFloat(this.savedInstanceData.getString("worldlogic_playery")));
+        this.world.getPlayer().setX(Float.parseFloat(this.savedInstanceData.getString("logic_playerx")));
+        this.world.getPlayer().setY(Float.parseFloat(this.savedInstanceData.getString("logic_playery")));
     }
 
     /**
-     * @purpose is to update any FPS tracker or any logic based on FPS
+     * Updates any FPS tracker or any logic based on FPS
      * @param FPS the current FPS
      */
     public void onFPSUpdate(float FPS) {
@@ -181,63 +165,48 @@ public class WorldLogic implements GameLogic {
         fpsCounter.setText(Float.toString(FPS));
     }
 
-    /**
-     * @purpose is to save any bundle data from a previous instance of this logic for loading after
-     * initialization
-     * @param savedInstanceData the bundle data to save for instating later
-     */
+    //Data Loading Method
     @Override
     public void loadData(Bundle savedInstanceData) {
         this.savedInstanceData = savedInstanceData;
     }
 
-    /**
-     * @purpose is to handle any input events that occur in the GameView
-     * @param e the input event to handle
-     * @return whether or not the MotionEvent was handled in any way
-     */
+    //Input Method
     @Override
-    public boolean input(MotionEvent e) { return this.control.input(e, this.world, this.width, this.height); }
+    public boolean input(MotionEvent e) { return this.control.input(e, this.world); }
 
-    /**
-     * @purpose is to handle specifically scale events
-     * @param factor the factor by which the user has scaled
-     */
+    //Scale Input Method
     @Override
     public boolean scaleInput(float factor) { return this.control.scaleInput(factor,
             this.world.getCamera(), this.world.getPlayer()); }
 
-    /**
-     * @purpose is the update the components of this logic
-     * @param dt the time, in milliseconds, since the last update
-     */
+    //Update Method
     @Override
     public void update(float dt) { this.world.update(dt); }
 
-    /**
-     * @purpose is to draw any graphical components to the screen.
-     * @called after update every cycle
-     */
+    //Render Method
     @Override
     public void render() {
         this.world.render();
         this.hud.render();
     }
 
-    /**
-     * @purpose is to compile all important data into a node to be put into a bundle before
-     * terminating this instance of the logic - this will be reloaded in the next instance
-     * after the interruption has ceased
-     * @return the node containing all of the compiled important information
-     */
+    //Data Requesting Method
     @Override
     public Node requestData() {
 
         //add data to node and return it
-        Node data = new Node("worldlogic");
+        Node data = new Node("logic", Util.WORLD_LOGIC_TAG);
+        this.world.requestData(data);
         data.addChild(new Node("playerx", Float.toString(this.world.getPlayer().getX())));
         data.addChild(new Node("playery", Float.toString(this.world.getPlayer().getY())));
-        this.world.requestData(data);
         return data;
+    }
+
+    //Cleanup Method
+    @Override
+    public void cleanup() {
+        this.world.cleanup();
+        this.hud.cleanup();
     }
 }

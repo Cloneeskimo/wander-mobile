@@ -1,7 +1,7 @@
 package com.jacoboaks.wandermobile.util;
 
 /**
- * @purpose is to represent a 4-component color (rgba)
+ * Represents a 4-component color (rgba).
  */
 public class Color {
 
@@ -12,14 +12,14 @@ public class Color {
     private float a;
 
     /**
-     * @purpose is to construct this color as the default color: white
+     * Constructs this color as the default color (white).
      */
     public Color() {
         this(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     /**
-     * @purpose is to construct this color with the given rgba values
+     * Constructs this color with the given rgba values.
      * @param r the red value
      * @param g the green value
      * @param b the blue value

@@ -5,41 +5,36 @@ import android.opengl.GLES20;
 import com.jacoboaks.wandermobile.R;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
+import com.jacoboaks.wandermobile.graphics.GameRenderer;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
 import com.jacoboaks.wandermobile.graphics.Transformation;
 import com.jacoboaks.wandermobile.util.Coord;
 import com.jacoboaks.wandermobile.util.Util;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @purpose is to hold many GameItems to be rendered over top of the world
+ * Holds many GameItems to be rendered over top of a World.
  */
 public class HUD {
 
     //Data
     private List<GameItem> gameItems;
-    private float aspectRatio;
-    private boolean aspectRatioAction; //true (ratio < 1) -> multiply y by aspect ratio; false (ratio >= 1) -> divide x by aspect ratio
     private ShaderProgram shaderProgram;
 
     /**
-     * @purpose is to construct this HUD
+     * Constructs this HUD.
      * @param aspectRatio the aspect ration of the surface
      * @param aspectRatioAction the aspect ratio action given the current aspect ratio (explained in data)
      */
     public HUD(float aspectRatio, boolean aspectRatioAction) {
-        this.aspectRatio = aspectRatio;
-        this.aspectRatioAction = aspectRatioAction;
         this.gameItems = new ArrayList<>();
         this.initShaderProgram();
     }
 
     /**
-     * @purpose is to initialize the HUD's shader program
+     * Initializes the HUD's shader program.
      */
     private void initShaderProgram() {
 
@@ -61,21 +56,21 @@ public class HUD {
     }
 
     /**
-     * @purpose is to add a new game item as is
+     * Adds a new GameItem to this HUD using the given information.
      * @param item the item to add
      * @param x the normalized x to place the item at
      * @param y the normalized y to place the item at
      */
     public void addItem(GameItem item, float x, float y) {
         Coord coord = new Coord(x, y);
-        Transformation.normalizedToAspected(coord, this.aspectRatio);
+        Transformation.normalizedToAspected(coord);
         item.setX(coord.x);
         item.setY(coord.y);
         this.gameItems.add(item);
     }
 
     /**
-     * @purpose is to add a new game item at the provided normalized x and y values.
+     * Adds a new GameItem to this HUD using the given information.
      * @param item the item to add
      * @param placement the placement for the item to go. can be relative to the last item added
      *                  or to the various corners of the screen.
@@ -89,25 +84,25 @@ public class HUD {
         switch (placement) {
             case TOP_LEFT:
                 newPos = new Coord(-1f, 1f);
-                Transformation.normalizedToAspected(newPos, this.aspectRatio);
+                Transformation.normalizedToAspected(newPos);
                 newPos.x += padding;
                 newPos.y -= padding;
                 break;
             case TOP_RIGHT:
                 newPos = new Coord(1f, 1f);
-                Transformation.normalizedToAspected(newPos, this.aspectRatio);
+                Transformation.normalizedToAspected(newPos);
                 newPos.x -= (padding + item.getWidth());
                 newPos.y -= padding;
                 break;
             case BOTTOM_LEFT:
                 newPos = new Coord(-1f, -1f);
-                Transformation.normalizedToAspected(newPos, this.aspectRatio);
+                Transformation.normalizedToAspected(newPos);
                 newPos.x += padding;
                 newPos.y += (padding + item.getHeight());
                 break;
             case BOTTOM_RIGHT:
                 newPos = new Coord(1f, -1f);
-                Transformation.normalizedToAspected(newPos, this.aspectRatio);
+                Transformation.normalizedToAspected(newPos);
                 newPos.x -= (padding + item.getWidth());
                 newPos.y += (padding + item.getHeight());
                 break;
@@ -153,9 +148,9 @@ public class HUD {
 
         //update aspect ratio and aspect ratio action
         GLES20.glUniform1fv(this.shaderProgram.getUniformIndex("aspectRatio"), 1,
-                new float[] { this.aspectRatio }, 0);
+                new float[] { GameRenderer.surfaceAspectRatio }, 0);
         GLES20.glUniform1iv(this.shaderProgram.getUniformIndex("aspectRatioAction"), 1,
-                new int[] { this.aspectRatioAction ? 1 : 0 }, 0);
+                new int[] { GameRenderer.surfaceAspectRatioAction ? 1 : 0 }, 0);
 
         //draw game items
         for (GameItem gameItem: this.gameItems) gameItem.render(this.shaderProgram);
@@ -165,8 +160,8 @@ public class HUD {
     }
 
     /**
-     * @purpose is to return the top-left coordinates of the last item added. if there is no items, return 0, 0
-     * @return the coordinates of the last item added or 0, 0
+     * @return the coordinates of the last item added. Will return (0, 0) if there are no items
+     * added yet
      */
     private Coord topLeftCoordsOfLastItem() {
         Coord coords = new Coord(0f, 0f);
@@ -183,8 +178,7 @@ public class HUD {
     }
 
     /**
-     * @purpose is to return the size of the last item added. if there is no items, return 0, 0
-     * @return the size of the last item added or 0, 0
+     * @return the size of the last item added. Will return (0, 0) if there are no items added yet
      */
     private Coord sizeOfLastItem() {
         Coord size = new Coord(0f, 0f);
@@ -203,7 +197,7 @@ public class HUD {
     }
 
     /**
-     * @purpose is to represent some possible placements for an item to go when added to the HUD
+     * Represents some possible placements for an item to go when added to the HUD
      */
     public enum Placement {
         TOP_LEFT,
@@ -214,5 +208,10 @@ public class HUD {
         RIGHT_OF_LAST,
         ABOVE_LAST,
         BELOW_LAST
+    }
+
+    //Cleanup Method
+    public void cleanup() {
+        this.shaderProgram.cleanup();
     }
 }

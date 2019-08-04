@@ -8,21 +8,21 @@ import java.util.Map;
 
 /**
  * Font Class
- * @purpose is to represent a font by having a font sheet texture which contains all the characters
- * of the font in ASCII order. While they may start at a custom character, they may NOT skip characters.
+ * Represents a font by having a font sheet texture which contains all the characters of the font in
+ * ASCII order. While they may start at a custom character, they may NOT skip characters.
  */
 public class Font {
 
     //Data
-    Texture fontSheet;
-    char startingChar;
-    int charsPerRow, charsPerColumn;
-    int standardLetterCutoff;
-    Map<Character, Integer> letterCutoffs;
+    private Texture fontSheet;
+    private char startingChar;
+    private int charsPerRow, charsPerColumn;
+    private int standardLetterCutoff;
+    private Map<Character, Integer> letterCutoffs;
 
     /**
-     * Constructor
-     * @param fontResourceID the resource ID of the fontsheet
+     * Constructs this font with the given information.
+     * @param fontResourceID the resource ID of the font sheet
      * @param letterCutoffResourceID the resource ID of the letter cutoff file
      * @param charsPerRow how many characters there are per row of the font sheet
      * @param charsPerColumn how many characters there are per column of the font sheet
@@ -39,7 +39,7 @@ public class Font {
     }
 
     /**
-     * @purpose is to read and parse the letetr cutoffs file
+     * Reads and parses the letter cutoffs file of this font.
      * @param letterCutoffResourceID the resource ID of the letter cutoff file
      */
     private void initLetterCutoffs(int letterCutoffResourceID) {
@@ -64,7 +64,7 @@ public class Font {
     public float[] getCharacterTextureCoordinates(char toGet, boolean cutoff) {
 
         //check if invalid char
-        if (toGet < 0 || toGet > 127) Util.fatalError("Font.java",
+        if (toGet > 127) throw Util.fatalError("Font.java",
                 "getCharacterTextureCoordinates(char)", "invalid char '" + toGet + "' given");
 
         //calculate row and column

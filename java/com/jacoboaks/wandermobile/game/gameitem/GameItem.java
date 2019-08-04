@@ -6,7 +6,7 @@ import com.jacoboaks.wandermobile.graphics.Model;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
 
 /**
- * @purpose is to represent a single game item with a model, position, and velocity
+ * Represents a single game item with a model, position, velocity, and visibility.
  */
 public abstract class GameItem {
 
@@ -17,7 +17,7 @@ public abstract class GameItem {
     boolean visible; //visibility
 
     /**
-     * @purpose is to construct this GameItem
+     * Constructs this GameItem with the given model, world x, and world y position.
      * @param model the model to represent the GameItem
      * @param x the world x position
      * @param y the world y position

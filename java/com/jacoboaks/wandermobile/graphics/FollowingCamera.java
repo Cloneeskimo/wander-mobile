@@ -4,7 +4,7 @@ import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.util.Coord;
 
 /**
- * @purpose is to be able to lock onto a given GameItem
+ * Extends the Camera class with the ability to lock onto a given GameItem.
  */
 public class FollowingCamera extends Camera {
 
@@ -23,7 +23,7 @@ public class FollowingCamera extends Camera {
     private float timeUntilReturn; //the time after the last pan until the camera should return to its followee
 
     /**
-     * @purpose is to construct this FollowingCamera
+     * Construct this FollowingCamera with the given information.
      * @param zoom the camera's zoom
      * @param followee the GameItem to follow
      * @param panLocked whether panning should be locked or not
@@ -37,15 +37,13 @@ public class FollowingCamera extends Camera {
     }
 
     /**
-     * @purpose is to only pan the camera if panning is not locked
-     * @param width the width of the screen
-     * @param height the height of the screen
+     * Pans the camera if panning is not locked.
      * @param oldPos the old world position
      * @param newPos the new world position to pan to
      */
     @Override
-    public void pan(float width, float height, Coord oldPos, Coord newPos) {
-        if (!this.panLocked) super.pan(width, height, oldPos, newPos);
+    public void pan(Coord oldPos, Coord newPos) {
+        if (!this.panLocked) super.pan(oldPos, newPos);
         this.recentlyPanned = true;
         this.isRepanning = false;
         this.brokeAway = true;
@@ -53,8 +51,8 @@ public class FollowingCamera extends Camera {
     }
 
     /**
-     * @purpose is to handle the user's finger release. If they have recently panned, start
-     * the countdown to when the camera re-pans over to the followee
+     * Handles the user's finger release. If they have recently panned, will start
+     * the countdown to when the camera re-pans over to the followee.
      */
     public void fingerReleased() {
         if (this.recentlyPanned) this.timeUntilReturn = FollowingCamera.STD_TIME_UNTIL_RETURN;

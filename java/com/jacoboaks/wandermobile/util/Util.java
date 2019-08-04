@@ -9,40 +9,47 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Provides many practical and useful methods to be used throughout the program.
+ */
 public final class Util {
+
+    //Logic Tags
+    public final static String MAIN_MENU_LOGIC_TAG = "mainmenulogic";
+    public final static String WORLD_LOGIC_TAG = "worldlogic";
 
     //Data
     public final static boolean DEBUG = true;
 
     /**
-     * @purpose to generate an appropriate log tag for logging information
+     * Generates an appropriate log tag for logging information.
      * @param sourceFile the name of the source code file from which this method is called
      * @param method the name of the method from which this method is called
      * @return the appropriate log tag for logging
      */
-    public final static String getLogTag(String sourceFile, String method) {
+    public static String getLogTag(String sourceFile, String method) {
         return "[WNDR][" + sourceFile + "][" + method + "]";
     }
 
     /**
-     * @purpose is to log a fatal error and return an appropriate exception to throw
+     * Logs a fatal error and return an appropriate exception to throw.
      * @param sourceFile the name of the source code file from which this method is called
      * @param method the name of the method from which this method is called
      * @param error the error message
      * @return the exception to be thrown
      */
-    public final static RuntimeException fatalError(String sourceFile, String method, String error) {
+    public static RuntimeException fatalError(String sourceFile, String method, String error) {
         String logTag = Util.getLogTag(sourceFile, method);
         Log.e(logTag, error);
         return new RuntimeException(logTag + ": " + error);
     }
 
     /**
-     * @purpose is to convert an InputStream to a String
+     * Converts an InputStream to a String.
      * @param stream the stream to convert
      * @return the converted string
      */
-    public final static String inputStreamToString(InputStream stream) {
+    public static String inputStreamToString(InputStream stream) {
 
         //convert to ByteArrayOutputStream
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -66,13 +73,13 @@ public final class Util {
     }
 
     /**
-     * @purpose is to convert a string to a string list by adding breaks every time the given
-     * character appears in the string
+     * Converts a string to a string list by adding breaks every time the given character appears in
+     * the string.
      * @param value the string to split
      * @param newLine the character to split by
      * @return the list of strings split from the given string
      */
-    public final static List<String> stringToStringList(String value, char newLine) {
+    public static List<String> stringToStringList(String value, char newLine) {
 
         //create list
         List<String> result = new ArrayList<>();
@@ -89,18 +96,18 @@ public final class Util {
     }
 
     /**
-     * @purpose is to convert a resource file to a list of strings to be parsed
+     * Converts a resource file to a list of strings to be parsed.
      * @param resourceID the id of the resource to be read
      * @return the list of string available for parsing
      */
-    public final static List<String> readResourceFile(int resourceID) {
-        InputStream stream = MainActivity.context.getResources().openRawResource(resourceID);
+    public static List<String> readResourceFile(int resourceID) {
+        InputStream stream = MainActivity.getAppResources().openRawResource(resourceID);
         String data = Util.inputStreamToString(stream);
         return stringToStringList(data, '\n');
     }
 
     /**
-     * @purpose is to convert a float list to an array
+     * Converts a float list to an array.
      * @param list the list to convert
      * @return the converted list
      */
@@ -112,7 +119,7 @@ public final class Util {
     }
 
     /**
-     * @purpose is to convert a integer list to an array
+     * Converts an integer list to an array.
      * @param list the list to convert
      * @return the converted list
      */

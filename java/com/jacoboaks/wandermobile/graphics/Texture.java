@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * @purpose is to represent an OpenGL texture
+ * Represents an OpenGL texture user for Materials.
  */
 public class Texture {
 
@@ -22,13 +22,13 @@ public class Texture {
     private int width, height;
 
     /**
-     * @purpose is to construct this texture
+     * Constructs this texture.
      * @param resourceID the resource ID of the image to use for this texture
      */
     public Texture(int resourceID) {
 
         //load texture into bitmap
-        InputStream is = MainActivity.context.getResources().openRawResource(resourceID);
+        InputStream is = MainActivity.getAppResources().openRawResource(resourceID);
         Bitmap bmp;
         try {
             bmp = BitmapFactory.decodeStream(is);

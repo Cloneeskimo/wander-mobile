@@ -3,18 +3,18 @@ package com.jacoboaks.wandermobile.graphics;
 import com.jacoboaks.wandermobile.util.Color;
 
 /**
- * @purpose is to represent a type of material to be used for a model. Can either be a color, a
- * texture, or a texture whose color is overriden by the provided colord
+ * Represents a type of material to be used for a Model. Can either be a color, a
+ * texture, or a texture whose color is overriden by the provided color.
  */
 public class Material {
 
     //Data
-    Texture texture;
-    Color color;
-    Boolean colorOverride;
+    private Texture texture;
+    private Color color;
+    private boolean colorOverride;
 
     /**
-     * @purpose is to construct this Material
+     * Constructs this Material with a Texture, a Color, and a color override value.
      * @param texture the texture to use for this material
      * @param color the color to use for this material
      * @param colorOverride whether or not to override this material's texture with the given color
@@ -26,7 +26,7 @@ public class Material {
     }
 
     /**
-     * @purpose is to construct this Material with color overriding disabled
+     * Constructs this Material with a Texture and without color overriding.
      * @param texture the texture to use for this material
      */
     public Material(Texture texture) {
@@ -34,7 +34,7 @@ public class Material {
     }
 
     /**
-     * @purpose is to construct this Material using a solid color
+     * Constructs this Material with a Color.
      * @param color the color to use for this material
      */
     public Material(Color color) {

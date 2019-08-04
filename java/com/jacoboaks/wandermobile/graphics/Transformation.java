@@ -3,51 +3,48 @@ package com.jacoboaks.wandermobile.graphics;
 import com.jacoboaks.wandermobile.util.Coord;
 
 /**
- * @purpose is to provide methods for converting coordinates between different spaces. The spaces
+ * Provides methods for converting coordinates between different spaces. The important spaces
  * are defined in the following order:
- *  - screen
- *  - normalized
- *  - aspect ratio
- *  - world
- *  - grid
+ *  - screen - the coordinates of the screen's pixels
+ *  - normalized - the coordinates of the screen from -1 to 1
+ *  - aspect ratio - the normalized coordinates adjusted for aspect ratio
+ *  - world - the coordinates of a world where a camera is taken into account
+ *  - grid - the coordinates of a world where items are locked into a Tile grid
  */
 public class Transformation {
 
     /**
-     * @purpose is to convert screen coordinates to normalized coordinates
+     * Converts screen coordinates to normalized coordinates.
      * @param coords the coordinates to convert
-     * @param width the width of the screen
-     * @param height the height of the screen
      */
-    public static void screenToNormalized(Coord coords, int width, int height) {
+    public static void screenToNormalized(Coord coords) {
 
         //convert x
-        coords.x /= width;
+        coords.x /= GameRenderer.surfaceWidth;
         coords.x *= 2;
         coords.x -= 1;
 
         //convert y
-        coords.y /= height;
+        coords.y /= GameRenderer.surfaceHeight;
         coords.y *= 2;
         coords.y -= 1;
         coords.y *= -1;
     }
 
     /**
-     * @purpose is to convert normalized coordinates to aspect ratio coordinates
+     * Converts normalized coordinates to aspect ratio coordinates.
      * @param coords the coordinates to convert
-     * @param aspectRatio the aspect ratio of the screen
      */
-    public static void normalizedToAspected(Coord coords, float aspectRatio) {
-        if (aspectRatio >= 1.0f) {
-            coords.x *= aspectRatio;
+    public static void normalizedToAspected(Coord coords) {
+        if (GameRenderer.surfaceAspectRatio >= 1.0f) {
+            coords.x *= GameRenderer.surfaceAspectRatio;
         } else {
-            coords.y /= aspectRatio;
+            coords.y /= GameRenderer.surfaceAspectRatio;
         }
     }
 
     /**
-     * @purpose is to convert aspect ratio coordinates to world coordinates
+     * Converts aspect ratio coordinates to world coordinates.
      * @param coords the coordinates to convert
      * @param camera the camera whose zoom and position to be taken into account
      */
@@ -63,32 +60,28 @@ public class Transformation {
     }
 
     /**
-     * @purpose is to convert screen coordinates to world coordinates
+     * Converts screen coordinates to world coordinates.
      * @param coords the coordinates to convert
-     * @param width the width of the screen
-     * @param height the height of the screen
      * @param camera the camera whose zoom and position to be taken account of
      */
-    public static void screenToWorld(Coord coords, int width, int height, Camera camera) {
-        screenToNormalized(coords, width, height);
-        normalizedToAspected(coords, (float)width / (float)height);
+    public static void screenToWorld(Coord coords, Camera camera) {
+        screenToNormalized(coords);
+        normalizedToAspected(coords);
         aspectedToWorld(coords, camera);
     }
 
     /**
-     * @purpose is to convert screen coordinates to grid coordinates
+     * Converts screen coordinates to grid coordinates.
      * @param coords the coordinates to convert
-     * @param width the width of the screen
-     * @param height the height of the screen
      * @param camera the camera whose zoom and position to be taken account of
      */
-    public static void screenToGrid(Coord coords, int width, int height, Camera camera) {
-        screenToWorld(coords, width, height, camera);
+    public static void screenToGrid(Coord coords, Camera camera) {
+        screenToWorld(coords, camera);
         worldToGrid(coords);
     }
 
     /**
-     * @purpose is to convert world coordinates to grid coordinates
+     * Converts world coordinates to grid coordinates.
      * @param coords the coordinates to convert
      */
     public static void worldToGrid(Coord coords) {
@@ -102,7 +95,7 @@ public class Transformation {
     }
 
     /**
-     * @purpose is to convert grid coordinates to world coordinates
+     * Converts grid coordinates to world coordinates.
      * @param coords the coordinates to convert
      */
     public static void gridToWorld(Coord coords) {
@@ -111,7 +104,7 @@ public class Transformation {
     }
 
     /**
-     * @purpose is to convert world coordinates to aspect ratio coordinates
+     * Converts world coordinates to aspect ratio coordinates.
      * @param coords the coordinates to convert
      * @param camera the camera whose zoom and position to be taken into account
      */
@@ -127,59 +120,52 @@ public class Transformation {
     }
 
     /**
-     * @purpose is to convert aspect ratio coordinates to normalized coordinates
+     * Converts aspect ratio coordinates to normalized coordinates.
      * @param coords the coordinates to convert
-     * @param aspectRatio the aspect ratio of the screen
      */
-    public static void aspectedToNormalized(Coord coords, float aspectRatio) {
-        if (aspectRatio >= 1.0f) {
-            coords.x /= aspectRatio;
+    public static void aspectedToNormalized(Coord coords) {
+        if (GameRenderer.surfaceAspectRatio >= 1.0f) {
+            coords.x /= GameRenderer.surfaceAspectRatio;
         } else {
-            coords.y *= aspectRatio;
+            coords.y *= GameRenderer.surfaceAspectRatio;
         }
     }
 
     /**
-     * @purpose is to convert normalized coordinates to screen coordinates
+     * Converts normalized coordinates to screen coordinates.
      * @param coords the coordinates to convert
-     * @param width the width of the screen
-     * @param height the height of the screen
      */
-    public static void normalizedToScreen(Coord coords, int width, int height) {
+    public static void normalizedToScreen(Coord coords) {
 
         //convert x
         coords.x += 1;
         coords.x /= 2;
-        coords.x *= width;
+        coords.x *= GameRenderer.surfaceWidth;
 
         //convert y
         coords.y += 1;
         coords.y /= 2;
-        coords.x *= height;
+        coords.x *= GameRenderer.surfaceHeight;
     }
 
     /**
-     * @purpose is to convert world coordinates to screen coordinates
+     * Converts world coordinates to screen coordinates.
      * @param coords the coordinates to convert
-     * @param width the width of the screen
-     * @param height the height of the screen
      * @param camera the camera whose zoom and position to be taken account of
      */
-    public static void worldToScreen(Coord coords, int width, int height, Camera camera) {
+    public static void worldToScreen(Coord coords, Camera camera) {
         worldToAspected(coords, camera);
-        aspectedToNormalized(coords, (float)width / (float)height);
-        normalizedToScreen(coords, width, height);
+        aspectedToNormalized(coords);
+        normalizedToScreen(coords);
     }
 
     /**
-     * @purpose is to convert grid coordinates to screen coordinates
+     * Converts grid coordinates to screen coordinates.
      * @param coords the coordinates to convert
-     * @param width the width of the screen
-     * @param height the height of the screen
      * @param camera the camera whose zoom and position to be taken account of
      */
-    public static void gridToScreen(Coord coords, int width, int height, Camera camera) {
+    public static void gridToScreen(Coord coords, Camera camera) {
         gridToWorld(coords);
-        worldToScreen(coords, width, height, camera);
+        worldToScreen(coords, camera);
     }
 }

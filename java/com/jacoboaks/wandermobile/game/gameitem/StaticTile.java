@@ -5,16 +5,16 @@ import com.jacoboaks.wandermobile.graphics.Texture;
 import com.jacoboaks.wandermobile.util.Color;
 
 /**
- * @purpose is to represent a Tile which would not normally move (although it may). Collision with
- * them depends on their maneuverability factor, explained below
+ * Represents a Tile which would not normally move (although it may). Collision with
+ * them depends on their maneuverability factor, explained below.
  */
 public class StaticTile extends Tile {
 
     //Data
-    int maneuverability; //how maneuverable the tile is - 0 -> non-maneuverable, 1 -> maneuverable
+    private int maneuverability; //how maneuverable the tile is - 0 -> non-maneuverable, 1 -> maneuverable
 
     /**
-     * @purpose is to construct this StaticTile using a colored character
+     * Constructs this StaticTile using a colored character.
      * @param name the name of the static tile
      * @param font the font to draw the character from
      * @param symbol the character to represent this tile
@@ -29,7 +29,7 @@ public class StaticTile extends Tile {
     }
 
     /**
-     * @purpose is to construct this StaticTile using a texture
+     * Constructs this StaticTile using a texture.
      * @param name the name of the static tile
      * @param texture the texture to use
      * @param gx the grid x coordinate

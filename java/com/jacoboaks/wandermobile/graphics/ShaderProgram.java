@@ -13,9 +13,8 @@ import java.util.Map;
 
 /**
  * ShaderProgram Class
- * @purpose is to maintain a GLES SL shader program for use when rendering
- * @note all uniforms must be registered in order to easily get their index using the methods of
- * this class
+ * Maintains a GLES SL shader program for use when rendering. All uniforms must be registered in
+ * order to easily get their index using the methods of this class.
  */
 public class ShaderProgram {
 
@@ -23,7 +22,9 @@ public class ShaderProgram {
     private int programID;
     private final Map<String, Integer> uniforms;
 
-    //Constructor
+    /**
+     * Constructs this ShaderProgram.
+     */
     public ShaderProgram() {
 
         //create shader program
@@ -32,14 +33,14 @@ public class ShaderProgram {
     }
 
     /**
-     * @purpose is to load a shader into this shader program
+     * Loads a shader into this ShaderProgram.
      * @param resourceID the id of the resource to be used
      * @param type the type (vertex or fragment)
      */
     public void loadShader(int resourceID, int type) {
 
         //read resource data into string
-        InputStream stream = MainActivity.context.getResources().openRawResource(resourceID);
+        InputStream stream = MainActivity.getAppResources().openRawResource(resourceID);
         String sourceCode = Util.inputStreamToString(stream);
 
         //pass to other method for compilation
@@ -47,7 +48,7 @@ public class ShaderProgram {
     }
 
     /**
-     * @purpose is to load a shader into this shader program
+     * Loads a shader into this ShaderProgram.
      * @param code the code to be compiled
      * @param type the type (vertex or fragment)
      */
@@ -85,7 +86,8 @@ public class ShaderProgram {
     }
 
     /**
-     * links the shaders together - should be done after loading all the desired shaders
+     * Links the vertex and fragment shaders of this ShaderPRogram together. This should be done
+     * after loading all of the desired shaders.
      */
     public void link() {
 
@@ -132,8 +134,8 @@ public class ShaderProgram {
     }
 
     /**
-     * @purpose is to retrieve the index of the uniform with the provided name - shouldn't be used
-     * to often to avoid too many gl calls
+     * Retrieves the index of the uniform with the provided name. This shouldn't be used too often
+     * to avoid too many gl calls.
      * @param name name of the uniform whose index to find
      * @return the index of the uniform
      */

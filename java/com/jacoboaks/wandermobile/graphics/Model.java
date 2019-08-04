@@ -9,8 +9,7 @@ import java.nio.IntBuffer;
 
 /**
  * Model Class
- * @purpose is to hold a collection of vertices, a draw path, and a material for drawing the
- * model with
+ * Holds a collection of vertices, a draw path, and a material for drawing a single model.
  */
 public class Model {
 
@@ -18,7 +17,6 @@ public class Model {
     private static final int COORDS_PER_VERTEX = 3;
 
     //Data
-    private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
     private Material material;
     private float[] modelCoords;
     private float[] textureCoords;
@@ -30,7 +28,7 @@ public class Model {
     private IntBuffer drawPathBuffer;
 
     /**
-     * @purpose is to construct this Model
+     * Constructs this Model with the given information.
      * @param modelCoords the model coordinates for this Model
      * @param textureCoords the texture coordinates for this Model
      * @param drawPath the draw path (or indices) for this Model
@@ -67,7 +65,8 @@ public class Model {
         //set position attribute data
         int positionHandle = shaderProgram.getAttributeIndex("position");
         GLES20.glEnableVertexAttribArray(positionHandle);
-        GLES20.glVertexAttribPointer(positionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false, vertexStride, this.vertexBuffer);
+        GLES20.glVertexAttribPointer(positionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false,
+                COORDS_PER_VERTEX * 4, this.vertexBuffer);
 
         //set texture coordinate attribute data
         int textureCoordHandle = shaderProgram.getAttributeIndex("texCoord");
@@ -87,7 +86,7 @@ public class Model {
     }
 
     /**
-     * @purpose is to scale by the given factor
+     * Scales this Model by the given factor.
      * @param factor the factor by which to scale the model
      */
     public void scale(float factor) {
@@ -96,15 +95,15 @@ public class Model {
     }
 
     /**
-     * @returns whether or not this model is textured;
+     * @return whether or not this model is textured
      */
     public boolean isTextured() {
         return this.material.isTextured();
     }
 
     /**
-     * @purpose is to update the vertex buffer
-     * @called after a transformation to the model has been made and the vertices need updated
+     * Updates the vertex buffer. This is important to do after scaling, or after any data
+     * of this Model has been changed.
      */
     private void updateBuffers() {
 
@@ -141,21 +140,21 @@ public class Model {
 
     //Standard Square Data
     public static final float STD_SQUARE_SIZE = 0.5f;
-    public static final float[] STD_SQUARE_MODEL_COORDS() {
+    public static float[] STD_SQUARE_MODEL_COORDS() {
         return new float[]{
                 -STD_SQUARE_SIZE / 2f, -STD_SQUARE_SIZE / 2f, 0f, //top left
                 -STD_SQUARE_SIZE / 2f, STD_SQUARE_SIZE / 2f, 0f,  //bottom left
                 STD_SQUARE_SIZE / 2f, -STD_SQUARE_SIZE / 2f, 0f,  //top right
                 STD_SQUARE_SIZE / 2f, STD_SQUARE_SIZE / 2f, 0f};  //bottom right
     }
-    public static final float[] STD_SQUARE_TEX_COORDS() {
+    public static float[] STD_SQUARE_TEX_COORDS() {
         return new float[]{
                 0.0f, 1.0f, //top left
                 0.0f, 0.0f, //bottom left
                 1.0f, 1.0f, //top right
                 1.0f, 0.0f}; //bottom right
     }
-    public static final int[] STD_SQUARE_DRAW_ORDER() {
+    public static int[] STD_SQUARE_DRAW_ORDER() {
         return new int[]{0, 1, 2, 2, 1, 3};
     }
 }

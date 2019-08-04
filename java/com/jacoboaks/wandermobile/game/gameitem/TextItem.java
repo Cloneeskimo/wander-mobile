@@ -9,19 +9,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @purpose is to model text as a GameItem. the model position is as follows: the coordinates
+ * Models text as a GameItem. The model position is as follows: the coordinates
  * represent the top-left position of the text as opposed to a normal GameItem where they would
- * normally represent the middle of the item
+ * normally represent the middle of the item.
  */
 public class TextItem extends GameItem {
 
     //Data
-    Font font; //the font used for the text
-    String text; //the text
-    float width, height, scale; //the width, height, and scale of the text
+    private Font font; //the font used for the text
+    private String text; //the text
+    private float width, height, scale; //the width, height, and scale of the text
 
     /**
-     * @purpose is to construct this TextItem
+     * Constructs this TextItem.
      * @param font the font to be used for the text
      * @param text the text to be written
      * @param material the material to use for the text model
@@ -36,7 +36,7 @@ public class TextItem extends GameItem {
     }
 
     /**
-     * @purpose is to create the appropriate model to display the given text using the given font
+     * Creates the appropriate model to display the given text using the given font.
      * @param text the text to display
      */
     private void updateModel(String text) {
@@ -124,7 +124,7 @@ public class TextItem extends GameItem {
     }
 
     /**
-     * @purpose is to scale the model and the item width according to a given factor
+     * Scales the model and the item width according to a given factor.
      * @param factor the factor to scale the model by
      */
     @Override

@@ -9,15 +9,15 @@ import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Coord;
 
 /**
- * @purpose is to represent a specific type of GameItem which is a tile existing in the grid world.
+ * Represents a specific type of GameItem which is a tile existing in the grid world.
  * Coordinates should be manipulated using grid position rather than direct position as it
  * represents the place in the grid separate of the model sizes.
  */
 public class Tile extends GameItem {
 
     //Static Data
-    public static final float STD_MOVE_ANIMATION_SPEED = 0.025f;
-    public static final float IMPENDING_MOVEMENT_TIME = 180f;
+    private static final float STD_MOVE_ANIMATION_SPEED = 0.025f;
+    private static final float IMPENDING_MOVEMENT_TIME = 180f;
 
     //Data
     private String name; //name of the tile
@@ -29,7 +29,7 @@ public class Tile extends GameItem {
     private char symbol; //symbol of the tile
 
     /**
-     * @purpose is to construct this Tile using a colored character
+     * Constructs this Tile using a colored character.
      * @param name the name of this tile
      * @param font the font to draw the character from
      * @param symbol the character to represent this tile
@@ -47,7 +47,7 @@ public class Tile extends GameItem {
     }
 
     /**
-     * @purpose is to construct this Tile using a texture
+     * Construct this Tile using a texture.
      * @param name the name of this tile
      * @param texture the texture to use
      * @param gx the grid x coordinate
@@ -109,7 +109,7 @@ public class Tile extends GameItem {
     }
 
     /**
-     * @return the height of the tile
+     * @return the height of the Tile
      */
     @Override
     public float getHeight() {
@@ -117,7 +117,7 @@ public class Tile extends GameItem {
     }
 
     /**
-     * @purpose is to begin a movement animation to the given world position
+     * Begins a movement animation to the given world position.
      * @param dgx the amount of grid x to move by (delta x)
      * @param dgy the amount of grid y to move by
      */
@@ -138,7 +138,7 @@ public class Tile extends GameItem {
     }
 
     /**
-     * @purpose is to register an impending movement
+     * Registers an impending movement.
      * @param dgx the delta grid x for the impending movement
      * @param dgy the delta grid y for the impending movement
      */
@@ -149,7 +149,7 @@ public class Tile extends GameItem {
     }
 
     /**
-     * @purpose is to reset any impending movement for this game item
+     * Resets any impending movement for this game item.
      */
     public void resetImpendingMovement() {
         this.igx = this.igy = 0;
@@ -157,7 +157,7 @@ public class Tile extends GameItem {
     }
 
     /**
-     * @purpose is to stop any movement or impending movement
+     * Stops any movement or impending movement.
      */
     @Override
     public void stopMoving() {
@@ -166,7 +166,11 @@ public class Tile extends GameItem {
         this.resetImpendingMovement();
     }
 
-    //Mutator
+    /**
+     * Sets the grid position of this Tile with the given coordinates
+     * @param gx the grid x
+     * @param gy the grid y
+     */
     public void setGridPosition(int gx, int gy) {
         Coord position = new Coord(gx, gy);
         Transformation.gridToWorld(position);

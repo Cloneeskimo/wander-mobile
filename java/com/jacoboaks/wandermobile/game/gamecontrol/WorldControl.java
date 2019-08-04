@@ -2,19 +2,18 @@ package com.jacoboaks.wandermobile.game.gamecontrol;
 
 import android.view.MotionEvent;
 
+import com.jacoboaks.wandermobile.MainActivity;
 import com.jacoboaks.wandermobile.game.World;
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
-import com.jacoboaks.wandermobile.game.gameitem.GameItem;
-import com.jacoboaks.wandermobile.game.gameitem.Tile;
+import com.jacoboaks.wandermobile.game.gamelogic.LogicChangeData;
 import com.jacoboaks.wandermobile.graphics.Camera;
-import com.jacoboaks.wandermobile.graphics.FollowingCamera;
+import com.jacoboaks.wandermobile.graphics.GameRenderer;
 import com.jacoboaks.wandermobile.util.Coord;
-
-import java.util.List;
+import com.jacoboaks.wandermobile.util.Util;
 
 /**
  * WorldControl Class
- * @purpose is to handle any input given in a WorldLogic
+ * Handles any input given in a WorldLogic.
  */
 public class WorldControl {
 
@@ -30,7 +29,6 @@ public class WorldControl {
     private boolean listenForPanning; //whether or not panning should be listened for
     private boolean currentlyScaling; //whether or not the user is currently scaling
     private boolean justScaledOrPanned; //whether or not the user has just scaled or panned
-    private float touchDownTime = 0;
 
     //Default Constructor
     public WorldControl() {
@@ -40,14 +38,12 @@ public class WorldControl {
     }
 
     /**
-     * @purpose is to act off of any input given to WorldLogic
+     * Acts off of any input given to WorldLogic.
      * @param e the input event to respond to
      * @param world the world to change with the input
-     * @param width the width of the surface
-     * @param height the height of the surface
      * @return whether the input was handled in any way
      */
-    public boolean input(MotionEvent e, World world, int width, int height) {
+    public boolean input(MotionEvent e, World world) {
 
         //handle touch
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
@@ -57,9 +53,9 @@ public class WorldControl {
             float y = e.getY();
 
             //calculate absolute value of x and y of touch in normalized coords
-            x /= ((float)width / 2);
+            x /= ((float)GameRenderer.surfaceWidth / 2);
             x -= 1f;
-            y /= ((float)height / 2);
+            y /= ((float)GameRenderer.surfaceHeight / 2);
             y -= 1f;
             float absX = Math.abs(x);
             float absY = Math.abs(y);
@@ -87,7 +83,7 @@ public class WorldControl {
             if (this.justScaledOrPanned) {
                 this.justScaledOrPanned = false;
             } else if (world.getPlayer().hasImpendingMovement()) { //register tap if user wasn't trying to move
-                world.registerTap(e.getX(), e.getY(), width, height);
+                world.registerTap(e.getX(), e.getY());
             }
 
             //report finger lift
@@ -132,7 +128,7 @@ public class WorldControl {
                 if (this.substantialPanningDetected) {
                     this.justScaledOrPanned = true;
                     world.getPlayer().stopMoving();
-                    world.getCamera().pan(width, height, previousPos, this.fingerPos);
+                    world.getCamera().pan(previousPos, this.fingerPos);
                 }
             }
 
@@ -145,7 +141,7 @@ public class WorldControl {
     }
 
     /**
-     * @purpose is to reset panning and any movement when a finger is lifted from the screen
+     * Resets panning and any movement when a finger is lifted from the screen.
      * @param player the player
      */
     private void fingerLifted(Entity player) {
@@ -161,11 +157,11 @@ public class WorldControl {
     }
 
     /**
-     * @purpose is to specifically handle and scale input events
-     * @param factor the factor by which scaling has occured
+     * Specifically handles and scales input events.
+     * @param factor the factor by which scaling has occurred
      * @param camera the camera in us by the WorldLogic
      * @param player the player
-     * @return
+     * @return whether or not the input was handled
      */
     public boolean scaleInput(float factor, Camera camera, Entity player) {
         camera.zoom(factor);

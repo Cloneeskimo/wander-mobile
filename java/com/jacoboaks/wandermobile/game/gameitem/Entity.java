@@ -7,13 +7,12 @@ import com.jacoboaks.wandermobile.util.Color;
 public class Entity extends Tile {
 
     //Data
-    int health;
-    int maxHealth;
-    int level;
-    boolean isDead;
+    private int health;
+    private int maxHealth;
+    private int level;
 
     /**
-     * @purpose is to construct this StaticTile using a colored character
+     * Constructs this StaticTile using a colored character.
      * @param name the name of the static tile
      * @param font the font to draw the character from
      * @param symbol the character to represent this tile
@@ -27,7 +26,7 @@ public class Entity extends Tile {
     }
 
     /**
-     * @purpose is to construct this StaticTile using a texture
+     * Constructs this StaticTile using a texture.
      * @param name the name of the static tile
      * @param texture the texture to use
      * @param gx the grid x coordinate
@@ -39,7 +38,7 @@ public class Entity extends Tile {
     }
 
     /**
-     * @purpose is to set the basic entity info
+     * Sets the basic entity info.
      * @param health the health this entity has
      * @param maxHealth the maximum health this entity can have
      * @param level the level of this entity
@@ -51,7 +50,7 @@ public class Entity extends Tile {
     }
 
     /**
-     * @purpose is to change the health of this entity
+     * Changes the health of this entity.
      * @param health the value to change the health to - will not heal over maximum health
      */
     public void setHealth(int health) {
@@ -60,8 +59,8 @@ public class Entity extends Tile {
     }
 
     /**
-     * @purpose is to deal a certain amount of damage to this entity
-     * @param damage
+     * Deals a certain amount of damage to this entity.
+     * @param damage the amount of damage to do to the entity
      */
     public void dealDamage(int damage) { this.health -= damage; }
 

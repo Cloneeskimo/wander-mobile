@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @purpose is to serve as a medium of data transfer using a tree-like data structure
+ * Serves as a medium of data transfer using a tree-like data structure.
  */
 public class Node {
 
@@ -20,7 +20,7 @@ public class Node {
     private List<Node> children;
 
     /**
-     * @purpose is to construct this Node by giving it all of its properties upfront
+     * Constructs this Node by giving it all of its properties upfront.
      * @param name the name of the node
      * @param value the value of the node
      * @param children the list of the node's children
@@ -32,7 +32,7 @@ public class Node {
     }
 
     /**
-     * @purpose is to construct this Node by giving it a name, its data, and a single child
+     * Constructs this Node by giving it a name, its data, and a single child.
      * @param name the name of the node
      * @param value the value of the node
      * @param child the single child of the node
@@ -43,7 +43,7 @@ public class Node {
     }
 
     /**
-     * @purpose is to construct this Node without giving it any children
+     * Constructs this Node without giving it any children.
      * @param name the name of the node
      * @param value the value of the node
      */
@@ -53,7 +53,7 @@ public class Node {
     }
 
     /**
-     * @purpose is to construct this Node by solely giving it a name
+     * Constructs this Node by solely giving it a name.
      * @param name the name of the node
      */
     public Node(String name) {
@@ -61,22 +61,44 @@ public class Node {
     }
 
     /**
-     * @purpose is to construct this Node without setting any of its properties initiailly
+     * Constructs this Node without setting any of its properties initially.
      */
     public Node() {}
 
-    //Children Manipulation Methods
+    /**
+     * @return the list of this Node's children
+     */
     public List<Node> getChildren() { return this.children; }
+
+    /**
+     * @return the amount of children this Node has
+     */
     public int getChildCount() { return this.children.size(); }
+
+    /**
+     * Adds a child to this Node.
+     * @param child the Node to add as a child to this Node
+     */
     public void addChild(Node child) {
         if (this.children == null) this.children = new ArrayList<>();
         this.children.add(child);
     }
+
+    /**
+     * Adds multiple children to this Node.
+     * @param children the List of Nodes to add as children to this Node
+     */
     public void addChildren(List<Node> children) {
         if (this.children == null) this.children = new ArrayList<>();
         if (children == null) return;
         for (Node child : children) this.children.add(child);
     }
+
+    /**
+     * Retrieves a child of this Node at the given index.
+     * @param index the index of the child to retrieve
+     * @return the child at the given index
+     */
     public Node getChild(int index) {
         if (index > this.children.size()) {
             throw Util.fatalError("Node.java", "getChild(int",
@@ -84,10 +106,25 @@ public class Node {
         }
         return this.children.get(index);
     }
+
+    /**
+     * Retrieves a child of this Node with the given name.
+     * @param name the name of the child to retrieve
+     * @return the first child of this Node whose name matches the given name
+     */
     public Node getChild(String name) {
         for (Node child : this.children) if (child.getName().equals(name)) return child;
         throw Util.fatalError("Node.java", "getChild(String)",
                 "Unable to access child with name '" + name + "'");
+    }
+
+    /**
+     * @return whether or not this Node has any children
+     */
+    public boolean hasChildren() {
+        if (this.children == null) return false;
+        if (this.children.size() < 1) return false;
+        return true;
     }
 
     //Accessors
@@ -95,32 +132,25 @@ public class Node {
     public String getValue() { return this.value; }
     public boolean hasName() { return this.name != null; }
     public boolean hasValue() { return this.value != null; }
-    public boolean hasChildren() {
-        if (this.children == null) return false;
-        if (this.children.size() < 1) return false;
-        return true;
-    }
 
     //Mutators
     public void setValue(String value) { this.value = value; }
     public void setName(String name) { this.name = name; }
 
     /**
-     * @purpose is convert a node to an Android Bundle
-     * @param bundle the bundle to store the node data in
-     * @param node the node to convert
-     * @return the bundle with the node data now in it
+     * Adds the given Node's data to the given Bundle.
+     * @param bundle the Bundle to store the Node data in
+     * @param node the Node whose data is to be added to the given Bundle.
      */
-    public static Bundle nodeToBundle(Bundle bundle, Node node) {
+    public static void nodeToBundle(Bundle bundle, Node node) {
         nodeToBundleR(bundle, "", node);
-        return bundle;
     }
 
     /**
-     * @purpose is to recursively traverse a node and put its contents into the given Android Bundle
-     * @param bundle the bundle to put the node data in
-     * @param preface the preface for the bundle data naming (maintains the structure of the node)
-     * @param node the node whose data to deposit into the bundle
+     * Recursively traverses a Node and put its contents into the given Bundle
+     * @param bundle the Bundle to put the node data in
+     * @param preface the preface for the Bundle data naming (maintains the structure of the Node)
+     * @param node the Node whose data to deposit into the Bundle
      */
     private static void nodeToBundleR(Bundle bundle, String preface, Node node) {
         bundle.putString(preface + node.getName(), node.getValue());
@@ -130,7 +160,7 @@ public class Node {
     }
 
     /**
-     * @purpose is to read a node from a file
+     * Reads a Node from a given resource.
      * @param resourceID the resourceID to read the node from
      * @return the read Node
      */
@@ -150,7 +180,7 @@ public class Node {
     }
 
     /**
-     * @purpose is to recursively reads a Node from a file
+     * Recursively reads a Node from a given list of strings.
      * @param node the current Node in focus
      * @param fileContents the recursively static file contents
      * @param i the current line of fileContents in focus

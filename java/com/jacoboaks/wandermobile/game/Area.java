@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @purpose is to represent a single area - composed of tiles and organized as shown below
+ * Represent a single area composed of StaticTiles and Entities.
  */
 public class Area {
 
@@ -20,7 +20,7 @@ public class Area {
     private List<Entity> entities;
 
     /**
-     * @purpose is to construct the area with only a name
+     * Constructs this Area with only a name.
      * @param name the name of the zone
      */
     public Area(String name) {
@@ -28,7 +28,7 @@ public class Area {
     }
 
     /**
-     * @purpose is to construct the area with a name and a list of tiles and entities
+     * Constructs this Area with a name and a list of tiles and entities.
      * @param name the name of the zone
      * @param staticTiles the list of static tiles of the zone
      * @param entities the list of entities of the zone
@@ -52,14 +52,14 @@ public class Area {
     }
 
     /**
-     * @returns the tile (or entity if there is one) at the given grid position. will return
+     * @return the StaticTile (or Entity if there is one) at the given grid position. Will return
      * null if there is none there
      */
     public Tile getTile(int gx, int gy) {
 
         //create tile and position coordinate
         Tile t = null;
-        Coord pos = new Coord();
+        Coord pos;
 
         //search static tiles
         for (StaticTile st : this.staticTiles) {
@@ -78,11 +78,13 @@ public class Area {
     }
 
     /**
-     * @purpose is to load a brand new area from a given resource id
+     * Loads a brand new area from a given resource id
      * @param resourceID the resource id of the area to load
      * @return the loaded area
      */
-    static final Area loadArea(int resourceID) {
+    static Area loadArea(int resourceID) {
+
+        //TODO: complete area loading from given resource IDs
 
         return new Area("");
     }
