@@ -77,6 +77,9 @@ public class Area {
         return t;
     }
 
+    //Accessor
+    public String getName() { return this.name; }
+
     /**
      * Loads a brand new area from a given resource id
      * @param resourceID the resource id of the area to load

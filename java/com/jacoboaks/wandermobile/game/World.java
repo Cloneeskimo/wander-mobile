@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.jacoboaks.wandermobile.R;
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
+import com.jacoboaks.wandermobile.game.gameitem.StaticTile;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.game.gameitem.Tile;
 import com.jacoboaks.wandermobile.graphics.FollowingCamera;
@@ -47,8 +48,11 @@ public class World {
         this.player = player;
         this.selectionTile = new Tile("Selection", new Texture(R.drawable.selected), 0, 0);
 
-        //set hud reference
+        //set hud reference, update area name in hud
         this.hud = hud;
+        TextItem areaName = (TextItem)this.hud.getItem("AREA_NAME");
+        areaName.setText(this.area.getName());
+        this.hud.reloadPlacement("AREA_NAME", HUD.Placement.BOTTOM_MIDDLE, 0.01f);
     }
 
     /**
@@ -141,10 +145,10 @@ public class World {
         //check if there is already a selected tile
         if (this.tileSelected) {
             this.tileSelected = false;
-            this.hud.getItem(3).setVisibility(false);
-            this.hud.getItem(4).setVisibility(false);
-            this.hud.getItem(5).setVisibility(false);
-            this.hud.getItem(6).setVisibility(false);
+            this.hud.getItem("SELECTION").setVisibility(false);
+            this.hud.getItem("SELECTION_NAME").setVisibility(false);
+            this.hud.getItem("SELECTION_INFO").setVisibility(false);
+            this.hud.getItem("ENTITY_SELECTION_HEALTH").setVisibility(false);
         } else { //respond to tap
 
             Coord position = new Coord(x, y);
@@ -177,21 +181,26 @@ public class World {
         if (selectedTile != null) {
 
             //set basic hud info
-            this.hud.getItem(3).setVisibility(true);
-            TextItem ti = (TextItem)this.hud.getItem(4);
+            this.hud.getItem("SELECTION").setVisibility(true);
+            TextItem ti = (TextItem)this.hud.getItem("SELECTION_NAME");
             ti.setVisibility(true);
             ti.setText(selectedTile.getName());
             ti.getModel().getMaterial().setColor(selectedTile.getModel().getMaterial().getColor());
+            ti = (TextItem)this.hud.getItem("SELECTION_INFO");
+            ti.setVisibility(true);
 
-            //check if entity
+            //check if Entity
             if (selectedTile instanceof Entity) {
                 Entity e = (Entity)selectedTile;
-                ti = (TextItem)this.hud.getItem(5);
-                ti.setVisibility(true);
                 ti.setText("Level: " + e.getLevel());
-                ti = (TextItem)this.hud.getItem(6);
+                ti = (TextItem)this.hud.getItem("ENTITY_SELECTION_HEALTH");
                 ti.setVisibility(true);
                 ti.setText("HP: " + e.getHealth() + "/" + e.getMaxHealth());
+
+            //check if StaticTile
+            } else if (selectedTile instanceof StaticTile) {
+                StaticTile st = (StaticTile)selectedTile;
+                ti.setText("Maneuverability: " + st.getManeuverability());
             }
         }
     }

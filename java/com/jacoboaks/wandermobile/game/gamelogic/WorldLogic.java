@@ -77,44 +77,49 @@ public class WorldLogic implements GameLogic {
         //fps label
         TextItem fpsLabel = new TextItem(this.font, "FPS: ", textMaterial, 0f, 0f);
         fpsLabel.scale(0.13f);
-        this.hud.addItem(fpsLabel, HUD.Placement.BOTTOM_LEFT, 0.02f);
+        this.hud.addItem("FPS_LABEL", fpsLabel, HUD.Placement.BOTTOM_LEFT, 0.02f);
 
         //fps counter
         TextItem fpsCounter = new TextItem(this.font, "calculating...", textMaterial, 0f, 0f);
         fpsCounter.scale(0.13f);
-        this.hud.addItem(fpsCounter, HUD.Placement.RIGHT_OF_LAST, 0f);
+        this.hud.addItem("FPS_COUNTER", fpsCounter, HUD.Placement.RIGHT_OF_LAST, 0f);
 
         //wander title
         TextItem title = new TextItem(this.font, "Wander Mobile v" + MainActivity.WANDER_VERSION
                 + "b" + MainActivity.WANDER_BUILD, textMaterial, 0f, 0f);
         title.scale(0.2f);
-        this.hud.addItem(title, HUD.Placement.TOP_LEFT, 0.02f);
+        this.hud.addItem("TITLE", title, HUD.Placement.TOP_LEFT, 0.02f);
 
         //selection
         TextItem selection = new TextItem(this.font, "Selection:", textMaterial, 0f, 0f);
         selection.scale(0.19f);
         selection.setVisibility(false);
-        this.hud.addItem(selection, HUD.Placement.BELOW_LAST, 0.13f);
+        this.hud.addItem("SELECTION", selection, HUD.Placement.BELOW_LAST, 0.13f);
 
         //selection name
-        Material selectionNameMaterial = new Material(font.getFontSheet(), new Color(1.0f, 1.0f, 1.0f, 1.0f), true);
-        TextItem selectionName = new TextItem(this.font, "", selectionNameMaterial, 0f, 0f);
+        Material selectionInfoMaterial = new Material(font.getFontSheet(), new Color(1.0f, 1.0f, 1.0f, 1.0f), true);
+        TextItem selectionName = new TextItem(this.font, "", selectionInfoMaterial, 0f, 0f);
         selectionName.scale(0.155f);
         selectionName.setVisibility(false);
-        this.hud.addItem(selectionName, HUD.Placement.BELOW_LAST, 0.02f);
+        this.hud.addItem("SELECTION_NAME", selectionName, HUD.Placement.BELOW_LAST, 0.02f);
 
         //entity selection level
-        TextItem selectionLevel = new TextItem(this.font, "", selectionNameMaterial, 0f, 0f);
-        selectionLevel.scale(0.126f);
-        selectionLevel.setVisibility(false);
-        this.hud.addItem(selectionLevel, HUD.Placement.BELOW_LAST, 0.02f);
+        TextItem selectionInfo = new TextItem(this.font, "", selectionInfoMaterial, 0f, 0f);
+        selectionInfo.scale(0.126f);
+        selectionInfo.setVisibility(false);
+        this.hud.addItem("SELECTION_INFO", selectionInfo, HUD.Placement.BELOW_LAST, 0.02f);
 
         //entity selection health
-        Material healthMaterial = new Material(font.getFontSheet(), new Color(0.8f, 0.1f, 0.1f, 1.0f), true);
+        Material healthMaterial = new Material(this.font.getFontSheet(), new Color(0.8f, 0.1f, 0.1f, 1.0f), true);
         TextItem entitySelectionHealth = new TextItem(this.font, "", healthMaterial, 0f, 0f);
         entitySelectionHealth.scale(0.126f);
         entitySelectionHealth.setVisibility(false);
-        this.hud.addItem(entitySelectionHealth, HUD.Placement.BELOW_LAST, 0.02f);
+        this.hud.addItem("ENTITY_SELECTION_HEALTH", entitySelectionHealth, HUD.Placement.BELOW_LAST, 0.02f);
+
+        //area name
+        TextItem areaName = new TextItem(this.font, "", textMaterial, 0f, 0f);
+        areaName.scale(0.20f);
+        this.hud.addItem("AREA_NAME", areaName, HUD.Placement.BOTTOM_MIDDLE, 0.02f);
     }
 
     /**
@@ -161,7 +166,7 @@ public class WorldLogic implements GameLogic {
      * @param FPS the current FPS
      */
     public void onFPSUpdate(float FPS) {
-        TextItem fpsCounter = (TextItem)this.hud.getItem(1);
+        TextItem fpsCounter = (TextItem)this.hud.getItem("FPS_COUNTER");
         fpsCounter.setText(Float.toString(FPS));
     }
 

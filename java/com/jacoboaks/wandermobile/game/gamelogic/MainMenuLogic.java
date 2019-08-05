@@ -50,20 +50,20 @@ public class MainMenuLogic implements GameLogic {
         TextItem title = new TextItem(this.font, "Wander Mobile", new Material(this.font.getFontSheet(),
                 new Color(1.0f, 1.0f, 1.0f, 1.0f), true), 0f, 0f);
         title.scale(0.4f);
-        this.hud.addItem(title, HUD.Placement.TOP_MIDDLE, 0.19f);
+        this.hud.addItem("TITLE", title, HUD.Placement.TOP_MIDDLE, 0.19f);
 
         //add version and build tag
         TextItem bvTag = new TextItem(this.font, "v" + MainActivity.WANDER_VERSION + "b" + MainActivity.WANDER_BUILD,
                 title.getModel().getMaterial(), 0f, 0f);
         bvTag.scale(0.14f);
-        this.hud.addItem(bvTag, HUD.Placement.BELOW_LAST, 0.05f);
+        this.hud.addItem("BUILD_VERSION_TAG", bvTag, HUD.Placement.BELOW_LAST, 0.05f);
 
         //create button and add to hud
         ButtonTextItem playButton = new ButtonTextItem(this.font, "Play",
                 new Color(0.0f, 0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f),
                 MainMenuLogic.PLAY_BUTTON_ACTION_CODE);
         playButton.scale(0.24f);
-        this.hud.addItem(playButton, HUD.Placement.MIDDLE, 0f);
+        this.hud.addItem("PLAY_BUTTON", playButton, HUD.Placement.MIDDLE, 0f);
     }
 
     //Data Loading Method
@@ -77,7 +77,7 @@ public class MainMenuLogic implements GameLogic {
     public boolean input(MotionEvent e) {
 
         //apply input data to play button
-        ButtonTextItem playButton = (ButtonTextItem)this.hud.getItem(2);
+        ButtonTextItem playButton = (ButtonTextItem)this.hud.getItem("PLAY_BUTTON");
         int actionCode = playButton.updateSelection(e);
 
         //check if button was pressed and switch to world logic if so

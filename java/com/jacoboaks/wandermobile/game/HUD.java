@@ -12,7 +12,9 @@ import com.jacoboaks.wandermobile.util.Coord;
 import com.jacoboaks.wandermobile.util.Util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Holds many GameItems to be rendered over top of a World.
@@ -20,14 +22,15 @@ import java.util.List;
 public class HUD {
 
     //Data
-    private List<GameItem> gameItems;
+    private Map<String, GameItem> gameItems;
     private ShaderProgram shaderProgram;
+    private GameItem lastAdded;
 
     /**
      * Constructs this HUD.
      */
     public HUD() {
-        this.gameItems = new ArrayList<>();
+        this.gameItems = new HashMap<>();
         this.initShaderProgram();
     }
 
@@ -55,25 +58,29 @@ public class HUD {
 
     /**
      * Adds a new GameItem to this HUD using the given information.
+     * @param tag the tag to identify this item with
      * @param item the item to add
      * @param x the normalized x to place the item at
      * @param y the normalized y to place the item at
      */
-    public void addItem(GameItem item, float x, float y) {
+    public void addItem(String tag, GameItem item, float x, float y) {
         Coord coord = new Coord(x, y);
         Transformation.normalizedToAspected(coord);
         item.setX(coord.x);
         item.setY(coord.y);
-        this.gameItems.add(item);
+        this.gameItems.put(tag, item);
+        this.lastAdded = item;
     }
 
     /**
      * Adds a new GameItem to this HUD using the given information.
+     * @param tag the tag to identify this item with
      * @param item the item to add
      * @param placement the placement for the item to go. can be relative to the last item added
      *                  or to the various corners of the screen.
+     * @param padding the amount of padding between the given placement and the item
      */
-    public void addItem(GameItem item, Placement placement, float padding) {
+    public void addItem(String tag, GameItem item, Placement placement, float padding) {
 
         //create coordinate for new position
         Coord newPos = new Coord();
@@ -152,7 +159,74 @@ public class HUD {
         item.setY(newPos.y);
 
         //add item
-        this.gameItems.add(item);
+        this.gameItems.put(tag, item);
+        this.lastAdded = item;
+    }
+
+    /**
+     * Reloads the placement for a HUD item. Useful for when sizes change. This only works
+     * for the placements that are not relative to other placements.
+     * @param tag the tag of the item to reset
+     * @param placement the placement to reset the item to
+     * @param padding the amount of padding to give the item
+     */
+    public void reloadPlacement(String tag, Placement placement, float padding) {
+
+        //get item reference
+        Coord newPos;
+        GameItem item = this.gameItems.get(tag);
+
+        //figure out new coordinates
+        switch (placement) {
+            case TOP_LEFT:
+                newPos = new Coord(-1f, 1f);
+                Transformation.normalizedToAspected(newPos);
+                newPos.x += padding;
+                newPos.y -= padding;
+                break;
+            case TOP_MIDDLE:
+                newPos = new Coord(0f, 1f);
+                Transformation.normalizedToAspected(newPos);
+                newPos.x -= (item.getWidth() / 2);
+                newPos.y -= (padding + item.getHeight());
+                break;
+            case TOP_RIGHT:
+                newPos = new Coord(1f, 1f);
+                Transformation.normalizedToAspected(newPos);
+                newPos.x -= (padding + item.getWidth());
+                newPos.y -= padding;
+                break;
+            case MIDDLE:
+                newPos = new Coord(0f, 0f);
+                newPos.x -= item.getWidth() / 2;
+                newPos.y -= item.getHeight() / 2;
+                break;
+            case BOTTOM_LEFT:
+                newPos = new Coord(-1f, -1f);
+                Transformation.normalizedToAspected(newPos);
+                newPos.x += padding;
+                newPos.y += (padding + item.getHeight());
+                break;
+            case BOTTOM_MIDDLE:
+                newPos = new Coord(0f, -1f);
+                Transformation.normalizedToAspected(newPos);
+                newPos.x -= (item.getWidth() / 2);
+                newPos.y += (padding + item.getHeight());
+                break;
+            case BOTTOM_RIGHT:
+                newPos = new Coord(1f, -1f);
+                Transformation.normalizedToAspected(newPos);
+                newPos.x -= (padding + item.getWidth());
+                newPos.y += (padding + item.getHeight());
+                break;
+            default:
+                throw Util.fatalError("HUD.java", "reloadPlacement(String, Placement, float)",
+                        "Invalid placement given. Only non-relative placements may be reloaded");
+        }
+
+        //set coordinates
+        item.setX(newPos.x);
+        item.setY(newPos.y);
     }
 
     //Render Method
@@ -168,7 +242,7 @@ public class HUD {
                 new int[] { GameRenderer.surfaceAspectRatioAction ? 1 : 0 }, 0);
 
         //draw game items
-        for (GameItem gameItem: this.gameItems) gameItem.render(this.shaderProgram);
+        for (String tag: this.gameItems.keySet()) this.gameItems.get(tag).render(this.shaderProgram);
 
         //unbind shader program
         this.shaderProgram.unbind();
@@ -180,13 +254,12 @@ public class HUD {
      */
     private Coord topLeftCoordsOfLastItem() {
         Coord coords = new Coord(0f, 0f);
-        if (this.gameItems.size() > 0) {
-            GameItem item = this.gameItems.get(gameItems.size() - 1);
-            coords.x = item.getX();
-            coords.y = item.getY();
-            if (!(item instanceof TextItem)) {
-                coords.x -= (item.getWidth() / 2);
-                coords.y += (item.getHeight() / 2);
+        if (this.lastAdded != null) {
+            coords.x = this.lastAdded.getX();
+            coords.y = this.lastAdded.getY();
+            if (!(this.lastAdded instanceof TextItem)) {
+                coords.x -= (this.lastAdded.getWidth() / 2);
+                coords.y += (this.lastAdded.getHeight() / 2);
             }
         }
         return coords;
@@ -197,19 +270,15 @@ public class HUD {
      */
     private Coord sizeOfLastItem() {
         Coord size = new Coord(0f, 0f);
-        if (this.gameItems.size() > 0) {
-            size.x = gameItems.get(gameItems.size() - 1).getWidth();
-            size.y = gameItems.get(gameItems.size() - 1).getHeight();
+        if (this.lastAdded != null) {
+            size.x = this.lastAdded.getWidth();
+            size.y = this.lastAdded.getHeight();
         }
         return size;
     }
 
     //Accessor
-    public GameItem getItem(int index) {
-        if (index >= gameItems.size() || index < 0) Util.fatalError("HUD.java", "getItem(int)",
-                "index '" + index + "' is out of range.");
-        return this.gameItems.get(index);
-    }
+    public GameItem getItem(String tag) { return this.gameItems.get(tag); }
 
     /**
      * Represents some possible placements for an item to go when added to the HUD
