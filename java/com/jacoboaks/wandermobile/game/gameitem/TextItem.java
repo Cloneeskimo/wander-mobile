@@ -16,9 +16,9 @@ import java.util.List;
 public class TextItem extends GameItem {
 
     //Data
-    private Font font; //the font used for the text
-    private String text; //the text
-    private float width, height, scale; //the width, height, and scale of the text
+    protected Font font; //the font used for the text
+    protected String text; //the text
+    protected float width, height, scale; //the width, height, and scale of the text
 
     /**
      * Constructs this TextItem.

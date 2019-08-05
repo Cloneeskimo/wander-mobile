@@ -25,10 +25,8 @@ public class HUD {
 
     /**
      * Constructs this HUD.
-     * @param aspectRatio the aspect ration of the surface
-     * @param aspectRatioAction the aspect ratio action given the current aspect ratio (explained in data)
      */
-    public HUD(float aspectRatio, boolean aspectRatioAction) {
+    public HUD() {
         this.gameItems = new ArrayList<>();
         this.initShaderProgram();
     }
@@ -88,16 +86,33 @@ public class HUD {
                 newPos.x += padding;
                 newPos.y -= padding;
                 break;
+            case TOP_MIDDLE:
+                newPos = new Coord(0f, 1f);
+                Transformation.normalizedToAspected(newPos);
+                newPos.x -= (item.getWidth() / 2);
+                newPos.y -= (padding + item.getHeight());
+                break;
             case TOP_RIGHT:
                 newPos = new Coord(1f, 1f);
                 Transformation.normalizedToAspected(newPos);
                 newPos.x -= (padding + item.getWidth());
                 newPos.y -= padding;
                 break;
+            case MIDDLE:
+                newPos = new Coord(0f, 0f);
+                newPos.x -= item.getWidth() / 2;
+                newPos.y -= item.getHeight() / 2;
+                break;
             case BOTTOM_LEFT:
                 newPos = new Coord(-1f, -1f);
                 Transformation.normalizedToAspected(newPos);
                 newPos.x += padding;
+                newPos.y += (padding + item.getHeight());
+                break;
+            case BOTTOM_MIDDLE:
+                newPos = new Coord(0f, -1f);
+                Transformation.normalizedToAspected(newPos);
+                newPos.x -= (item.getWidth() / 2);
                 newPos.y += (padding + item.getHeight());
                 break;
             case BOTTOM_RIGHT:
@@ -201,8 +216,11 @@ public class HUD {
      */
     public enum Placement {
         TOP_LEFT,
+        TOP_MIDDLE,
         TOP_RIGHT,
+        MIDDLE,
         BOTTOM_LEFT,
+        BOTTOM_MIDDLE,
         BOTTOM_RIGHT,
         LEFT_OF_LAST,
         RIGHT_OF_LAST,

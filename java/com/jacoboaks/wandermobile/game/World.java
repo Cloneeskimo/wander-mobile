@@ -135,8 +135,6 @@ public class World {
      * Registers a single tap on the world - user is either selecting or deselecting a tile.
      * @param x the screen x position of the tap
      * @param y the screen y position of the tap
-     * @param w the width of the screen
-     * @param h the height of the screen
      */
     public void registerTap(float x, float y) {
 

@@ -11,10 +11,10 @@ import com.jacoboaks.wandermobile.graphics.ShaderProgram;
 public abstract class GameItem {
 
     //Data
-    Model model; //model
-    float x, y; //world position
-    float vx = 0, vy = 0; //velocity
-    boolean visible; //visibility
+    protected Model model; //model
+    protected float x, y; //world position
+    protected float vx = 0, vy = 0; //velocity
+    protected boolean visible; //visibility
 
     /**
      * Constructs this GameItem with the given model, world x, and world y position.

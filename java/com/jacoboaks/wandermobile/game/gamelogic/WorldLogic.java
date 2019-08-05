@@ -69,7 +69,7 @@ public class WorldLogic implements GameLogic {
     private void initHUD() {
 
         //create HUD
-        this.hud = new HUD(GameRenderer.surfaceAspectRatio, GameRenderer.surfaceAspectRatioAction);
+        this.hud = new HUD();
 
         //create hud text material
         Material textMaterial = new Material(font.getFontSheet(), new Color(1.0f, 1.0f, 1.0f, 1.0f), true);
@@ -173,7 +173,9 @@ public class WorldLogic implements GameLogic {
 
     //Input Method
     @Override
-    public boolean input(MotionEvent e) { return this.control.input(e, this.world); }
+    public boolean input(MotionEvent e) {
+
+        return this.control.input(e, this.world); }
 
     //Scale Input Method
     @Override
