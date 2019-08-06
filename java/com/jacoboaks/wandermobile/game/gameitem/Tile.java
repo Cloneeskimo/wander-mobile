@@ -7,6 +7,7 @@ import com.jacoboaks.wandermobile.graphics.Texture;
 import com.jacoboaks.wandermobile.graphics.Transformation;
 import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Coord;
+import com.jacoboaks.wandermobile.util.Node;
 
 /**
  * Represents a specific type of GameItem which is a tile existing in the grid world.
@@ -59,6 +60,60 @@ public class Tile extends GameItem {
         this.symbolTile = false;
         this.symbol = 0;
         this.name = name;
+    }
+
+    /**
+     * Contructs this Tile by copying another Tile.
+     * @param other the Tile to copy from
+     */
+    public Tile(Tile other) {
+        super(other);
+        this.name = other.name;
+        this.igx = other.igx;
+        this.igy = other.igy;
+        this.impendingMovementTime = other.impendingMovementTime;
+        this.tgtX = other.tgtX;
+        this.tgtY = other.tgtY;
+        this.symbolTile = other.symbolTile;
+        this.isMoving = other.isMoving;
+        this.symbol = other.symbol;
+    }
+
+    /**
+     * Constructs this Tile using a given Node. This constructor assumes that this Tile is a symbol
+     * tile.
+     * @param data the node to use when constructing this Tile
+     * @param font the font to draw the character from
+     */
+    protected Tile(Node data, Font font) {
+        this(data.getChild("name").getValue(), font, data.getChild("symbol").getValue().charAt(0),
+                new Color(data.getChild("color")), Integer.parseInt(data.getChild("gridx").getValue()),
+                Integer.parseInt(data.getChild("gridy").getValue()));
+    }
+
+    /**
+     * Constructs this Tile using a given Node. This constructor assume that this Tile is not a
+     * symbol tile.
+     * @param data the node to use when constructing this Tile
+     */
+    protected Tile(Node data) {
+        this(data.getChild("name").getValue(), new Texture(Integer.parseInt(data.getChild("texture").getValue())),
+                Integer.parseInt(data.getChild("gridx").getValue()), Integer.parseInt(data.getChild("gridy").getValue()));
+    }
+
+    /**
+     * Creates a Tile with the given data. Will make the differentiation between symbol tiles and
+     * non-symbol tiles so that one doesn't have to choose which constructor to use.
+     * @param data the node to use when constructing this Tile
+     * @param font the font to draw the character from
+     * @return the constructed Tile
+     */
+    public static Tile nodeToTile(Node data, Font font) {
+        if (Boolean.parseBoolean(data.getChild("symbolTile").getValue())) {
+            return new Tile(data, font);
+        } else {
+            return new Tile(data);
+        }
     }
 
     //Update Method
@@ -187,5 +242,21 @@ public class Tile extends GameItem {
         Coord position = new Coord(this.x, this.y);
         Transformation.worldToGrid(position);
         return position;
+    }
+
+    //Node Converter
+    public Node toNode() {
+        Node node = new Node(Character.toString(this.symbol), "Tile");
+        node.addChild(new Node("name", this.name));
+        node.addChild(new Node("symbolTile", Boolean.toString(this.symbolTile)));
+        if (this.symbolTile) {
+            node.addChild(new Node("symbol", Character.toString(this.symbol)));
+            node.addChild(this.model.getMaterial().getColor().toNode());
+        }
+        else node.addChild(new Node("texture", Integer.toString(this.model.getMaterial().getTexture().getResourceID())));
+        Coord gridPosition = this.getGridPosition();
+        node.addChild(new Node("gridx", Integer.toString((int)gridPosition.x)));
+        node.addChild(new Node("gridy", Integer.toString((int)gridPosition.y)));
+        return node;
     }
 }

@@ -46,7 +46,7 @@ public class World {
         //set area and player references
         this.area = area;
         this.player = player;
-        this.selectionTile = new Tile("Selection", new Texture(R.drawable.selected), 0, 0);
+        this.selectionTile = new Tile("Selection", new Texture(R.drawable.texture_selected), 0, 0);
 
         //set hud reference, update area name in hud
         this.hud = hud;
@@ -72,8 +72,8 @@ public class World {
 
         //create shader program, load shaders, and link them.
         this.shaderProgram = new ShaderProgram();
-        this.shaderProgram.loadShader(R.raw.worldvshader, GLES20.GL_VERTEX_SHADER);
-        this.shaderProgram.loadShader(R.raw.worldfshader, GLES20.GL_FRAGMENT_SHADER);
+        this.shaderProgram.loadShader(R.raw.shader_worldvertex, GLES20.GL_VERTEX_SHADER);
+        this.shaderProgram.loadShader(R.raw.shader_worldfragment, GLES20.GL_FRAGMENT_SHADER);
         this.shaderProgram.link();
 
         //register shader program uniforms
@@ -128,7 +128,7 @@ public class World {
         this.area.render(this.shaderProgram);
         this.player.render(this.shaderProgram);
 
-        //render selection if tile selected
+        //render selection if tile texture_selected
         if (this.tileSelected) this.selectionTile.render(this.shaderProgram);
 
         //unbind shader program
@@ -142,7 +142,7 @@ public class World {
      */
     public void registerTap(float x, float y) {
 
-        //check if there is already a selected tile
+        //check if there is already a texture_selected tile
         if (this.tileSelected) {
             this.tileSelected = false;
             this.hud.getItem("SELECTION").setVisibility(false);
@@ -162,13 +162,13 @@ public class World {
     }
 
     /**
-     * Registers a selected tile and updates the corresponding HUD.
+     * Registers a texture_selected tile and updates the corresponding HUD.
      * @param gx the grid x of the tile
      * @param gy the grid y of the tile
      */
     private void registerSelection(int gx, int gy) {
 
-        //get selected tile
+        //get texture_selected tile
         Tile selectedTile = this.area.getTile(gx, gy);
 
         //check if player

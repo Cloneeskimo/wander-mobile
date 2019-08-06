@@ -20,6 +20,7 @@ public class Texture {
     //Data
     private int id[];
     private int width, height;
+    private int resourceID;
 
     /**
      * Constructs this texture.
@@ -63,10 +64,14 @@ public class Texture {
 
         //recycle bitmap
         bmp.recycle();
+
+        //save resource id
+        this.resourceID = resourceID;
     }
 
     //Accessors
     public int getID() { return this.id[0]; }
     public int getWidth() { return this.width; }
     public int getHeight() { return this.height; }
+    public int getResourceID() { return this.resourceID; }
 }

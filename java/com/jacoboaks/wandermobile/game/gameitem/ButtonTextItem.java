@@ -21,10 +21,10 @@ public class ButtonTextItem extends TextItem {
 
     /**
      * Constructs this ButtonTextItem with the given information.
-     * @param font the font to use for the text
+     * @param font the font_default to use for the text
      * @param text the text to display
-     * @param unselected the color to use when the button is not selected
-     * @param selected the color to use when the button is selected
+     * @param unselected the color to use when the button is not texture_selected
+     * @param selected the color to use when the button is texture_selected
      * @param actionCode the action code to return when this button is pressed
      */
     public ButtonTextItem(Font font, String text, Color unselected, Color selected, int actionCode) {
@@ -32,6 +32,18 @@ public class ButtonTextItem extends TextItem {
         this.unselectedColor = unselected;
         this.selectedColor = selected;
         this.actionCode = actionCode;
+    }
+
+    /**
+     * Constructs this ButtonTextItem by copying another ButtonTextItem.
+     * @param other the ButtonTextItem to copy from
+     */
+    public ButtonTextItem(ButtonTextItem other) {
+        super(other);
+        this.actionCode = other.actionCode;
+        this.unselectedColor = other.unselectedColor;
+        this.selectedColor = other.selectedColor;
+        this.selected = other.selected;
     }
 
     /**
@@ -57,7 +69,7 @@ public class ButtonTextItem extends TextItem {
                 this.selected = false;
                 this.model.getMaterial().setColor(this.unselectedColor);
                 return this.actionCode;
-            } else if (!this.selected) { //otherwise make sure appropriate color is selected
+            } else if (!this.selected) { //otherwise make sure appropriate color is texture_selected
                 this.model.getMaterial().setColor(this.selectedColor);
                 this.selected = true;
             }

@@ -11,9 +11,7 @@ import com.jacoboaks.wandermobile.graphics.Transformation;
 import com.jacoboaks.wandermobile.util.Coord;
 import com.jacoboaks.wandermobile.util.Util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,8 +39,8 @@ public class HUD {
 
         //create shader program, load shaders, and link them.
         this.shaderProgram = new ShaderProgram();
-        this.shaderProgram.loadShader(R.raw.hudvshader, GLES20.GL_VERTEX_SHADER);
-        this.shaderProgram.loadShader(R.raw.hudfshader, GLES20.GL_FRAGMENT_SHADER);
+        this.shaderProgram.loadShader(R.raw.shader_hudvertex, GLES20.GL_VERTEX_SHADER);
+        this.shaderProgram.loadShader(R.raw.shader_hudfragment, GLES20.GL_FRAGMENT_SHADER);
         this.shaderProgram.link();
 
         //register shader program uniforms

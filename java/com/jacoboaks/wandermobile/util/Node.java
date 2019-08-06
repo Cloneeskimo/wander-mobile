@@ -114,8 +114,7 @@ public class Node {
      */
     public Node getChild(String name) {
         for (Node child : this.children) if (child.getName().equals(name)) return child;
-        throw Util.fatalError("Node.java", "getChild(String)",
-                "Unable to access child with name '" + name + "'");
+        return null;
     }
 
     /**

@@ -32,6 +32,15 @@ public class Color {
         this.a = a;
     }
 
+    /**
+     * Constructs this Color using a Node.
+     * @param data the Node to use when constructing this Color
+     */
+    public Color(Node data) {
+        this(Float.parseFloat(data.getChild("r").getValue()), Float.parseFloat(data.getChild("g").getValue()),
+                Float.parseFloat(data.getChild("b").getValue()), Float.parseFloat(data.getChild("a").getValue()));
+    }
+
     //Accessors
     public float getR() { return this.r; }
     public float getG() { return this.g; }
@@ -44,4 +53,14 @@ public class Color {
     public void setG(float g) { this.g = g; }
     public void setB(float b) { this.b = b; }
     public void setA(float a) { this.a = a; }
+
+    //Node Converter
+    public Node toNode() {
+        Node node = new Node("color");
+        node.addChild(new Node("r", Float.toString(this.r)));
+        node.addChild(new Node("g", Float.toString(this.g)));
+        node.addChild(new Node("b", Float.toString(this.b)));
+        node.addChild(new Node("a", Float.toString(this.a)));
+        return node;
+    }
 }

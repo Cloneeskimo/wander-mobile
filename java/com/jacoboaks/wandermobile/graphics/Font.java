@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * Font Class
- * Represents a font by having a font sheet texture which contains all the characters of the font in
+ * Represents a font_default by having a font_default sheet texture which contains all the characters of the font_default in
  * ASCII order. While they may start at a custom character, they may NOT skip characters.
  */
 public class Font {
@@ -21,12 +21,12 @@ public class Font {
     private Map<Character, Integer> letterCutoffs;
 
     /**
-     * Constructs this font with the given information.
-     * @param fontResourceID the resource ID of the font sheet
+     * Constructs this font_default with the given information.
+     * @param fontResourceID the resource ID of the font_default sheet
      * @param letterCutoffResourceID the resource ID of the letter cutoff file
-     * @param charsPerRow how many characters there are per row of the font sheet
-     * @param charsPerColumn how many characters there are per column of the font sheet
-     * @param startingChar the character at the beginning of the font sheet. The least this value will
+     * @param charsPerRow how many characters there are per row of the font_default sheet
+     * @param charsPerColumn how many characters there are per column of the font_default sheet
+     * @param startingChar the character at the beginning of the font_default sheet. The least this value will
      *                     be is 0. The max this value will be is 127.
      */
     public Font(int fontResourceID, int letterCutoffResourceID, int charsPerRow, int charsPerColumn, char startingChar) {
@@ -39,7 +39,7 @@ public class Font {
     }
 
     /**
-     * Reads and parses the letter cutoffs file of this font.
+     * Reads and parses the letter cutoffs file of this font_default.
      * @param letterCutoffResourceID the resource ID of the letter cutoff file
      */
     private void initLetterCutoffs(int letterCutoffResourceID) {
@@ -59,7 +59,7 @@ public class Font {
     /**
      * @param toGet the character whose texture coordinates to receive
      * @param cutoff whether to incorporate cutoff into the texture coordinates
-     * @return the texture coordinates for given character if using this font (for a standard square model)
+     * @return the texture coordinates for given character if using this font_default (for a standard square model)
      */
     public float[] getCharacterTextureCoordinates(char toGet, boolean cutoff) {
 

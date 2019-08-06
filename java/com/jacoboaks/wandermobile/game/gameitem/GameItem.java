@@ -29,6 +29,19 @@ public abstract class GameItem {
         this.visible = true;
     }
 
+    /**
+     * Constructs this GameItem by copying another.
+     * @param other the GameItem to copy from
+     */
+    public GameItem(GameItem other) {
+        this.model = other.model;
+        this.x = other.x;
+        this.y = other.y;
+        this.vx = other.vx;
+        this.vy = other.vy;
+        this.visible = other.visible;
+    }
+
     //Update Method
     public void update(float dt) {
 

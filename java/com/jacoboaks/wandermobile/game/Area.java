@@ -1,13 +1,21 @@
 package com.jacoboaks.wandermobile.game;
 
+import android.util.Log;
+
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
 import com.jacoboaks.wandermobile.game.gameitem.StaticTile;
 import com.jacoboaks.wandermobile.game.gameitem.Tile;
+import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
+import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Coord;
+import com.jacoboaks.wandermobile.util.Node;
+import com.jacoboaks.wandermobile.util.Util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represent a single area composed of StaticTiles and Entities.
@@ -83,12 +91,85 @@ public class Area {
     /**
      * Loads a brand new area from a given resource id
      * @param resourceID the resource id of the area to load
+     * @param font the font to use for symbol tiles
      * @return the loaded area
      */
-    static Area loadArea(int resourceID) {
+    public static Area loadArea(int resourceID, Font font) {
 
-        //TODO: complete area loading from given resource IDs
+        //load data and parse load type
+        Node areaData = Node.readNode(resourceID);
+        String loadTypes = areaData.getChild("loadType").getValue();
 
-        return new Area("");
+        //create lists
+        List<StaticTile> st = new ArrayList<>();
+        List<Entity> e = new ArrayList<>();
+
+        //populate area based on load type
+        if (loadTypes.equals("row listing")) {
+
+            //load key
+            Node keyNode = areaData.getChild("key");
+            Map<Character, Tile> key = new HashMap<>();
+            for (Node child : keyNode.getChildren()) {
+
+                //check for type of tile and add accordingly
+                if (child.getName().equals("StaticTile")) {
+                    key.put(child.getValue().charAt(0), StaticTile.nodeToStaticTile(child, font));
+                } else if (child.getName().equals("Entity")) {
+                    key.put(child.getValue().charAt(0), Entity.nodeToEntity(child, font));
+                } else if (child.getName().equals("Tile")) {
+                    key.put(child.getValue().charAt(0), Tile.nodeToTile(child, font));
+                }
+            }
+
+            //load layout
+            boolean moreRows = false;
+            Node layout = areaData.getChild("layout");
+            Node nextRow = layout.getChild("row 1");
+            moreRows = nextRow != null;
+            for (int y = 1; moreRows; y++) {
+
+                //loop through row
+                String row = nextRow.getValue();
+                for (int x = 0; x < row.length(); x++) {
+
+                    //ignore spaces
+                    if (row.charAt(x) != ' ') {
+                        Tile matchingTile = key.get(row.charAt(x));
+                        if (matchingTile == null) { //check if null
+                            if (Util.DEBUG) Log.i(Util.getLogTag("Area.java", "loadArea(int, Font)"),
+                                    "invalid character in map (not defined in key): " + row.charAt(x));
+
+                        //copy and add tile if not
+                        } else {
+                            matchingTile.setGridPosition(x, -(y - 1));
+                            if (matchingTile instanceof StaticTile) {
+                                st.add(new StaticTile((StaticTile)matchingTile));
+                            } else if (matchingTile instanceof Entity) {
+                                e.add(new Entity((Entity)matchingTile));
+                            } else { //all normal tiles are treated as StaticTiles with a maneuverability of 0
+                                st.add(new StaticTile(matchingTile, 0));
+                            }
+                        }
+                    }
+                }
+
+                //check if there is another row
+                nextRow = layout.getChild("row " + (y + 1));
+                moreRows = nextRow != null;
+            }
+
+        } else if (loadTypes.equals("tile listing")) {
+
+            //TODO: implement tile listing area loading
+
+        //invalid load type given
+        } else {
+            throw Util.fatalError("Area.java", "loadArea(int)", "Unable to" +
+                    "load area with loadType: " + loadTypes + ". Options are: 'row listing' or 'tile listing'");
+        }
+
+        //create and return area
+        return new Area(areaData.getChild("name").getValue(), st, e);
     }
 }

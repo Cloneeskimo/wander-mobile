@@ -3,7 +3,6 @@ package com.jacoboaks.wandermobile.game.gamelogic;
 import android.opengl.GLES20;
 import android.os.Bundle;
 import android.view.MotionEvent;
-import android.widget.Button;
 
 import com.jacoboaks.wandermobile.MainActivity;
 import com.jacoboaks.wandermobile.R;
@@ -35,8 +34,8 @@ public class MainMenuLogic implements GameLogic {
         //set clear color
         GLES20.glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
 
-        //create font and hud
-        this.font = new Font(R.drawable.font, R.raw.fontcutoffs,10, 10, ' ');
+        //create font_default and hud
+        this.font = new Font(R.drawable.font_default, R.raw.fontcuttoffs_default,10, 10, ' ');
         this.initHUD();
     }
 

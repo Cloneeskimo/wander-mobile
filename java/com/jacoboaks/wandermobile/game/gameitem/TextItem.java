@@ -16,13 +16,13 @@ import java.util.List;
 public class TextItem extends GameItem {
 
     //Data
-    protected Font font; //the font used for the text
+    protected Font font; //the font_default used for the text
     protected String text; //the text
     protected float width, height, scale; //the width, height, and scale of the text
 
     /**
      * Constructs this TextItem.
-     * @param font the font to be used for the text
+     * @param font the font_default to be used for the text
      * @param text the text to be written
      * @param material the material to use for the text model
      * @param x the x position
@@ -36,7 +36,20 @@ public class TextItem extends GameItem {
     }
 
     /**
-     * Creates the appropriate model to display the given text using the given font.
+     * Constructs this TextItem by copying another one.
+     * @param other the TextItem to copy from
+     */
+    public TextItem(TextItem other) {
+        super(other);
+        this.font = other.font;
+        this.text = other.text;
+        this.width = other.width;
+        this.height = other.height;
+        this.scale = other.scale;
+    }
+
+    /**
+     * Creates the appropriate model to display the given text using the given font_default.
      * @param text the text to display
      */
     private void updateModel(String text) {
