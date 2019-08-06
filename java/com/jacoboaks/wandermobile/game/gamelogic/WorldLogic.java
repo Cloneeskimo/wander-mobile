@@ -11,10 +11,12 @@ import com.jacoboaks.wandermobile.game.HUD;
 import com.jacoboaks.wandermobile.game.World;
 import com.jacoboaks.wandermobile.game.gamecontrol.WorldControl;
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
+import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.game.gameitem.StaticTile;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
+import com.jacoboaks.wandermobile.graphics.Model;
 import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
@@ -32,6 +34,7 @@ public class WorldLogic implements GameLogic {
     private HUD hud;
     private WorldControl control;
     private Font font;
+    private float fadeOutTime = 0f;
 
     //Saved Data
     private Bundle savedInstanceData;
@@ -119,6 +122,13 @@ public class WorldLogic implements GameLogic {
         TextItem areaName = new TextItem(this.font, "", textMaterial, 0f, 0f);
         areaName.scale(0.20f);
         this.hud.addItem("AREA_NAME", areaName, HUD.Placement.BOTTOM_MIDDLE, 0.02f);
+
+        //fading box
+        GameItem fadingBox = new GameItem(new Model(Model.getScreenBoxModelCoords(), Model.STD_SQUARE_TEX_COORDS(),
+                Model.STD_SQUARE_DRAW_ORDER(), new Material(new Color(0.6f, 0.6f, 0.6f, 1.0f))), 0f, 0f);
+        fadingBox.scale(4.0f);
+        this.hud.addItem("Z_FADING_BOX", fadingBox, HUD.Placement.MIDDLE, 0f);
+        this.fadeOutTime = Util.FADE_TIME;
     }
 
     /**
@@ -130,20 +140,6 @@ public class WorldLogic implements GameLogic {
         Entity player = new Entity("Svenske", this.font, 'S', new Color(0.62f, 0.0f, 0.1f, 1.0f), 0, 0);
 
         //create area
-//        List<StaticTile> staticTiles = new ArrayList<>();
-//        for (int x = -5; x < 6; x++) {
-//            staticTiles.add(new StaticTile("Trees", this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), x, -5, 0));
-//            staticTiles.add(new StaticTile("Trees", this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), x, 5, 0));
-//        }
-//        for (int y = -4; y < 5; y++) {
-//            staticTiles.add(new StaticTile("Trees", this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), -5, y, 0));
-//            staticTiles.add(new StaticTile("Trees", this.font, '#', new Color(0.0f, 0.6f, 0.0f, 1.0f), 5, y, 0));
-//        }
-//        List<Entity> entities = new ArrayList<>();
-//        Entity spider = new Entity("Forest Spider", this.font, 'f', new Color(0.9f, 0.1f, 0.1f, 1.0f), -2, 3);
-//        spider.setEntityInto(27, 27, 4);
-//        entities.add(spider);
-//        Area area = new Area("Deep Woods", staticTiles, entities);
         Area area = Area.loadArea(R.raw.area_deepwoods, this.font);
 
         //create world
@@ -189,7 +185,18 @@ public class WorldLogic implements GameLogic {
 
     //Update Method
     @Override
-    public void update(float dt) { this.world.update(dt); }
+    public void update(float dt) {
+
+        //fade in
+        if (this.fadeOutTime > 0f) {
+            this.fadeOutTime -= dt;
+            float alpha = this.fadeOutTime / Util.FADE_TIME;
+            this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
+        }
+
+        //update world
+        this.world.update(dt);
+    }
 
     //Render Method
     @Override

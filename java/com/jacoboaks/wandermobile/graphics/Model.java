@@ -2,6 +2,9 @@ package com.jacoboaks.wandermobile.graphics;
 
 import android.opengl.GLES20;
 
+import com.jacoboaks.wandermobile.util.Coord;
+
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -18,6 +21,7 @@ public class Model {
 
     //Data
     private Material material;
+    private float width, height;
     private float[] modelCoords;
     private float[] textureCoords;
     private int[] drawPath;
@@ -40,6 +44,38 @@ public class Model {
         this.drawPath = drawPath;
         this.material = material;
         this.updateBuffers();
+        this.calculateWidthAndHeight();
+    }
+
+    /**
+     * Calculates the width and height of this Model.
+     */
+    private void calculateWidthAndHeight() {
+
+        //account for empty models
+        if (this.modelCoords.length == 0) {
+            this.width = this.height = 0;
+            return;
+        }
+
+        //create variables
+        float leastX = this.modelCoords[0], greatestX = this.modelCoords[0];
+        float leastY = this.modelCoords[1], greatestY = this.modelCoords[1];
+
+        //loop through each model coordinate to find lowest and greatest values
+        for (int i = 0; i < this.modelCoords.length; i++) {
+            if (i % 3 == 0) { //x
+                if (modelCoords[i] < leastX) leastX = modelCoords[i];
+                else if (modelCoords[i] > greatestX) greatestX = modelCoords[i];
+            } else if (i % 3 == 1) { //y
+                if (modelCoords[i] < leastY) leastY = modelCoords[i];
+                else if (modelCoords[i] > greatestY) greatestY = modelCoords[i];
+            }
+        }
+
+        //calculate width and height
+        this.width = greatestX - leastX;
+        this.height = greatestY - leastY;
     }
 
     //Draw Method
@@ -92,6 +128,7 @@ public class Model {
     public void scale(float factor) {
         for (int i = 0; i < this.modelCoords.length; i++) this.modelCoords[i] = this.modelCoords[i] * factor;
         this.updateBuffers();
+        this.calculateWidthAndHeight();
     }
 
     /**
@@ -135,8 +172,10 @@ public class Model {
         this.drawPathBuffer.position(0);
     }
 
-    //Accessor
+    //Accessors
     public Material getMaterial() { return this.material; }
+    public float getWidth() { return this.width; }
+    public float getHeight() { return this.height; }
 
     //Standard Square Data
     public static final float STD_SQUARE_SIZE = 0.5f;
@@ -156,5 +195,20 @@ public class Model {
     }
     public static int[] STD_SQUARE_DRAW_ORDER() {
         return new int[]{0, 1, 2, 2, 1, 3};
+    }
+
+    /**
+     * @return the model coordinates for a box which covers the entire screen
+     */
+    public static float[] getScreenBoxModelCoords() {
+        float[] posArr = Model.STD_SQUARE_MODEL_COORDS();
+        for (int i = 0; i < posArr.length; i += 3) {
+
+            Coord coord = new Coord(posArr[i], posArr[i + 1]);
+            Transformation.normalizedToAspected(coord);
+            posArr[i] = coord.x;
+            posArr[i + 1] = coord.y;
+        }
+        return posArr;
     }
 }

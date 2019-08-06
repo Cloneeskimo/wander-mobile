@@ -149,7 +149,7 @@ public class HUD {
         //adjust for GameItems that aren't TextItems
         if (!(item instanceof TextItem)) {
             newPos.x += (item.getWidth() / 2);
-            newPos.y -= (item.getHeight() / 2);
+            newPos.y += (item.getHeight() / 2);
         }
 
         //set position
@@ -227,7 +227,10 @@ public class HUD {
         item.setY(newPos.y);
     }
 
-    //Render Method
+    /**
+     * Will render the GameItems in this HUD. If there is an object whose tag starts with a capital
+     * Z, it will be rendered last.
+     */
     public void render() {
 
         //draw shapes
@@ -240,7 +243,12 @@ public class HUD {
                 new int[] { GameRenderer.surfaceAspectRatioAction ? 1 : 0 }, 0);
 
         //draw game items
-        for (String tag: this.gameItems.keySet()) this.gameItems.get(tag).render(this.shaderProgram);
+        GameItem lastRender = null;
+        for (String tag: this.gameItems.keySet()) {
+            if (tag.charAt(0) == 'Z') lastRender = this.gameItems.get(tag);
+            else this.gameItems.get(tag).render(this.shaderProgram);
+        }
+        if (lastRender != null) lastRender.render(this.shaderProgram);
 
         //unbind shader program
         this.shaderProgram.unbind();

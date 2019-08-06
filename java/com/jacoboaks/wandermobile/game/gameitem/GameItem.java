@@ -8,7 +8,7 @@ import com.jacoboaks.wandermobile.graphics.ShaderProgram;
 /**
  * Represents a single game item with a model, position, velocity, and visibility.
  */
-public abstract class GameItem {
+public class GameItem {
 
     //Data
     protected Model model; //model
@@ -70,8 +70,8 @@ public abstract class GameItem {
     public float getX() { return this.x; }
     public float getY() { return this.y; }
     public Model getModel() { return this.model; }
-    public abstract float getWidth();
-    public abstract float getHeight();
+    public float getWidth() { return this.model.getWidth(); };
+    public float getHeight() { return this.model.getHeight(); };
 
     //Mutators
     public void setX(float x) { this.x = x; }

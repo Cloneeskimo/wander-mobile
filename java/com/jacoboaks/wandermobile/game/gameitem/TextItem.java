@@ -127,7 +127,9 @@ public class TextItem extends GameItem {
     }
 
     //Accessors
+    @Override
     public float getWidth() { return this.width; }
+    @Override
     public float getHeight() { return this.height; }
 
     //Mutators

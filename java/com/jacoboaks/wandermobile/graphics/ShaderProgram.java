@@ -103,12 +103,12 @@ public class ShaderProgram {
             String info = GLES20.glGetShaderInfoLog(this.programID);
 
             //throw failure error if an actual error occured
-            if (info.length() != 0) throw Util.fatalError("ShaderProgram.java", "link()",
+            if (info.length() > 2) throw Util.fatalError("ShaderProgram.java", "link()",
                     "failed to link shader program: " + info);
 
             //log success if debug enabled
         } else if (Util.DEBUG) Log.i(Util.getLogTag("ShaderProgram.java", "link()"),
-                "shader program link succesful");
+                "shader program link successful");
 
     }
 

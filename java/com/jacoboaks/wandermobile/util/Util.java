@@ -17,6 +17,7 @@ public final class Util {
     //Logic Tags
     public final static String MAIN_MENU_LOGIC_TAG = "mainmenulogic";
     public final static String WORLD_LOGIC_TAG = "worldlogic";
+    public final static float FADE_TIME = 1000f;
 
     //Data
     public final static boolean DEBUG = true;

@@ -8,10 +8,14 @@ import com.jacoboaks.wandermobile.MainActivity;
 import com.jacoboaks.wandermobile.R;
 import com.jacoboaks.wandermobile.game.HUD;
 import com.jacoboaks.wandermobile.game.gameitem.ButtonTextItem;
+import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
+import com.jacoboaks.wandermobile.graphics.Model;
+import com.jacoboaks.wandermobile.graphics.Transformation;
 import com.jacoboaks.wandermobile.util.Color;
+import com.jacoboaks.wandermobile.util.Coord;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
 
@@ -23,6 +27,7 @@ public class MainMenuLogic implements GameLogic {
     //Data
     private HUD hud;
     private Font font;
+    private float fadeOutTime = 0f;
 
     //Button Data
     private static final int PLAY_BUTTON_ACTION_CODE = 1;
@@ -63,6 +68,12 @@ public class MainMenuLogic implements GameLogic {
                 MainMenuLogic.PLAY_BUTTON_ACTION_CODE);
         playButton.scale(0.24f);
         this.hud.addItem("PLAY_BUTTON", playButton, HUD.Placement.MIDDLE, 0f);
+
+        //create fading box
+        GameItem fadingBox = new GameItem(new Model(Model.getScreenBoxModelCoords(), Model.STD_SQUARE_TEX_COORDS(),
+                Model.STD_SQUARE_DRAW_ORDER(), new Material(new Color(0.6f, 0.6f, 0.6f, 0.0f))), 0f, 0f);
+        fadingBox.scale(4.0f);
+        this.hud.addItem("Z_FADING_BOX", fadingBox, HUD.Placement.MIDDLE, 0f);
     }
 
     //Data Loading Method
@@ -81,8 +92,7 @@ public class MainMenuLogic implements GameLogic {
 
         //check if button was pressed and switch to world logic if so
         if (actionCode == MainMenuLogic.PLAY_BUTTON_ACTION_CODE) {
-            LogicChangeData lgd = new LogicChangeData(Util.WORLD_LOGIC_TAG, true, false);
-            MainActivity.initLogicChange(lgd);
+            this.fadeOutTime = Util.FADE_TIME;
             return true;
         }
 
@@ -99,6 +109,18 @@ public class MainMenuLogic implements GameLogic {
     //Update Method
     @Override
     public void update(float dt) {
+
+        //fade out at end
+        if (this.fadeOutTime > 0f) {
+            float alpha = 1f - (this.fadeOutTime / Util.FADE_TIME);
+            this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
+            this.fadeOutTime -= dt;
+            if (this.fadeOutTime < 0f) {
+                LogicChangeData lgd = new LogicChangeData(Util.WORLD_LOGIC_TAG, true, false);
+                MainActivity.initLogicChange(lgd);
+
+            }
+        }
     }
 
     //Render Method

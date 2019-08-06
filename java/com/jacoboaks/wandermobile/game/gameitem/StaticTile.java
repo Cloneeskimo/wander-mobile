@@ -100,6 +100,7 @@ public class StaticTile extends Tile {
     public int getManeuverability() { return this.maneuverability; }
 
     //Node Converter
+    @Override
     public Node toNode() {
         Node data = super.toNode();
         data.setName("StaticTile");
