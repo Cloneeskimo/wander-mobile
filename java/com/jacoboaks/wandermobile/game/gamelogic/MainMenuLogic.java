@@ -31,6 +31,7 @@ public class MainMenuLogic implements GameLogic {
 
     //Button Data
     private static final int PLAY_BUTTON_ACTION_CODE = 1;
+    private static final int EXIT_BUTTON_ACTION_CODE = 2;
 
     //Initialization Method
     @Override
@@ -53,21 +54,28 @@ public class MainMenuLogic implements GameLogic {
         //create title and add to hud
         TextItem title = new TextItem(this.font, "Wander Mobile", new Material(this.font.getFontSheet(),
                 new Color(1.0f, 1.0f, 1.0f, 1.0f), true), 0f, 0f);
-        title.scale(0.4f);
+        title.scale(0.42f);
         this.hud.addItem("TITLE", title, HUD.Placement.TOP_MIDDLE, 0.19f);
 
         //add version and build tag
         TextItem bvTag = new TextItem(this.font, "v" + MainActivity.WANDER_VERSION + "b" + MainActivity.WANDER_BUILD,
                 title.getModel().getMaterial(), 0f, 0f);
-        bvTag.scale(0.14f);
+        bvTag.scale(0.16f);
         this.hud.addItem("BUILD_VERSION_TAG", bvTag, HUD.Placement.BELOW_LAST, 0.05f);
 
-        //create button and add to hud
+        //create play button and add to hud
         ButtonTextItem playButton = new ButtonTextItem(this.font, "Play",
                 new Color(0.0f, 0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f),
                 MainMenuLogic.PLAY_BUTTON_ACTION_CODE);
-        playButton.scale(0.24f);
+        playButton.scale(0.26f);
         this.hud.addItem("PLAY_BUTTON", playButton, HUD.Placement.MIDDLE, 0f);
+
+        //create exit button and add to hud
+        ButtonTextItem exitButton = new ButtonTextItem(this.font, "Exit",
+                new Color(0.0f, 0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f),
+                MainMenuLogic.EXIT_BUTTON_ACTION_CODE);
+        exitButton.scale(0.26f);
+        this.hud.addItem("EXIT_BUTTON", exitButton, HUD.Placement.BELOW_LAST, 0.1f);
 
         //create fading box
         GameItem fadingBox = new GameItem(new Model(Model.getScreenBoxModelCoords(), Model.STD_SQUARE_TEX_COORDS(),
@@ -86,13 +94,18 @@ public class MainMenuLogic implements GameLogic {
     @Override
     public boolean input(MotionEvent e) {
 
-        //apply input data to play button
-        ButtonTextItem playButton = (ButtonTextItem)this.hud.getItem("PLAY_BUTTON");
-        int actionCode = playButton.updateSelection(e);
+        //figure out the action code
+        ButtonTextItem button = (ButtonTextItem)this.hud.getItem("PLAY_BUTTON");
+        int actionCode = button.updateSelection(e);
+        if (actionCode == -1) button = (ButtonTextItem)this.hud.getItem("EXIT_BUTTON");
+        actionCode = button.updateSelection(e);
 
         //check if button was pressed and switch to world logic if so
         if (actionCode == MainMenuLogic.PLAY_BUTTON_ACTION_CODE) {
             this.fadeOutTime = Util.FADE_TIME;
+            return true;
+        } else if (actionCode == MainMenuLogic.EXIT_BUTTON_ACTION_CODE) {
+            System.exit(0);
             return true;
         }
 
