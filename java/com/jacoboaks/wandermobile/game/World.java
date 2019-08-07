@@ -47,6 +47,8 @@ public class World {
         this.area = area;
         this.player = player;
         this.selectionTile = new Tile("Selection", new Texture(R.drawable.texture_selected), 0, 0);
+        Coord spawn = this.area.getSpawn();
+        this.player.setGridPosition((int)spawn.x, (int)spawn.y);
 
         //set hud reference, update area name in hud
         this.hud = hud;

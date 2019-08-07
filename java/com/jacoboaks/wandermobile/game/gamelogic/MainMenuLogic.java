@@ -28,10 +28,12 @@ public class MainMenuLogic implements GameLogic {
     private HUD hud;
     private Font font;
     private float fadeOutTime = 0f;
+    private int chosenAction;
 
     //Button Data
-    private static final int PLAY_BUTTON_ACTION_CODE = 1;
-    private static final int EXIT_BUTTON_ACTION_CODE = 2;
+    private static final int NEW_GAME_BUTTON_ACTION_CODE = 1;
+    private static final int LOAD_GAME_BUTTON_ACTION_CODE = 2;
+    private static final int EXIT_BUTTON_ACTION_CODE = 3;
 
     //Initialization Method
     @Override
@@ -63,19 +65,28 @@ public class MainMenuLogic implements GameLogic {
         bvTag.scale(0.16f);
         this.hud.addItem("BUILD_VERSION_TAG", bvTag, HUD.Placement.BELOW_LAST, 0.05f);
 
-        //create play button and add to hud
-        ButtonTextItem playButton = new ButtonTextItem(this.font, "Play",
+        //create load game button and add to hud
+        ButtonTextItem loadGameButton = new ButtonTextItem(this.font, "Load Game",
                 new Color(0.0f, 0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f),
-                MainMenuLogic.PLAY_BUTTON_ACTION_CODE);
-        playButton.scale(0.26f);
-        this.hud.addItem("PLAY_BUTTON", playButton, HUD.Placement.MIDDLE, 0f);
+                MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE);
+        loadGameButton.scale(0.26f);
+        this.hud.addItem("LOAD_GAME_BUTTON", loadGameButton, HUD.Placement.MIDDLE, 0f);
+
+        //create new game button and add to hud
+        ButtonTextItem newGameButton = new ButtonTextItem(this.font, "New Game",
+                new Color(0.0f, 0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f),
+                MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE);
+        newGameButton.scale(0.26f);
+        this.hud.addItem("NEW_GAME_BUTTON", newGameButton, HUD.Placement.ABOVE_LAST, 0.1f);
+        this.hud.recenter("NEW_GAME_BUTTON");
 
         //create exit button and add to hud
         ButtonTextItem exitButton = new ButtonTextItem(this.font, "Exit",
                 new Color(0.0f, 0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f),
                 MainMenuLogic.EXIT_BUTTON_ACTION_CODE);
         exitButton.scale(0.26f);
-        this.hud.addItem("EXIT_BUTTON", exitButton, HUD.Placement.BELOW_LAST, 0.1f);
+        this.hud.addItem("EXIT_BUTTON", exitButton, HUD.Placement.BELOW_LAST, 0.2f + loadGameButton.getHeight());
+        this.hud.recenter("EXIT_BUTTON");
 
         //create fading box
         GameItem fadingBox = new GameItem(new Model(Model.getScreenBoxModelCoords(), Model.STD_SQUARE_TEX_COORDS(),
@@ -95,14 +106,21 @@ public class MainMenuLogic implements GameLogic {
     public boolean input(MotionEvent e) {
 
         //figure out the action code
-        ButtonTextItem button = (ButtonTextItem)this.hud.getItem("PLAY_BUTTON");
+        ButtonTextItem button = (ButtonTextItem)this.hud.getItem("NEW_GAME_BUTTON");
         int actionCode = button.updateSelection(e);
+        if (actionCode == -1) button = (ButtonTextItem)this.hud.getItem("LOAD_GAME_BUTTON");
+        actionCode = button.updateSelection(e);
         if (actionCode == -1) button = (ButtonTextItem)this.hud.getItem("EXIT_BUTTON");
         actionCode = button.updateSelection(e);
 
         //check if button was pressed and switch to world logic if so
-        if (actionCode == MainMenuLogic.PLAY_BUTTON_ACTION_CODE) {
+        if (actionCode == MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE) {
             this.fadeOutTime = Util.FADE_TIME;
+            this.chosenAction = actionCode;
+            return true;
+        } else if (actionCode == MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE) {
+            this.fadeOutTime = Util.FADE_TIME;
+            this.chosenAction = actionCode;
             return true;
         } else if (actionCode == MainMenuLogic.EXIT_BUTTON_ACTION_CODE) {
             System.exit(0);
@@ -128,10 +146,15 @@ public class MainMenuLogic implements GameLogic {
             float alpha = 1f - (this.fadeOutTime / Util.FADE_TIME);
             this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
             this.fadeOutTime -= dt;
-            if (this.fadeOutTime < 0f) {
-                LogicChangeData lgd = new LogicChangeData(Util.WORLD_LOGIC_TAG, true, false);
-                MainActivity.initLogicChange(lgd);
 
+            //switch logic if fade transition is over
+            if (this.fadeOutTime < 0f) {
+                LogicChangeData lgd = null;
+                if (this.chosenAction == MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE)
+                    lgd = new LogicChangeData(Util.NEW_GAME_LOGIC_TAG, true, false);
+                else if (this.chosenAction == MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE)
+                    lgd = new LogicChangeData(Util.LOAD_GAME_LOGIC_TAG, true, false);
+                MainActivity.initLogicChange(lgd, null);
             }
         }
     }

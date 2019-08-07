@@ -137,7 +137,9 @@ public class WorldLogic implements GameLogic {
     private void initWorld() {
 
         //create player
-        Entity player = new Entity("Svenske", this.font, 'S', new Color(0.62f, 0.0f, 0.1f, 1.0f), 0, 0);
+        Node transferData = MainActivity.getLogicTransferData();
+        Entity player = new Entity(transferData.getValue(), this.font, transferData.getValue().charAt(0),
+                new Color(0.62f, 0.0f, 0.1f, 1.0f), 0, 0);
 
         //create area
         Area area = Area.loadArea(R.raw.area_deepwoods, this.font);
@@ -155,6 +157,7 @@ public class WorldLogic implements GameLogic {
         this.world.instateLoadedData(this.savedInstanceData);
         this.world.getPlayer().setX(Float.parseFloat(this.savedInstanceData.getString("logic_playerx")));
         this.world.getPlayer().setY(Float.parseFloat(this.savedInstanceData.getString("logic_playery")));
+        this.fadeOutTime = Float.parseFloat(this.savedInstanceData.getString("fadeOutTime"));
     }
 
     /**
@@ -214,6 +217,7 @@ public class WorldLogic implements GameLogic {
         this.world.requestData(data);
         data.addChild(new Node("playerx", Float.toString(this.world.getPlayer().getX())));
         data.addChild(new Node("playery", Float.toString(this.world.getPlayer().getY())));
+        data.addChild(new Node("fadeOutTime", Float.toString(this.fadeOutTime)));
         return data;
     }
 

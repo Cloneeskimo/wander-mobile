@@ -10,8 +10,10 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
 import com.jacoboaks.wandermobile.game.gamelogic.GameLogic;
+import com.jacoboaks.wandermobile.game.gamelogic.LoadGameLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.LogicChangeData;
 import com.jacoboaks.wandermobile.game.gamelogic.MainMenuLogic;
+import com.jacoboaks.wandermobile.game.gamelogic.NewGameLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.WorldLogic;
 import com.jacoboaks.wandermobile.graphics.GameRenderer;
 import com.jacoboaks.wandermobile.util.Node;
@@ -28,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     //Game Version/Build
     public final static String WANDER_VERSION = "0.0";
     public final static String WANDER_STARTING_LOGIC = Util.MAIN_MENU_LOGIC_TAG;
-    public final static int WANDER_BUILD = 18;
+    public final static int WANDER_BUILD = 19;
 
     //Public Static Data
     public static boolean changeLogic = false; //flag for changing logic
@@ -39,11 +41,11 @@ public class MainActivity extends AppCompatActivity {
     private static Resources resources; //reference to resources for resource loading
     private static Map<String, Bundle> savedLogics; //data from saved previous logic instances
     private static Bundle savedBundle; //saved data from when app is paused
+    private static Node logicTransferData; //data to transfer between logic when switching
 
     //Data
     private GameView view; //view
 
-    //Creation Method
     /**
      * Is called every time the activity is created or recreated.
      * @param savedInstanceState any saved information from the previous activity lifecycle
@@ -76,6 +78,10 @@ public class MainActivity extends AppCompatActivity {
         //create appropriate logic instance
         if (logicToLoad.equals(Util.MAIN_MENU_LOGIC_TAG)) {
             logic = new MainMenuLogic();
+        } else if (logicToLoad.equals(Util.NEW_GAME_LOGIC_TAG)) {
+            logic = new NewGameLogic();
+        } else if (logicToLoad.equals(Util.LOAD_GAME_LOGIC_TAG)) {
+            logic = new LoadGameLogic();
         } else if (logicToLoad.equals(Util.WORLD_LOGIC_TAG)) {
             logic = new WorldLogic();
         } else {
@@ -150,9 +156,10 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Sets the data for a logic change to be read by the GameRenderer.
      */
-    public static void initLogicChange(LogicChangeData logicChangeData) {
+    public static void initLogicChange(LogicChangeData logicChangeData, Node transferData) {
         MainActivity.changeLogic = true;
         MainActivity.logicChangeData = logicChangeData;
+        MainActivity.logicTransferData = transferData;
     }
 
     /**
@@ -165,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
     //Static Accessors
     public static Resources getAppResources() { return MainActivity.resources; }
     public static LogicChangeData getLogicChangeData() { return MainActivity.logicChangeData; }
+    public static Node getLogicTransferData() { return MainActivity.logicTransferData; }
 
     /**
      * GameView Inner Class

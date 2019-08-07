@@ -2,6 +2,8 @@ area:
 {
 	loadType: row listing
 	name: Deep Woods
+	spawnx: 3
+	spawny: -5
 	layout:
 	{
 		row 1:     #####

@@ -90,8 +90,7 @@ public class Transformation {
         if (coords.y < 0) coords.y -= (Model.STD_SQUARE_SIZE / 2);
         else coords.y += (Model.STD_SQUARE_SIZE / 2);
         coords.x = (int)(coords.x / Model.STD_SQUARE_SIZE);
-        coords.y = (int)(coords.y
-                / Model.STD_SQUARE_SIZE);
+        coords.y = (int)(coords.y / Model.STD_SQUARE_SIZE);
     }
 
     /**

@@ -228,6 +228,15 @@ public class HUD {
     }
 
     /**
+     * Re-centers the GameItem of the associated tag (horizontally)
+     * @param tag the tag of the GameItem to re-center
+     */
+    public void recenter(String tag) {
+        GameItem item = this.gameItems.get(tag);
+        item.setX(-item.getWidth() / 2);
+    }
+
+    /**
      * Will render the GameItems in this HUD. If there is an object whose tag starts with a capital
      * Z, it will be rendered last.
      */

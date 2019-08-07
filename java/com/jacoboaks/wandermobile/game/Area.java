@@ -26,13 +26,14 @@ public class Area {
     private String name;
     private List<StaticTile> staticTiles;
     private List<Entity> entities;
+    private Coord spawn;
 
     /**
      * Constructs this Area with only a name.
      * @param name the name of the zone
      */
     public Area(String name) {
-        this(name, new ArrayList<StaticTile>(), new ArrayList<Entity>());
+        this(name, new ArrayList<StaticTile>(), new ArrayList<Entity>(), new Coord(0, 0));
     }
 
     /**
@@ -41,10 +42,11 @@ public class Area {
      * @param staticTiles the list of static tiles of the zone
      * @param entities the list of entities of the zone
      */
-    public Area(String name, List<StaticTile> staticTiles, List<Entity> entities) {
+    public Area(String name, List<StaticTile> staticTiles, List<Entity> entities, Coord spawn) {
         this.name = name;
         this.staticTiles = staticTiles;
         this.entities = entities;
+        this.spawn = spawn;
     }
 
     //Update Method
@@ -87,6 +89,7 @@ public class Area {
 
     //Accessor
     public String getName() { return this.name; }
+    public Coord getSpawn() { return this.spawn; }
 
     /**
      * Loads a brand new area from a given resource id
@@ -169,7 +172,15 @@ public class Area {
                     "load area with loadType: " + loadTypes + ". Options are: 'row listing' or 'tile listing'");
         }
 
+        //get spawn
+        Coord spawn = new Coord();
+        Node spawnNodeX = areaData.getChild("spawnx");
+        Node spawnNodeY = areaData.getChild("spawny");
+        if (spawnNodeX != null && spawnNodeY != null) {
+            spawn = new Coord(Integer.parseInt(spawnNodeX.getValue()), Integer.parseInt(spawnNodeY.getValue()));
+        }
+
         //create and return area
-        return new Area(areaData.getChild("name").getValue(), st, e);
+        return new Area(areaData.getChild("name").getValue(), st, e, spawn);
     }
 }
