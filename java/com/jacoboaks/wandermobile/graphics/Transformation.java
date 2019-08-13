@@ -6,10 +6,25 @@ import com.jacoboaks.wandermobile.util.Coord;
  * Provides methods for converting coordinates between different spaces. The important spaces
  * are defined in the following order:
  *  - screen - the coordinates of the screen's pixels
+ *      ^ 0
+ *  0 <   > +x
+ *     \/ +y
  *  - normalized - the coordinates of the screen from -1 to 1
- *  - aspect ratio - the normalized coordinates adjusted for aspect ratio
+ *         ^ -1.0
+ *  -1.0 <   > 1.0
+ *        \/ 1.0
+ *  - aspected - the normalized coordinates adjusted for aspect ratio
+ *       ^ +y
+ *  -x <   > +x
+ *      \/ -y
  *  - world - the coordinates of a world where a camera is taken into account
+ *       ^ +y
+ *  -x <   > +x
+ *      \/ -y
  *  - grid - the coordinates of a world where items are locked into a Tile grid
+ *       ^ +y
+ *  -x <   > +x
+ *      \/ -y
  */
 public class Transformation {
 
@@ -28,7 +43,6 @@ public class Transformation {
         coords.y /= GameRenderer.surfaceHeight;
         coords.y *= 2;
         coords.y -= 1;
-        coords.y *= -1;
     }
 
     /**
@@ -41,6 +55,7 @@ public class Transformation {
         } else {
             coords.y /= GameRenderer.surfaceAspectRatio;
         }
+        coords.y *= -1;
     }
 
     /**
@@ -128,6 +143,7 @@ public class Transformation {
         } else {
             coords.y *= GameRenderer.surfaceAspectRatio;
         }
+        coords.y *= -1;
     }
 
     /**
@@ -144,7 +160,7 @@ public class Transformation {
         //convert y
         coords.y += 1;
         coords.y /= 2;
-        coords.x *= GameRenderer.surfaceHeight;
+        coords.y *= GameRenderer.surfaceHeight;
     }
 
     /**

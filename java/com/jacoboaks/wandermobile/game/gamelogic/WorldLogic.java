@@ -12,7 +12,6 @@ import com.jacoboaks.wandermobile.game.World;
 import com.jacoboaks.wandermobile.game.gamecontrol.WorldControl;
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
-import com.jacoboaks.wandermobile.game.gameitem.StaticTile;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
@@ -20,9 +19,6 @@ import com.jacoboaks.wandermobile.graphics.Model;
 import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Contains the logic for the world navigation of the game.
@@ -87,16 +83,16 @@ public class WorldLogic implements GameLogic {
         this.hud.addItem("FPS_COUNTER", fpsCounter, HUD.Placement.RIGHT_OF_LAST, 0f);
 
         //wander title
-        TextItem title = new TextItem(this.font, "Wander Mobile v" + MainActivity.WANDER_VERSION
+        TextItem title = new TextItem(this.font, "v" + MainActivity.WANDER_VERSION
                 + "b" + MainActivity.WANDER_BUILD, textMaterial, 0f, 0f);
         title.scale(0.2f);
-        this.hud.addItem("TITLE", title, HUD.Placement.TOP_LEFT, 0.02f);
+        this.hud.addItem("TITLE", title, HUD.Placement.BOTTOM_RIGHT, 0.02f);
 
         //selection
         TextItem selection = new TextItem(this.font, "Selection:", textMaterial, 0f, 0f);
         selection.scale(0.19f);
         selection.setVisibility(false);
-        this.hud.addItem("SELECTION", selection, HUD.Placement.BELOW_LAST, 0.13f);
+        this.hud.addItem("SELECTION", selection, HUD.Placement.TOP_MIDDLE, 0.13f);
 
         //selection name
         Material selectionInfoMaterial = new Material(font.getFontSheet(), new Color(1.0f, 1.0f, 1.0f, 1.0f), true);

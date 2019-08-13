@@ -13,9 +13,7 @@ import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
 import com.jacoboaks.wandermobile.graphics.Model;
-import com.jacoboaks.wandermobile.graphics.Transformation;
 import com.jacoboaks.wandermobile.util.Color;
-import com.jacoboaks.wandermobile.util.Coord;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
 
@@ -63,30 +61,29 @@ public class MainMenuLogic implements GameLogic {
         TextItem bvTag = new TextItem(this.font, "v" + MainActivity.WANDER_VERSION + "b" + MainActivity.WANDER_BUILD,
                 title.getModel().getMaterial(), 0f, 0f);
         bvTag.scale(0.16f);
-        this.hud.addItem("BUILD_VERSION_TAG", bvTag, HUD.Placement.BELOW_LAST, 0.05f);
-
-        //create load game button and add to hud
-        ButtonTextItem loadGameButton = new ButtonTextItem(this.font, "Load Game",
-                new Color(0.0f, 0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f),
-                MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE);
-        loadGameButton.scale(0.26f);
-        this.hud.addItem("LOAD_GAME_BUTTON", loadGameButton, HUD.Placement.MIDDLE, 0f);
+        this.hud.addItem("BUILD_VERSION_TAG", bvTag, HUD.Placement.BELOW_LAST, 0.0f);
+        bvTag.moveX(-(title.getWidth() / 2 - bvTag.getWidth() / 2));
 
         //create new game button and add to hud
-        ButtonTextItem newGameButton = new ButtonTextItem(this.font, "New Game",
+        ButtonTextItem newGameButton = new ButtonTextItem(this.font, null,"New Game",
                 new Color(0.0f, 0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f),
-                MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE);
+                MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE, 0.05f);
         newGameButton.scale(0.26f);
-        this.hud.addItem("NEW_GAME_BUTTON", newGameButton, HUD.Placement.ABOVE_LAST, 0.1f);
-        this.hud.recenter("NEW_GAME_BUTTON");
+        this.hud.addItem("NEW_GAME_BUTTON", newGameButton, HUD.Placement.MIDDLE, 0.05f);
+
+        //create load game button and add to hud
+        ButtonTextItem loadGameButton = new ButtonTextItem(this.font, null, "Load Game",
+                new Color(0.0f, 0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f),
+                MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE, 0.05f);
+        loadGameButton.scale(0.26f);
+        this.hud.addItem("LOAD_GAME_BUTTON", loadGameButton, HUD.Placement.BELOW_LAST, 0.05f);
 
         //create exit button and add to hud
-        ButtonTextItem exitButton = new ButtonTextItem(this.font, "Exit",
+        ButtonTextItem exitButton = new ButtonTextItem(this.font, null, "Exit",
                 new Color(0.0f, 0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f),
-                MainMenuLogic.EXIT_BUTTON_ACTION_CODE);
+                MainMenuLogic.EXIT_BUTTON_ACTION_CODE, 0.05f);
         exitButton.scale(0.26f);
-        this.hud.addItem("EXIT_BUTTON", exitButton, HUD.Placement.BELOW_LAST, 0.2f + loadGameButton.getHeight());
-        this.hud.recenter("EXIT_BUTTON");
+        this.hud.addItem("EXIT_BUTTON", exitButton, HUD.Placement.BELOW_LAST, 0.05f);
 
         //create fading box
         GameItem fadingBox = new GameItem(new Model(Model.getScreenBoxModelCoords(), Model.STD_SQUARE_TEX_COORDS(),

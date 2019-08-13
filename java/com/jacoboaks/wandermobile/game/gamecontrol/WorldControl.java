@@ -2,14 +2,11 @@ package com.jacoboaks.wandermobile.game.gamecontrol;
 
 import android.view.MotionEvent;
 
-import com.jacoboaks.wandermobile.MainActivity;
 import com.jacoboaks.wandermobile.game.World;
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
-import com.jacoboaks.wandermobile.game.gamelogic.LogicChangeData;
 import com.jacoboaks.wandermobile.graphics.Camera;
 import com.jacoboaks.wandermobile.graphics.GameRenderer;
 import com.jacoboaks.wandermobile.util.Coord;
-import com.jacoboaks.wandermobile.util.Util;
 
 /**
  * WorldControl Class

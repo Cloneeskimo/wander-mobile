@@ -9,9 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Models text as a GameItem. The model position is as follows: the coordinates
- * represent the top-left position of the text as opposed to a normal GameItem where they would
- * normally represent the middle of the item.
+ * Models text as a GameItem.
  */
 public class TextItem extends GameItem {
 
@@ -117,8 +115,15 @@ public class TextItem extends GameItem {
         this.width = x;
         this.height = Model.STD_SQUARE_SIZE * this.scale;
 
+        //move to middle x
+        float modelCoordsArr[] = new float[modelCoords.size()];
+        for (int i = 0; i < modelCoords.size(); i++) {
+            if (i % 3 == 0) modelCoordsArr[i] = modelCoords.get(i) - this.width / 2;
+            else if (i % 3 == 1) modelCoordsArr[i] = modelCoords.get(i) + this.height / 2;
+            else modelCoordsArr[i] = 0;
+        }
+
         //convert lists to arrays
-        float[] modelCoordsArr = Util.flistToArray(modelCoords);
         float[] textureCoordsArr = Util.flistToArray(textureCoords);
         int[] drawOrderArr = Util.ilistToArray(drawOrder);
 

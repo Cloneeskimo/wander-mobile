@@ -7,7 +7,6 @@ import com.jacoboaks.wandermobile.game.gameitem.StaticTile;
 import com.jacoboaks.wandermobile.game.gameitem.Tile;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
-import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Coord;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;

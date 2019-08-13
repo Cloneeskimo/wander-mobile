@@ -3,7 +3,11 @@ package com.jacoboaks.wandermobile.game.gamelogic;
 import android.os.Bundle;
 import android.view.MotionEvent;
 
-import com.jacoboaks.wandermobile.MainActivity;
+import com.jacoboaks.wandermobile.R;
+import com.jacoboaks.wandermobile.game.HUD;
+import com.jacoboaks.wandermobile.game.gameitem.Keyboard;
+import com.jacoboaks.wandermobile.graphics.Font;
+import com.jacoboaks.wandermobile.graphics.Texture;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
 
@@ -12,11 +16,20 @@ import com.jacoboaks.wandermobile.util.Util;
  */
 public class NewGameLogic implements GameLogic {
 
+    private HUD hud;
+    private Font font;
+
     //Initialization Method
     @Override
     public void init() {
-        LogicChangeData lgd = new LogicChangeData(Util.WORLD_LOGIC_TAG, true, false);
-        MainActivity.initLogicChange(lgd, new Node("new game", "new game"));
+
+        this.hud = new HUD();
+        this.font = new Font(R.drawable.font_default, R.raw.fontcuttoffs_default,10, 10, ' ');
+
+        Keyboard keyboard = new Keyboard(this.font, Keyboard.STD_CHARACTER_SET, new Texture(R.drawable.texture_keyboardbutton),
+                new Texture(R.drawable.texture_keyboardspacebutton), true, 4, 0f, 0f, 1.8f, 1.0f, 0.06f);
+
+        this.hud.addItem("KEYBOARD", keyboard, HUD.Placement.MIDDLE, 0f);
     }
 
     //Data Loading Method
@@ -39,13 +52,12 @@ public class NewGameLogic implements GameLogic {
 
     //Update Method
     public void update(float dt) {
-
     }
 
     //Render Method
     @Override
     public void render() {
-
+        this.hud.render();
     }
 
     //Data Requesting Method
@@ -58,6 +70,6 @@ public class NewGameLogic implements GameLogic {
     //Cleanup Method
     @Override
     public void cleanup() {
-
+        this.hud.cleanup();
     }
 }

@@ -30,4 +30,9 @@ public class Coord {
     public Coord() {
         this(0, 0);
     }
+
+    @Override
+    public String toString() {
+        return "(" + this.x + ", " + this.y + ")";
+    }
 }

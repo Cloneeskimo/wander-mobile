@@ -4,7 +4,6 @@ import android.opengl.GLES20;
 
 import com.jacoboaks.wandermobile.util.Coord;
 
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -13,6 +12,7 @@ import java.nio.IntBuffer;
 /**
  * Model Class
  * Holds a collection of vertices, a draw path, and a material for drawing a single model.
+ * All Models should be defined by having their (0, 0) coordinate representing the middle of the Model.
  */
 public class Model {
 
@@ -44,7 +44,7 @@ public class Model {
         this.drawPath = drawPath;
         this.material = material;
         this.updateBuffers();
-        this.calculateWidthAndHeight();
+        this.width = this.height = -1;
     }
 
     /**
@@ -174,8 +174,14 @@ public class Model {
 
     //Accessors
     public Material getMaterial() { return this.material; }
-    public float getWidth() { return this.width; }
-    public float getHeight() { return this.height; }
+    public float getWidth() {
+        if (this.width == -1) this.calculateWidthAndHeight();
+        return this.width;
+    }
+    public float getHeight() {
+        if (this.height == -1) this.calculateWidthAndHeight();
+        return this.height;
+    }
 
     //Standard Square Data
     public static final float STD_SQUARE_SIZE = 0.5f;
@@ -210,5 +216,21 @@ public class Model {
             posArr[i + 1] = coord.y;
         }
         return posArr;
+    }
+
+    /**
+     * @param width the width of the rectangle
+     * @param height the height of the rectangle
+     * @return the model coordinates for a rectangle of the given width and height
+     */
+    public static float[] getRectangleModelCoords(float width, float height) {
+        float[] regular = Model.STD_SQUARE_MODEL_COORDS();
+        float xMult = width / Model.STD_SQUARE_SIZE;
+        float yMult = height / Model.STD_SQUARE_SIZE;
+        for (int i = 0; i < regular.length; i++) {
+            if (i % 3 == 0) regular[i] *= xMult;
+            else if (i % 3 == 1) regular[i] *= yMult;
+        }
+        return regular;
     }
 }

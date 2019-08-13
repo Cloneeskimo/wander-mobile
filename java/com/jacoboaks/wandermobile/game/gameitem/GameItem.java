@@ -4,6 +4,8 @@ import android.opengl.GLES20;
 
 import com.jacoboaks.wandermobile.graphics.Model;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
+import com.jacoboaks.wandermobile.util.Bounds;
+import com.jacoboaks.wandermobile.util.Coord;
 
 /**
  * Represents a single game item with a model, position, velocity, and visibility.
@@ -12,8 +14,8 @@ public class GameItem {
 
     //Data
     protected Model model; //model
-    protected float x, y; //world position
-    protected float vx = 0, vy = 0; //velocity
+    protected float x, y; //position in aspected or world space
+    protected float vx = 0, vy = 0; //velocity in aspected or world space
     protected boolean visible; //visibility
 
     /**
@@ -72,6 +74,10 @@ public class GameItem {
     public Model getModel() { return this.model; }
     public float getWidth() { return this.model.getWidth(); };
     public float getHeight() { return this.model.getHeight(); };
+    public Bounds getBounds() {
+        return new Bounds(new Coord(this.x, this.y),
+            this.getWidth(), this.getHeight());
+    }
 
     //Mutators
     public void setX(float x) { this.x = x; }

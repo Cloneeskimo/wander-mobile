@@ -4,7 +4,6 @@ import android.opengl.GLES20;
 
 import com.jacoboaks.wandermobile.R;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
-import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.graphics.GameRenderer;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
 import com.jacoboaks.wandermobile.graphics.Transformation;
@@ -86,70 +85,60 @@ public class HUD {
         //place item
         switch (placement) {
             case TOP_LEFT:
-                newPos = new Coord(-1f, 1f);
+                newPos = new Coord(-1f, -1f);
                 Transformation.normalizedToAspected(newPos);
-                newPos.x += padding;
-                newPos.y -= padding;
+                newPos.x += (padding + item.getWidth() / 2);
+                newPos.y -= (padding + item.getHeight() / 2);
                 break;
             case TOP_MIDDLE:
-                newPos = new Coord(0f, 1f);
+                newPos = new Coord(0f, -1f);
                 Transformation.normalizedToAspected(newPos);
-                newPos.x -= (item.getWidth() / 2);
-                newPos.y -= (padding + item.getHeight());
+                newPos.y -= (padding + item.getHeight() / 2);
                 break;
             case TOP_RIGHT:
-                newPos = new Coord(1f, 1f);
+                newPos = new Coord(1f, -1f);
                 Transformation.normalizedToAspected(newPos);
-                newPos.x -= (padding + item.getWidth());
-                newPos.y -= padding;
+                newPos.x -= (padding + item.getWidth() / 2);
+                newPos.y -= (padding + item.getHeight() / 2);
                 break;
             case MIDDLE:
                 newPos = new Coord(0f, 0f);
-                newPos.x -= item.getWidth() / 2;
-                newPos.y -= item.getHeight() / 2;
                 break;
             case BOTTOM_LEFT:
-                newPos = new Coord(-1f, -1f);
+                newPos = new Coord(-1f, 1f);
                 Transformation.normalizedToAspected(newPos);
-                newPos.x += padding;
-                newPos.y += (padding + item.getHeight());
+                newPos.x += (padding + item.getWidth() / 2);
+                newPos.y += (padding + item.getHeight() / 2);
                 break;
             case BOTTOM_MIDDLE:
-                newPos = new Coord(0f, -1f);
+                newPos = new Coord(0f, 1f);
                 Transformation.normalizedToAspected(newPos);
-                newPos.x -= (item.getWidth() / 2);
-                newPos.y += (padding + item.getHeight());
+                newPos.y += (padding + item.getHeight() / 2);
                 break;
             case BOTTOM_RIGHT:
-                newPos = new Coord(1f, -1f);
+                newPos = new Coord(1f, 1f);
                 Transformation.normalizedToAspected(newPos);
-                newPos.x -= (padding + item.getWidth());
-                newPos.y += (padding + item.getHeight());
+                newPos.x -= (padding + item.getWidth() / 2);
+                newPos.y += (padding + item.getHeight() / 2);
                 break;
             case LEFT_OF_LAST:
-                newPos = this.topLeftCoordsOfLastItem();
+                newPos = this.coordsOfLastItem();
                 newPos.x -= (padding + item.getWidth());
                 break;
             case RIGHT_OF_LAST:
-                newPos = this.topLeftCoordsOfLastItem();
+                newPos = this.coordsOfLastItem();
                 Coord size1 = this.sizeOfLastItem();
                 newPos.x += (padding + size1.x);
                 break;
             case ABOVE_LAST:
-                newPos = this.topLeftCoordsOfLastItem();
+                newPos = this.coordsOfLastItem();
                 newPos.y += (padding + item.getHeight());
                 break;
             case BELOW_LAST:
-                newPos = this.topLeftCoordsOfLastItem();
+                newPos = this.coordsOfLastItem();
                 Coord size2 = this.sizeOfLastItem();
                 newPos.y -= (padding + size2.y);
                 break;
-        }
-
-        //adjust for GameItems that aren't TextItems
-        if (!(item instanceof TextItem)) {
-            newPos.x += (item.getWidth() / 2);
-            newPos.y += (item.getHeight() / 2);
         }
 
         //set position
@@ -228,15 +217,6 @@ public class HUD {
     }
 
     /**
-     * Re-centers the GameItem of the associated tag (horizontally)
-     * @param tag the tag of the GameItem to re-center
-     */
-    public void recenter(String tag) {
-        GameItem item = this.gameItems.get(tag);
-        item.setX(-item.getWidth() / 2);
-    }
-
-    /**
      * Will render the GameItems in this HUD. If there is an object whose tag starts with a capital
      * Z, it will be rendered last.
      */
@@ -267,15 +247,11 @@ public class HUD {
      * @return the coordinates of the last item added. Will return (0, 0) if there are no items
      * added yet
      */
-    private Coord topLeftCoordsOfLastItem() {
+    private Coord coordsOfLastItem() {
         Coord coords = new Coord(0f, 0f);
         if (this.lastAdded != null) {
             coords.x = this.lastAdded.getX();
             coords.y = this.lastAdded.getY();
-            if (!(this.lastAdded instanceof TextItem)) {
-                coords.x -= (this.lastAdded.getWidth() / 2);
-                coords.y += (this.lastAdded.getHeight() / 2);
-            }
         }
         return coords;
     }
