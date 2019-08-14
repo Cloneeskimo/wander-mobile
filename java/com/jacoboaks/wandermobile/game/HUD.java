@@ -1,8 +1,11 @@
 package com.jacoboaks.wandermobile.game;
 
 import android.opengl.GLES20;
+import android.view.MotionEvent;
+import android.widget.Button;
 
 import com.jacoboaks.wandermobile.R;
+import com.jacoboaks.wandermobile.game.gameitem.ButtonTextItem;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.graphics.GameRenderer;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
@@ -151,69 +154,24 @@ public class HUD {
     }
 
     /**
-     * Reloads the placement for a HUD item. Useful for when sizes change. This only works
-     * for the placements that are not relative to other placements.
-     * @param tag the tag of the item to reset
-     * @param placement the placement to reset the item to
-     * @param padding the amount of padding to give the item
+     * Loops through any ButtonTextItems in this HUD and updates their selections.
+     * @param e the MotionEvent to consider
+     * @return -1 if no ButtonTextItems are selected, the action code of the selected ButtonTextItem if
+     * one is selected
      */
-    public void reloadPlacement(String tag, Placement placement, float padding) {
+    public int updateButtonSelections(MotionEvent e) {
 
-        //get item reference
-        Coord newPos;
-        GameItem item = this.gameItems.get(tag);
-
-        //figure out new coordinates
-        switch (placement) {
-            case TOP_LEFT:
-                newPos = new Coord(-1f, 1f);
-                Transformation.normalizedToAspected(newPos);
-                newPos.x += padding;
-                newPos.y -= padding;
-                break;
-            case TOP_MIDDLE:
-                newPos = new Coord(0f, 1f);
-                Transformation.normalizedToAspected(newPos);
-                newPos.x -= (item.getWidth() / 2);
-                newPos.y -= (padding + item.getHeight());
-                break;
-            case TOP_RIGHT:
-                newPos = new Coord(1f, 1f);
-                Transformation.normalizedToAspected(newPos);
-                newPos.x -= (padding + item.getWidth());
-                newPos.y -= padding;
-                break;
-            case MIDDLE:
-                newPos = new Coord(0f, 0f);
-                newPos.x -= item.getWidth() / 2;
-                newPos.y -= item.getHeight() / 2;
-                break;
-            case BOTTOM_LEFT:
-                newPos = new Coord(-1f, -1f);
-                Transformation.normalizedToAspected(newPos);
-                newPos.x += padding;
-                newPos.y += (padding + item.getHeight());
-                break;
-            case BOTTOM_MIDDLE:
-                newPos = new Coord(0f, -1f);
-                Transformation.normalizedToAspected(newPos);
-                newPos.x -= (item.getWidth() / 2);
-                newPos.y += (padding + item.getHeight());
-                break;
-            case BOTTOM_RIGHT:
-                newPos = new Coord(1f, -1f);
-                Transformation.normalizedToAspected(newPos);
-                newPos.x -= (padding + item.getWidth());
-                newPos.y += (padding + item.getHeight());
-                break;
-            default:
-                throw Util.fatalError("HUD.java", "reloadPlacement(String, Placement, float)",
-                        "Invalid placement given. Only non-relative placements may be reloaded");
+        //loop through buttons
+        int actionCode = -1;
+        for (String tag : this.gameItems.keySet()) {
+            if (actionCode == -1) {
+                GameItem item = this.gameItems.get(tag);
+                if (item instanceof ButtonTextItem) actionCode = ((ButtonTextItem)item).updateSelection(e);
+            }
         }
 
-        //set coordinates
-        item.setX(newPos.x);
-        item.setY(newPos.y);
+        //return the found action code
+        return actionCode;
     }
 
     /**
@@ -234,6 +192,9 @@ public class HUD {
         //draw game items
         GameItem lastRender = null;
         for (String tag: this.gameItems.keySet()) {
+            if (tag.equals("AREA_NAME")) {
+                System.out.println("area name");
+            }
             if (tag.charAt(0) == 'Z') lastRender = this.gameItems.get(tag);
             else this.gameItems.get(tag).render(this.shaderProgram);
         }

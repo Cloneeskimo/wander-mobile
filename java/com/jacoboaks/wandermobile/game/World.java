@@ -54,7 +54,6 @@ public class World {
         this.hud = hud;
         TextItem areaName = (TextItem)this.hud.getItem("AREA_NAME");
         areaName.setText(this.area.getName());
-        this.hud.reloadPlacement("AREA_NAME", HUD.Placement.BOTTOM_MIDDLE, 0.01f);
     }
 
     /**
@@ -62,9 +61,9 @@ public class World {
      * @param data the data to reinstate
      */
     public void instateLoadedData(Bundle data) {
-        this.camera.setX(Float.parseFloat(data.getString("logic_camerax")));;
-        this.camera.setY(Float.parseFloat(data.getString("logic_cameray")));;
-        this.camera.setZoom(Float.parseFloat(data.getString("logic_camerazoom")));
+        this.camera.setX(Float.parseFloat(data.getString("logic_world_camerax")));;
+        this.camera.setY(Float.parseFloat(data.getString("logic_world_cameray")));;
+        this.camera.setZoom(Float.parseFloat(data.getString("logic_world_camerazoom")));
     }
 
     /**
@@ -219,9 +218,9 @@ public class World {
         this.player.setGridPosition((int)playerPos.x, (int)playerPos.y);
 
         //save data
-        data.addChild(new Node("camerax", Float.toString(this.camera.getX())));
-        data.addChild(new Node("cameray", Float.toString(this.camera.getY())));
-        data.addChild(new Node("camerazoom", Float.toString(this.camera.getZoom())));
+        data.addChild(new Node("world_camerax", Float.toString(this.camera.getX())));
+        data.addChild(new Node("world_cameray", Float.toString(this.camera.getY())));
+        data.addChild(new Node("world_camerazoom", Float.toString(this.camera.getZoom())));
     }
 
     //Cleanup Method

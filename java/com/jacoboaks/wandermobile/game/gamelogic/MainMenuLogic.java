@@ -13,7 +13,9 @@ import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
 import com.jacoboaks.wandermobile.graphics.Model;
+import com.jacoboaks.wandermobile.graphics.Texture;
 import com.jacoboaks.wandermobile.util.Color;
+import com.jacoboaks.wandermobile.util.Coord;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
 
@@ -65,31 +67,33 @@ public class MainMenuLogic implements GameLogic {
         bvTag.moveX(-(title.getWidth() / 2 - bvTag.getWidth() / 2));
 
         //create new game button and add to hud
-        ButtonTextItem newGameButton = new ButtonTextItem(this.font, null,"New Game",
+        ButtonTextItem newGameButton = new ButtonTextItem(this.font, "New Game",
                 new Color(0.0f, 0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f),
-                MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE, 0.05f);
+                MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE);
         newGameButton.scale(0.26f);
-        this.hud.addItem("NEW_GAME_BUTTON", newGameButton, HUD.Placement.MIDDLE, 0.05f);
+        this.hud.addItem("NEW_GAME_BUTTON", newGameButton, HUD.Placement.MIDDLE, 0.0f);
 
         //create load game button and add to hud
-        ButtonTextItem loadGameButton = new ButtonTextItem(this.font, null, "Load Game",
+        ButtonTextItem loadGameButton = new ButtonTextItem(this.font, "Load Game",
                 new Color(0.0f, 0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f),
-                MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE, 0.05f);
+                MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE);
         loadGameButton.scale(0.26f);
-        this.hud.addItem("LOAD_GAME_BUTTON", loadGameButton, HUD.Placement.BELOW_LAST, 0.05f);
+        this.hud.addItem("LOAD_GAME_BUTTON", loadGameButton, HUD.Placement.BELOW_LAST, 0.1f);
 
         //create exit button and add to hud
-        ButtonTextItem exitButton = new ButtonTextItem(this.font, null, "Exit",
+        ButtonTextItem exitButton = new ButtonTextItem(this.font, "Exit",
                 new Color(0.0f, 0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f),
-                MainMenuLogic.EXIT_BUTTON_ACTION_CODE, 0.05f);
+                MainMenuLogic.EXIT_BUTTON_ACTION_CODE);
         exitButton.scale(0.26f);
-        this.hud.addItem("EXIT_BUTTON", exitButton, HUD.Placement.BELOW_LAST, 0.05f);
+        this.hud.addItem("EXIT_BUTTON", exitButton, HUD.Placement.BELOW_LAST, 0.1f);
 
         //create fading box
         GameItem fadingBox = new GameItem(new Model(Model.getScreenBoxModelCoords(), Model.STD_SQUARE_TEX_COORDS(),
                 Model.STD_SQUARE_DRAW_ORDER(), new Material(new Color(0.6f, 0.6f, 0.6f, 0.0f))), 0f, 0f);
         fadingBox.scale(4.0f);
         this.hud.addItem("Z_FADING_BOX", fadingBox, HUD.Placement.MIDDLE, 0f);
+
+        System.out.println(new Coord(exitButton.getWidth(), exitButton.getHeight()));
     }
 
     //Data Loading Method
@@ -103,29 +107,27 @@ public class MainMenuLogic implements GameLogic {
     public boolean input(MotionEvent e) {
 
         //figure out the action code
-        ButtonTextItem button = (ButtonTextItem)this.hud.getItem("NEW_GAME_BUTTON");
-        int actionCode = button.updateSelection(e);
-        if (actionCode == -1) button = (ButtonTextItem)this.hud.getItem("LOAD_GAME_BUTTON");
-        actionCode = button.updateSelection(e);
-        if (actionCode == -1) button = (ButtonTextItem)this.hud.getItem("EXIT_BUTTON");
-        actionCode = button.updateSelection(e);
+        int actionCode = this.hud.updateButtonSelections(e);
 
         //check if button was pressed and switch to world logic if so
-        if (actionCode == MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE) {
-            this.fadeOutTime = Util.FADE_TIME;
-            this.chosenAction = actionCode;
-            return true;
-        } else if (actionCode == MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE) {
-            this.fadeOutTime = Util.FADE_TIME;
-            this.chosenAction = actionCode;
-            return true;
-        } else if (actionCode == MainMenuLogic.EXIT_BUTTON_ACTION_CODE) {
-            System.exit(0);
-            return true;
+        switch(actionCode) {
+            case MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE:
+                this.fadeOutTime = Util.FADE_TIME;
+                this.chosenAction = actionCode;
+                break;
+            case MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE:
+                this.fadeOutTime = Util.FADE_TIME;
+                this.chosenAction = actionCode;
+                break;
+            case MainMenuLogic.EXIT_BUTTON_ACTION_CODE:
+                System.exit(0);
+                break;
+            default: //return false if no action codes were returned
+                return false;
         }
 
-        //return false if button was not pressed
-        return false;
+        //return true if button was pressed
+        return true;
     }
 
     //Scale Input Method

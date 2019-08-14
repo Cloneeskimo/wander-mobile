@@ -153,7 +153,8 @@ public class WorldLogic implements GameLogic {
         this.world.instateLoadedData(this.savedInstanceData);
         this.world.getPlayer().setX(Float.parseFloat(this.savedInstanceData.getString("logic_playerx")));
         this.world.getPlayer().setY(Float.parseFloat(this.savedInstanceData.getString("logic_playery")));
-        this.fadeOutTime = Float.parseFloat(this.savedInstanceData.getString("fadeOutTime"));
+        this.fadeOutTime = Float.parseFloat(this.savedInstanceData.getString("logic_fadeOutTime"));
+        this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(this.fadeOutTime / Util.FADE_TIME);
     }
 
     /**

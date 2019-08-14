@@ -13,10 +13,13 @@ import java.util.List;
  */
 public class TextItem extends GameItem {
 
+    //Static Data
+    public static final String DEFAULT_TEXT = "N/A";
+
     //Data
     protected Font font; //the font_default used for the text
     protected String text; //the text
-    protected float width, height, scale; //the width, height, and scale of the text
+    protected float scale; //the width, height, and scale of the text
 
     /**
      * Constructs this TextItem.
@@ -30,7 +33,7 @@ public class TextItem extends GameItem {
         super(new Model(new float[] {}, new float[] {}, new int[] {}, material), x, y);
         this.font = font;
         this.scale = 1.0f;
-        this.setText(text);
+        this.setText(text.equals("") ? TextItem.DEFAULT_TEXT : text);
     }
 
     /**
@@ -40,10 +43,8 @@ public class TextItem extends GameItem {
     public TextItem(TextItem other) {
         super(other);
         this.font = other.font;
-        this.text = other.text;
-        this.width = other.width;
-        this.height = other.height;
         this.scale = other.scale;
+        this.setText(other.text);
     }
 
     /**
@@ -111,15 +112,11 @@ public class TextItem extends GameItem {
             drawOrder.add(i * 4 + 3);
         }
 
-        //update width and height
-        this.width = x;
-        this.height = Model.STD_SQUARE_SIZE * this.scale;
-
         //move to middle x
-        float modelCoordsArr[] = new float[modelCoords.size()];
+        float[] modelCoordsArr = new float[modelCoords.size()];
         for (int i = 0; i < modelCoords.size(); i++) {
-            if (i % 3 == 0) modelCoordsArr[i] = modelCoords.get(i) - this.width / 2;
-            else if (i % 3 == 1) modelCoordsArr[i] = modelCoords.get(i) + this.height / 2;
+            if (i % 3 == 0) modelCoordsArr[i] = modelCoords.get(i) - x / 2;
+            else if (i % 3 == 1) modelCoordsArr[i] = modelCoords.get(i) + (Model.STD_SQUARE_SIZE * this.scale) / 2;
             else modelCoordsArr[i] = 0;
         }
 
@@ -130,12 +127,6 @@ public class TextItem extends GameItem {
         //create and set model
         this.model = new Model(modelCoordsArr, textureCoordsArr, drawOrderArr, this.model.getMaterial());
     }
-
-    //Accessors
-    @Override
-    public float getWidth() { return this.width; }
-    @Override
-    public float getHeight() { return this.height; }
 
     //Mutators
     public void setText(String text) {
@@ -151,7 +142,5 @@ public class TextItem extends GameItem {
     public void scale(float factor) {
         super.scale(factor);
         this.scale = factor;
-        this.width *= factor;
-        this.height *= factor;
     }
 }

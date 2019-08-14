@@ -19,32 +19,8 @@ public class ButtonTextItem extends TextItem {
 
     //Data
     private int actionCode;
-    private float padding;
     private Color unselectedColor, selectedColor;
     private boolean selected = false;
-    private GameItem underButton = null;
-
-    /**
-     * Constructs this ButtonTextItem with the given information.
-     * @param font the font_default to use for the text
-     * @param underTexture the texture to apply underneath the button
-     * @param text the text to display
-     * @param unselected the color to use when the button is not texture_selected
-     * @param selected the color to use when the button is texture_selected
-     * @param actionCode the action code to return when this button is pressed
-     * @param padding the amount of padding in between the text and the underlying texture of the button
-     */
-    public ButtonTextItem(Font font, Texture underTexture, String text, Color unselected, Color selected, int actionCode, float padding) {
-        super(font, text, new Material(font.getFontSheet(), unselected, true), 0f, 0f);
-        this.unselectedColor = unselected;
-        this.selectedColor = selected;
-        this.actionCode = actionCode;
-        this.padding = padding;
-        if (underTexture != null) {
-            this.underButton = new GameItem(new Model(Model.getRectangleModelCoords(this.width + padding * 2, this.height + padding * 2),
-            Model.STD_SQUARE_TEX_COORDS(), Model.STD_SQUARE_DRAW_ORDER(), new Material(underTexture)), this.x, this.y);
-        }
-    }
 
     /**
      * Constructs this ButtonTextItem with the given information.
@@ -55,7 +31,10 @@ public class ButtonTextItem extends TextItem {
      * @param actionCode the action code to return when this button is pressed
      */
     public ButtonTextItem(Font font, String text, Color unselected, Color selected, int actionCode) {
-        this(font, null, text, unselected, selected, actionCode, 0.0f);
+        super(font, text, new Material(font.getFontSheet(), unselected, true), 0f, 0f);
+        this.unselectedColor = unselected;
+        this.selectedColor = selected;
+        this.actionCode = actionCode;
     }
 
     /**
@@ -112,7 +91,6 @@ public class ButtonTextItem extends TextItem {
      */
     @Override
     public void render(ShaderProgram shaderProgram) {
-        if (this.underButton != null) this.underButton.render(shaderProgram);
         super.render(shaderProgram);
     }
 
@@ -122,27 +100,6 @@ public class ButtonTextItem extends TextItem {
      */
     @Override
     public void scale(float factor) {
-        if (this.underButton != null) this.underButton.scale(factor);
         super.scale(factor);
-    }
-
-    /**
-     * @return the width of this ButtonTextItem
-     */
-    @Override
-    public float getWidth() {
-        float w = super.getWidth();
-        w += this.padding * 2;
-        return w;
-    }
-
-    /**
-     * @return the height of this ButtonTextItem
-     */
-    @Override
-    public float getHeight() {
-        float h = super.getHeight();
-        h += this.padding * 2;
-        return h;
     }
 }
