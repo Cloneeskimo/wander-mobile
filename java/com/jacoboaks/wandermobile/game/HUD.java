@@ -2,16 +2,15 @@ package com.jacoboaks.wandermobile.game;
 
 import android.opengl.GLES20;
 import android.view.MotionEvent;
-import android.widget.Button;
 
 import com.jacoboaks.wandermobile.R;
 import com.jacoboaks.wandermobile.game.gameitem.ButtonTextItem;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
+import com.jacoboaks.wandermobile.game.gameitem.Keyboard;
 import com.jacoboaks.wandermobile.graphics.GameRenderer;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
 import com.jacoboaks.wandermobile.graphics.Transformation;
 import com.jacoboaks.wandermobile.util.Coord;
-import com.jacoboaks.wandermobile.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,6 +53,16 @@ public class HUD {
         this.shaderProgram.registerUniform("textureSampler");
         this.shaderProgram.registerUniform("colorOverride");
         this.shaderProgram.registerUniform("isTextured");
+    }
+
+    /**
+     * Adds a new GameItem to this HUD using the given information.
+     * @param tag the tag to identify this item with
+     * @param item the item to add
+     */
+    public void addItem(String tag, GameItem item) {
+        this.gameItems.put(tag, item);
+        this.lastAdded = item;
     }
 
     /**
@@ -167,6 +176,7 @@ public class HUD {
             if (actionCode == -1) {
                 GameItem item = this.gameItems.get(tag);
                 if (item instanceof ButtonTextItem) actionCode = ((ButtonTextItem)item).updateSelection(e);
+                else if (item instanceof Keyboard) actionCode = ((Keyboard)item).updateSelections(e);
             }
         }
 
@@ -192,9 +202,6 @@ public class HUD {
         //draw game items
         GameItem lastRender = null;
         for (String tag: this.gameItems.keySet()) {
-            if (tag.equals("AREA_NAME")) {
-                System.out.println("area name");
-            }
             if (tag.charAt(0) == 'Z') lastRender = this.gameItems.get(tag);
             else this.gameItems.get(tag).render(this.shaderProgram);
         }

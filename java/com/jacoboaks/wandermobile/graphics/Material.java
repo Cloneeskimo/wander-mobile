@@ -43,6 +43,7 @@ public class Material {
 
     //Mutator
     public void setColor(Color color) { this.color = color; }
+    public void setTexture(Texture texture) { this.texture = texture; }
 
     //Accessors
     public boolean isTextured() { return this.texture != null; }

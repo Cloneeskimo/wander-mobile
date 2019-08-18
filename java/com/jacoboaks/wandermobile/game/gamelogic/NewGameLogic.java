@@ -27,7 +27,8 @@ public class NewGameLogic implements GameLogic {
         this.font = new Font(R.drawable.font_default, R.raw.fontcuttoffs_default,10, 10, ' ');
 
         Keyboard keyboard = new Keyboard(this.font, Keyboard.STD_CHARACTER_SET, new Texture(R.drawable.texture_keyboardbutton),
-                new Texture(R.drawable.texture_keyboardspacebutton), true, 4, 0f, 0f, 1.8f, 1.0f, 0.06f);
+                new Texture(R.drawable.texture_keyboardbuttonpress), new Texture(R.drawable.texture_keyboardspacebutton),
+                new Texture(R.drawable.texture_keyboardspacebuttonpress), 4, 0f, 0f, 1.95f, 1.0f, 0.03f);
 
         this.hud.addItem("KEYBOARD", keyboard, HUD.Placement.MIDDLE, 0f);
     }
@@ -41,7 +42,8 @@ public class NewGameLogic implements GameLogic {
     //Input Method
     @Override
     public boolean input(MotionEvent e) {
-        return false;
+        int actionCode = this.hud.updateButtonSelections(e);
+        return (actionCode == -1);
     }
 
     //Scale Input Method

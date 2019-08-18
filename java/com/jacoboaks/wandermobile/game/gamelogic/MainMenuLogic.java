@@ -7,6 +7,7 @@ import android.view.MotionEvent;
 import com.jacoboaks.wandermobile.MainActivity;
 import com.jacoboaks.wandermobile.R;
 import com.jacoboaks.wandermobile.game.HUD;
+import com.jacoboaks.wandermobile.game.gameitem.ButtonItem;
 import com.jacoboaks.wandermobile.game.gameitem.ButtonTextItem;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;

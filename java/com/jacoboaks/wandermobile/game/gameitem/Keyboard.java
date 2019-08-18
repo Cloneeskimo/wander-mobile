@@ -1,7 +1,9 @@
 package com.jacoboaks.wandermobile.game.gameitem;
 
 import android.opengl.GLES20;
+import android.view.MotionEvent;
 
+import com.jacoboaks.wandermobile.game.HUD;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
 import com.jacoboaks.wandermobile.graphics.Model;
@@ -28,26 +30,17 @@ public class Keyboard extends GameItem {
     public static final int SHIFT_CHARACTER_WIDTH = 2;
 
     //Data
-    private boolean shift;
-    private int shiftRow;
-    private float width, height;
-    private float padding;
-    private String[] characterSet;
-    private Texture buttonTexture;
-    private Texture spaceButtonTexture;
-    private List<Float> buttonWidths;
-    private List<GameItem> buttons;
-    private List<ButtonTextItem> buttonTextItems;
-    private Font font;
+    private HUD hud;
 
     /**
      * Constructs this Keyboard with the given character set and shift row
      * @param font the font to use for this Keyboard
      * @param characterSet the character set to be accessible on the Keyboard. Each entry should
      *                     be a new row of the Keyboard.
-     * @param button the Texture to use for the normal buttons
-     * @param space the Texture to use for the space bar
-     * @param shift whether a alternate set of character is available through a shift key
+     * @param buttonTexture the texture to use for the buttons
+     * @param selectedButtonTexture the selected texture to use for the buttons
+     * @param longButtonTexture the texture to use for the longer buttons (such as shift and space bar)
+     * @param selectedLongButtonTexture the texture to use for the selected longer button (such as shift and space bar)
      * @param shiftRow what row the shift key is on (if shift is set to true) - important: set to -1
      *                 if there is no shift key
      * @param x the x coordinate to place this keyboard at (top-left, aspected)
@@ -56,29 +49,23 @@ public class Keyboard extends GameItem {
      * @param height the height of the Keyboard in aspected coordinates
      * @param padding the padding between buttons on this Keyboard
      */
-    public Keyboard(Font font, String[] characterSet, Texture button, Texture space, boolean shift, int shiftRow, float x, float y, float width, float height, float padding) {
-        super(new Model(new float[] { 0f, 0f, 0f, 0f, height, 0f, width, 0f, 0f, width, height, 0f },
-                Model.STD_SQUARE_TEX_COORDS(), Model.STD_SQUARE_DRAW_ORDER(), new Material(Keyboard.backgroundColor)), x ,y);
+    public Keyboard(Font font, String[] characterSet, Texture buttonTexture, Texture selectedButtonTexture,
+                    Texture longButtonTexture, Texture selectedLongButtonTexture, int shiftRow, float x, float y,
+                    float width, float height, float padding) {
 
-        //set data
-        this.characterSet = characterSet;
-        this.buttonTexture = button;
-        this.spaceButtonTexture = space;
-        this.shift = shift;
-        this.shiftRow = shiftRow;
-        this.width = width;
-        this.height = height;
-        this.padding = padding;
-        this.font = font;
+        //create keyboard background and hud for buttons
+        super(new Model(Model.getRectangleModelCoords(width, height), Model.STD_SQUARE_TEX_COORDS(),
+                Model.STD_SQUARE_DRAW_ORDER(), new Material(Keyboard.backgroundColor)), x ,y);
+        this.hud = new HUD();
 
         //calculate button height
-        int amountOfRows = shift ? characterSet.length / 2 : characterSet.length;
+        int amountOfRows = shiftRow > -1 ? characterSet.length / 2 : characterSet.length;
         int amountOfVerticalPaddings = amountOfRows + 1;
         float totalVerticalPadding = (float)amountOfVerticalPaddings * padding;
         float buttonHeight = (height - totalVerticalPadding) / (float)amountOfRows;
 
         //calculate button widths
-        this.buttonWidths = new ArrayList<>();
+        List<Float> buttonWidths = new ArrayList<>();
         for (int i = 0; i < amountOfRows; i++) {
             int amountOfCharacters = characterSet[i].length();
             int amountOfHorizontalPaddings = amountOfCharacters + 1 + (i == shiftRow ? 1 : 0);
@@ -86,69 +73,71 @@ public class Keyboard extends GameItem {
             if (shiftRow == i) additionCharacterAccount += SHIFT_CHARACTER_WIDTH;
             float totalHorizontalPadding = (float)amountOfHorizontalPaddings * padding;
             float buttonWidth = (width - totalHorizontalPadding) / (float)(amountOfCharacters + additionCharacterAccount);
-            this.buttonWidths.add(buttonWidth);
+            buttonWidths.add(buttonWidth);
         }
 
-        //create button models for each row
-        List<Model> buttonModels = new ArrayList<>();
-        Model spaceModel = null, shiftModel = null;
-        for (int i = 0; i < amountOfRows; i++) {
-            buttonModels.add(new Model(new float[] { 0f, 0f, 0f, 0f, buttonHeight, 0f,
-                    buttonWidths.get(i), 0f, 0f, buttonWidths.get(i), buttonHeight, 0f },
-                    Model.STD_SQUARE_TEX_COORDS(), Model.STD_SQUARE_DRAW_ORDER(), new Material(button)));
-            if (i == shiftRow) {
-                shiftModel = new Model(new float[] { 0f, 0f, 0f, 0f, buttonHeight, 0f,
-                        Keyboard.SHIFT_CHARACTER_WIDTH * buttonWidths.get(i), 0f, 0f, Keyboard.SHIFT_CHARACTER_WIDTH *
-                        buttonWidths.get(i), buttonHeight, 0f }, Model.STD_SQUARE_TEX_COORDS(),
-                        Model.STD_SQUARE_DRAW_ORDER(), new Material(space));
-            }
-            if (characterSet[i].contains(" ")) {
-                spaceModel = new Model(new float[] { 0f, 0f, 0f, 0f, buttonHeight, 0f,
-                        Keyboard.SPACE_BAR_CHARACTER_WIDTH * buttonWidths.get(i), 0f, 0f, Keyboard.SPACE_BAR_CHARACTER_WIDTH *
-                        buttonWidths.get(i), buttonHeight, 0f }, Model.STD_SQUARE_TEX_COORDS(),
-                        Model.STD_SQUARE_DRAW_ORDER(), new Material(space));
-            }
-        }
+        Color textColor = new Color(0.4f, 0.4f, 0.4f, 1.0f);
 
-        //create GameItems
-        float yp = -padding - buttonHeight + height / 2;
+        //create ButtonItems
+        float yp = this.y + (height / 2) - (buttonHeight / 2) - padding + this.y;
         boolean shiftAccountedFor = false;
-        this.buttons = new ArrayList<>();
-        this.buttonTextItems = new ArrayList<>();
         for (int i = 0; i < amountOfRows; i++) {
 
-            float xp = padding - (width / 2);
+            //create buttonss for row i
+            float xp = this.x - (width / 2) + (buttonWidths.get(i) / 2) + padding + this.x;
             for (int j = 0; j < characterSet[i].length(); j++) {
 
-                GameItem nextButton = null;
+                //create shift if next up
+                ButtonItem nextButton = null;
                 if (i == shiftRow && !shiftAccountedFor) {
                     shiftAccountedFor = true;
-                    nextButton = new GameItem(shiftModel, xp, yp);
-                    xp += nextButton.getWidth() + padding;
-                    this.buttons.add(nextButton);
+                    nextButton = new ButtonItem("shift", font, longButtonTexture, selectedLongButtonTexture,
+                            textColor, textColor, -1, 0.02f, buttonWidths.get(i) * Keyboard.SHIFT_CHARACTER_WIDTH,
+                            buttonHeight);
+                    xp += nextButton.getWidth() / 2;
+                    xp -= (buttonWidths.get(i) / 2);
+                    nextButton.setX(xp);
+                    nextButton.setY(yp);
+                    xp += (nextButton.getWidth() / 2) + padding + (buttonWidths.get(i) / 2);
+                    this.hud.addItem("KEYBOARD_SHIFT", nextButton);
                 }
 
+                //create space of characters
                 if (characterSet[i].charAt(j) == ' ') {
-                    nextButton = new GameItem(spaceModel, xp, yp);
+                    nextButton = new ButtonItem("space", font, longButtonTexture, selectedLongButtonTexture,
+                            textColor, textColor, characterSet[i].charAt(j), 0.02f, buttonWidths.get(i) * Keyboard.SPACE_BAR_CHARACTER_WIDTH,
+                            buttonHeight);
+                    xp += nextButton.getWidth() / 2;
+                    xp -= (buttonWidths.get(i) / 2);
                 } else {
-                    nextButton = new GameItem(buttonModels.get(i), xp, yp);
+                    nextButton = new ButtonItem(Character.toString(characterSet[i].charAt(j)), font, buttonTexture, selectedButtonTexture,
+                            textColor, textColor, -1, 0.02f, buttonWidths.get(i),
+                            buttonHeight);
                 }
-                this.buttons.add(nextButton);
 
-                ButtonTextItem bti = new ButtonTextItem(font, Character.toString(characterSet[i].charAt(j)),
-                        new Color(0.0f, 0.0f, 0.0f, 1.0f), new Color(0.2f, 0.2f, 0.2f, 1.0f),
-                        characterSet[i].charAt(j));
-                bti.scale(0.2f);
-                bti.setX(xp + nextButton.getWidth() / 2);
-                bti.setY(yp + nextButton.getHeight() / 2);
-                this.buttonTextItems.add(bti);
+                //set button position and add button
+                nextButton.setX(xp);
+                nextButton.setY(yp);
+                this.hud.addItem("KEYBOARD_" + Character.toString(characterSet[i].charAt(j)), nextButton);
 
-
-                xp += nextButton.getWidth() + padding;
+                //increment x position
+                if (characterSet[i].charAt(j) == ' ') {
+                    xp += (nextButton.getWidth() / 2) + padding + (buttonWidths.get(i) / 2);
+                } else xp += nextButton.getWidth() + padding;
             }
 
+            //increment y position
             yp -= (padding + buttonHeight);
         }
+    }
+
+    /**
+     * Updates the selection of each button on the keyboard.
+     * @param e the MotionEvent to respond to
+     * @return -1 if nothing is selected, the action code of the selected button if one is pressed
+     */
+    public int updateSelections(MotionEvent e) {
+        return this.hud.updateButtonSelections(e);
     }
 
     @Override
@@ -166,9 +155,7 @@ public class Keyboard extends GameItem {
         //draw model
         this.model.render(shaderProgram);
 
-        //draw each button
-        for (GameItem button : this.buttons) button.render(shaderProgram);
-        for (ButtonTextItem buttonTextItem : this.buttonTextItems) buttonTextItem.render(shaderProgram);
+        //draw the buttons
+        this.hud.render();
     }
-
 }
