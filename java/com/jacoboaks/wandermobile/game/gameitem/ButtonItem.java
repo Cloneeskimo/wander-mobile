@@ -188,6 +188,16 @@ public class ButtonItem extends ButtonTextItem {
     }
 
     /**
+     * Moves the x value in world/aspected coordinates of this ButtonItem
+     * @param x the y value to move this ButtonItem by
+     */
+    @Override
+    public void moveX(float x) {
+        super.moveX(x);
+        this.underItem.moveX(x);
+    }
+
+    /**
      * Sets the y value in world/aspected coordinates of this ButtonItem.
      * @param y the y value to set this ButtonItem to
      */
@@ -195,5 +205,15 @@ public class ButtonItem extends ButtonTextItem {
     public void setY(float y) {
         super.setY(y);
         this.underItem.setY(y);
+    }
+
+    /**
+     * Moves the y value in world/aspected coordinates of this ButtonItem
+     * @param y the y value to move this ButtonItem by
+     */
+    @Override
+    public void moveY(float y) {
+        super.moveY(y);
+        this.underItem.moveY(y);
     }
 }

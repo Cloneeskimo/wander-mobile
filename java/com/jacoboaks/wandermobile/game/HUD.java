@@ -13,7 +13,9 @@ import com.jacoboaks.wandermobile.graphics.Transformation;
 import com.jacoboaks.wandermobile.util.Coord;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Holds many GameItems to be rendered over top of a World.
@@ -177,7 +179,7 @@ public class HUD {
                 GameItem item = this.gameItems.get(tag);
                 if (item instanceof ButtonTextItem) actionCode = ((ButtonTextItem)item).updateSelection(e);
                 else if (item instanceof Keyboard) actionCode = ((Keyboard)item).updateSelections(e);
-            }
+            } else return actionCode;
         }
 
         //return the found action code
@@ -236,8 +238,10 @@ public class HUD {
         return size;
     }
 
-    //Accessor
+    //Accessors
     public GameItem getItem(String tag) { return this.gameItems.get(tag); }
+
+    public Set<String> getTags() { return this.gameItems.keySet(); }
 
     /**
      * Represents some possible placements for an item to go when added to the HUD

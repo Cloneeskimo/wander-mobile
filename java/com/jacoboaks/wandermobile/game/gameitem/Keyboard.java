@@ -28,9 +28,10 @@ public class Keyboard extends GameItem {
     public static Color backgroundColor = new Color(0.4f, 0.4f, 0.4f, 0.8f);
     public static final int SPACE_BAR_CHARACTER_WIDTH = 3;
     public static final int SHIFT_CHARACTER_WIDTH = 2;
+    public static final int DELETE_CHARACTER_WIDTH = 2;
 
     //Data
-    private HUD hud;
+    private List<ButtonItem> buttons;
 
     /**
      * Constructs this Keyboard with the given character set and shift row
@@ -53,10 +54,10 @@ public class Keyboard extends GameItem {
                     Texture longButtonTexture, Texture selectedLongButtonTexture, int shiftRow, float x, float y,
                     float width, float height, float padding) {
 
-        //create keyboard background and hud for buttons
+        //create keyboard background and button list
         super(new Model(Model.getRectangleModelCoords(width, height), Model.STD_SQUARE_TEX_COORDS(),
                 Model.STD_SQUARE_DRAW_ORDER(), new Material(Keyboard.backgroundColor)), x ,y);
-        this.hud = new HUD();
+        this.buttons = new ArrayList<>();
 
         //calculate button height
         int amountOfRows = shiftRow > -1 ? characterSet.length / 2 : characterSet.length;
@@ -76,19 +77,22 @@ public class Keyboard extends GameItem {
             buttonWidths.add(buttonWidth);
         }
 
+        //create text color
         Color textColor = new Color(0.4f, 0.4f, 0.4f, 1.0f);
 
         //create ButtonItems
-        float yp = this.y + (height / 2) - (buttonHeight / 2) - padding + this.y;
+        float yp = this.y + height / 2 - (buttonHeight / 2) - padding;
         boolean shiftAccountedFor = false;
         for (int i = 0; i < amountOfRows; i++) {
 
-            //create buttonss for row i
-            float xp = this.x - (width / 2) + (buttonWidths.get(i) / 2) + padding + this.x;
+            //create buttons for row i
+            float xp = this.x - (width / 2) + (buttonWidths.get(i) / 2) + padding;
             for (int j = 0; j < characterSet[i].length(); j++) {
 
-                //create shift if next up
+                //create null button
                 ButtonItem nextButton = null;
+
+                //shift
                 if (i == shiftRow && !shiftAccountedFor) {
                     shiftAccountedFor = true;
                     nextButton = new ButtonItem("shift", font, longButtonTexture, selectedLongButtonTexture,
@@ -96,34 +100,34 @@ public class Keyboard extends GameItem {
                             buttonHeight);
                     xp += nextButton.getWidth() / 2;
                     xp -= (buttonWidths.get(i) / 2);
-                    nextButton.setX(xp);
-                    nextButton.setY(yp);
-                    xp += (nextButton.getWidth() / 2) + padding + (buttonWidths.get(i) / 2);
-                    this.hud.addItem("KEYBOARD_SHIFT", nextButton);
+                    j--;
                 }
 
-                //create space of characters
-                if (characterSet[i].charAt(j) == ' ') {
+                //space
+                else if (characterSet[i].charAt(j) == ' ') {
                     nextButton = new ButtonItem("space", font, longButtonTexture, selectedLongButtonTexture,
                             textColor, textColor, characterSet[i].charAt(j), 0.02f, buttonWidths.get(i) * Keyboard.SPACE_BAR_CHARACTER_WIDTH,
                             buttonHeight);
                     xp += nextButton.getWidth() / 2;
                     xp -= (buttonWidths.get(i) / 2);
-                } else {
+                }
+
+                //other characters
+                else {
                     nextButton = new ButtonItem(Character.toString(characterSet[i].charAt(j)), font, buttonTexture, selectedButtonTexture,
-                            textColor, textColor, -1, 0.02f, buttonWidths.get(i),
+                            textColor, textColor, characterSet[i].charAt(j), 0.02f, buttonWidths.get(i),
                             buttonHeight);
                 }
 
                 //set button position and add button
                 nextButton.setX(xp);
                 nextButton.setY(yp);
-                this.hud.addItem("KEYBOARD_" + Character.toString(characterSet[i].charAt(j)), nextButton);
+                this.buttons.add(nextButton);
 
                 //increment x position
-                if (characterSet[i].charAt(j) == ' ') {
-                    xp += (nextButton.getWidth() / 2) + padding + (buttonWidths.get(i) / 2);
-                } else xp += nextButton.getWidth() + padding;
+                nextButton.setX(xp);
+                nextButton.setY(yp);
+                xp += (nextButton.getWidth() / 2) + padding + (buttonWidths.get(i) / 2);
             }
 
             //increment y position
@@ -137,9 +141,20 @@ public class Keyboard extends GameItem {
      * @return -1 if nothing is selected, the action code of the selected button if one is pressed
      */
     public int updateSelections(MotionEvent e) {
-        return this.hud.updateButtonSelections(e);
+
+        //loop through buttons
+        int actionCode = -1;
+        for (ButtonItem item : this.buttons) {
+            if (actionCode == -1) {
+                actionCode = ((ButtonTextItem)item).updateSelection(e);
+            } else return actionCode;
+        }
+
+        //return the found action code
+        return actionCode;
     }
 
+    //Render Method
     @Override
     public void render(ShaderProgram shaderProgram) {
 
@@ -154,8 +169,18 @@ public class Keyboard extends GameItem {
 
         //draw model
         this.model.render(shaderProgram);
+        for (ButtonItem buttonItem : this.buttons) buttonItem.render(shaderProgram);
+    }
 
-        //draw the buttons
-        this.hud.render();
+    @Override
+    public void setX(float x) {
+        for (ButtonItem item : this.buttons) item.moveX(x - this.x);
+        super.setX(x);
+    }
+
+    @Override
+    public void setY(float y) {
+        for (ButtonItem item : this.buttons) item.moveY(y - this.y);
+        super.setY(y);
     }
 }

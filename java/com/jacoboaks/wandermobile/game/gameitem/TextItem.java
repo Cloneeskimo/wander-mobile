@@ -135,6 +135,15 @@ public class TextItem extends GameItem {
     }
 
     /**
+     * Appends the given text onto the end of this TextItem.
+     * @param text the text to append
+     */
+    public void appendText(String text) {
+        this.text = this.text + text;
+        this.updateModel(this.text);
+    }
+
+    /**
      * Scales the model and the item width according to a given factor.
      * @param factor the factor to scale the model by
      */

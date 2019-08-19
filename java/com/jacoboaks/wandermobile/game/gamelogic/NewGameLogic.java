@@ -6,8 +6,11 @@ import android.view.MotionEvent;
 import com.jacoboaks.wandermobile.R;
 import com.jacoboaks.wandermobile.game.HUD;
 import com.jacoboaks.wandermobile.game.gameitem.Keyboard;
+import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.graphics.Font;
+import com.jacoboaks.wandermobile.graphics.Material;
 import com.jacoboaks.wandermobile.graphics.Texture;
+import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
 
@@ -16,6 +19,7 @@ import com.jacoboaks.wandermobile.util.Util;
  */
 public class NewGameLogic implements GameLogic {
 
+    //Data
     private HUD hud;
     private Font font;
 
@@ -23,14 +27,23 @@ public class NewGameLogic implements GameLogic {
     @Override
     public void init() {
 
+        //create hud and font
         this.hud = new HUD();
         this.font = new Font(R.drawable.font_default, R.raw.fontcuttoffs_default,10, 10, ' ');
 
+        //create keyboard
         Keyboard keyboard = new Keyboard(this.font, Keyboard.STD_CHARACTER_SET, new Texture(R.drawable.texture_keyboardbutton),
                 new Texture(R.drawable.texture_keyboardbuttonpress), new Texture(R.drawable.texture_keyboardspacebutton),
-                new Texture(R.drawable.texture_keyboardspacebuttonpress), 4, 0f, 0f, 1.95f, 1.0f, 0.03f);
+                new Texture(R.drawable.texture_keyboardspacebuttonpress), 4, 0f, 0f, 1.9f, 1.0f, 0.03f);
 
-        this.hud.addItem("KEYBOARD", keyboard, HUD.Placement.MIDDLE, 0f);
+        this.hud.addItem("KEYBOARD", keyboard, HUD.Placement.BOTTOM_MIDDLE, 0.05f);
+
+        //create inout text
+        TextItem inputText = new TextItem(font, "", new Material(font.getFontSheet(), new Color(0.0f, 0.0f, 0.0f, 1.0f), true),
+                0f, 0f);
+        inputText.scale(0.2f);
+        inputText.setText("");
+        this.hud.addItem("INPUT_TEXT", inputText, HUD.Placement.TOP_MIDDLE, 0.15f);
     }
 
     //Data Loading Method
@@ -43,6 +56,10 @@ public class NewGameLogic implements GameLogic {
     @Override
     public boolean input(MotionEvent e) {
         int actionCode = this.hud.updateButtonSelections(e);
+        if (actionCode != -1) {
+            char c = (char)actionCode;
+            ((TextItem)this.hud.getItem("INPUT_TEXT")).appendText(Character.toString(c));
+        }
         return (actionCode == -1);
     }
 
