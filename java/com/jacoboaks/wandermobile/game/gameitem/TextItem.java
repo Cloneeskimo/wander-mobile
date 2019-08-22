@@ -153,6 +153,9 @@ public class TextItem extends GameItem {
         }
     }
 
+    //Accessor
+    public String getText() { return this.text; }
+
     /**
      * Scales the model and the item width according to a given factor.
      * @param factor the factor to scale the model by
