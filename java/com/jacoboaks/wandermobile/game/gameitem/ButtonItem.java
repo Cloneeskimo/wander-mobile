@@ -216,4 +216,12 @@ public class ButtonItem extends ButtonTextItem {
         super.moveY(y);
         this.underItem.moveY(y);
     }
+
+    /**
+     * Sets the action code of this ButtonItem to the given code.
+     * @param actionCode the action code to assign to this ButtonItem.
+     */
+    public void setActionCode(int actionCode) {
+        this.actionCode = actionCode;
+    }
 }

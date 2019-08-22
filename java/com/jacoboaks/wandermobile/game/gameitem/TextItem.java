@@ -144,6 +144,16 @@ public class TextItem extends GameItem {
     }
 
     /**
+     * Removes the last character of the text of this TextItem.
+     */
+    public void removeLastChar() {
+        if (this.text.length() > 0) {
+            this.text = this.text.substring(0, this.text.length() - 1);
+            this.updateModel(this.text);
+        }
+    }
+
+    /**
      * Scales the model and the item width according to a given factor.
      * @param factor the factor to scale the model by
      */

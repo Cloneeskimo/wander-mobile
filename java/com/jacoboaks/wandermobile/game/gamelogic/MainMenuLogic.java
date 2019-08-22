@@ -93,8 +93,6 @@ public class MainMenuLogic implements GameLogic {
                 Model.STD_SQUARE_DRAW_ORDER(), new Material(new Color(0.6f, 0.6f, 0.6f, 0.0f))), 0f, 0f);
         fadingBox.scale(4.0f);
         this.hud.addItem("Z_FADING_BOX", fadingBox, HUD.Placement.MIDDLE, 0f);
-
-        System.out.println(new Coord(exitButton.getWidth(), exitButton.getHeight()));
     }
 
     //Data Loading Method

@@ -32,9 +32,9 @@ public class NewGameLogic implements GameLogic {
         this.font = new Font(R.drawable.font_default, R.raw.fontcuttoffs_default,10, 10, ' ');
 
         //create keyboard
-        Keyboard keyboard = new Keyboard(this.font, Keyboard.STD_CHARACTER_SET, new Texture(R.drawable.texture_keyboardbutton),
+        Keyboard keyboard = new Keyboard(this.font, Keyboard.LETTER_ONLY_CHARACTER_SET, new Texture(R.drawable.texture_keyboardbutton),
                 new Texture(R.drawable.texture_keyboardbuttonpress), new Texture(R.drawable.texture_keyboardspacebutton),
-                new Texture(R.drawable.texture_keyboardspacebuttonpress), 4, 0f, 0f, 1.9f, 1.0f, 0.03f);
+                new Texture(R.drawable.texture_keyboardspacebuttonpress), 3, 3, 0f, 0f, 1.9f, 1.0f, 0.03f);
 
         this.hud.addItem("KEYBOARD", keyboard, HUD.Placement.BOTTOM_MIDDLE, 0.05f);
 
@@ -57,8 +57,12 @@ public class NewGameLogic implements GameLogic {
     public boolean input(MotionEvent e) {
         int actionCode = this.hud.updateButtonSelections(e);
         if (actionCode != -1) {
-            char c = (char)actionCode;
-            ((TextItem)this.hud.getItem("INPUT_TEXT")).appendText(Character.toString(c));
+            if (actionCode == Keyboard.DELETE_ACTION_CODE) {
+                ((TextItem)this.hud.getItem("INPUT_TEXT")).removeLastChar();
+            } else {
+                char c = (char) actionCode;
+                ((TextItem) this.hud.getItem("INPUT_TEXT")).appendText(Character.toString(c));
+            }
         }
         return (actionCode == -1);
     }
