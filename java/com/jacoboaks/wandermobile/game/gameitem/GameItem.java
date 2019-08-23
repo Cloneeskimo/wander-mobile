@@ -69,6 +69,7 @@ public class GameItem {
     }
 
     //Accessors
+    public boolean isVisible() { return this.visible; }
     public float getX() { return this.x; }
     public float getY() { return this.y; }
     public Model getModel() { return this.model; }

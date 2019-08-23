@@ -55,7 +55,7 @@ public class NewGameLogic implements GameLogic {
         //create keyboard
         Keyboard keyboard = new Keyboard(this.font, Keyboard.LETTER_ONLY_CHARACTER_SET, new Texture(R.drawable.texture_keyboardbutton),
                 new Texture(R.drawable.texture_keyboardbuttonpress), new Texture(R.drawable.texture_keyboardspacebutton),
-                new Texture(R.drawable.texture_keyboardspacebuttonpress), 3, 3, 0f, 0f, 1.9f, 1.0f, 0.03f);
+                new Texture(R.drawable.texture_keyboardspacebuttonpress), 3, 3, 0f, 0f, 1.9f, 0.8f, 0.025f);
         this.hud.addItem("KEYBOARD", keyboard, HUD.Placement.BOTTOM_MIDDLE, 0.05f);
 
         //create intro text
@@ -74,7 +74,7 @@ public class NewGameLogic implements GameLogic {
         TextItem notificationText = new TextItem(this.font, "Your name should be longer.",
                 textMaterial, 0f, 0f);
         notificationText.scale(0.15f);
-        notificationText.setVisibility(false);
+        notificationText.setVisibility(this.savedData == null ? false : this.savedData.getString("logic_notification").equals("true") ? true : false);
         this.hud.addItem("NOTIFICATION_TEXT", notificationText, HUD.Placement.BELOW_LAST, 0.12f);
 
         //create done button
@@ -83,6 +83,7 @@ public class NewGameLogic implements GameLogic {
         doneButton.scale(0.2f);
         this.hud.addItem("DONE_BUTTON", doneButton, HUD.Placement.TOP_RIGHT, 0.07f);
         doneButton.setY(keyboard.getY() + keyboard.getHeight() / 2 + 0.07f + doneButton.getHeight() / 2);
+        doneButton.setX(keyboard.getX() + keyboard.getWidth() / 2 - doneButton.getWidth() / 2);
 
         //create fading box
         GameItem fadingBox = new GameItem(new Model(Model.getScreenBoxModelCoords(), Model.STD_SQUARE_TEX_COORDS(),
@@ -183,6 +184,7 @@ public class NewGameLogic implements GameLogic {
     public Node requestData() {
         Node data = new Node("logic", Util.NEW_GAME_LOGIC_TAG);
         data.addChild(new Node("inputText", ((TextItem)this.hud.getItem("INPUT_TEXT")).getText()));
+        data.addChild(new Node("notification", this.hud.getItem("NOTIFICATION_TEXT").isVisible() ? "true" : "false"));
         return data;
     }
 
