@@ -2,19 +2,21 @@ package com.jacoboaks.wandermobile.game.gameitem;
 
 import android.opengl.GLES20;
 import android.view.MotionEvent;
-import android.widget.Button;
 
-import com.jacoboaks.wandermobile.game.HUD;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
 import com.jacoboaks.wandermobile.graphics.Model;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
 import com.jacoboaks.wandermobile.graphics.Texture;
 import com.jacoboaks.wandermobile.util.Color;
+import com.jacoboaks.wandermobile.util.Coord;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a configurable Keyboard for user input.
+ */
 public class Keyboard extends GameItem {
 
     //Standard Character Sets
@@ -22,19 +24,16 @@ public class Keyboard extends GameItem {
             "qwertyuiop", "asdfghjkl", "zxcvbnm", " ", //non-shift
             "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM", " " //shift
     };
-    public static final String[] STD_CHARACTER_SET = {
-            "1234567890", "qwertyuiop", "asdfghjkl", "zxcvbnm`-=", " ,./", //non-shift
-            "!@#$%^&*()", "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM~_+", " <>?" //shift
-    };
 
     //Static Keyboard Data
     private static Color backgroundColor = new Color(0.4f, 0.4f, 0.4f, 0.8f);
-    private static final int SPACE_BAR_CHARACTER_WIDTH = 3;
-    private static final int SHIFT_CHARACTER_WIDTH = 2;
-    private static final int DELETE_CHARACTER_WIDTH = 2;
+    private static final int SPACE_BAR_WIDTH = 3;
+    private static final int SHIFT_WIDTH = 2;
+    private static final int DELETE_WIDTH = 2;
+    private static final char NON_CHARACTER_SHIFT_VALUE = (char)0;
 
-    //Button Action Codes
-    public static final int SHIFT_ACTION_CODE = 1;
+    //Action Codes
+    private static final int SHIFT_ACTION_CODE = 1;
     public static final int DELETE_ACTION_CODE = 2;
 
     //Data
@@ -80,9 +79,9 @@ public class Keyboard extends GameItem {
         for (int i = 0; i < amountOfRows; i++) {
             int amountOfCharacters = characterSet[i].length();
             int amountOfHorizontalPaddings = amountOfCharacters + 1 + (i == shiftRow ? 1 : 0) + (i == deleteRow ? 1 : 0);
-            int additionCharacterAccount = (characterSet[i].contains(" ") ? Keyboard.SPACE_BAR_CHARACTER_WIDTH - 1 : 0);
-            if (shiftRow == i) additionCharacterAccount += SHIFT_CHARACTER_WIDTH;
-            if (deleteRow == i) additionCharacterAccount += DELETE_CHARACTER_WIDTH;
+            int additionCharacterAccount = (characterSet[i].contains(" ") ? Keyboard.SPACE_BAR_WIDTH - 1 : 0);
+            if (shiftRow == i) additionCharacterAccount += SHIFT_WIDTH;
+            if (deleteRow == i) additionCharacterAccount += DELETE_WIDTH;
             float totalHorizontalPadding = (float)amountOfHorizontalPaddings * padding;
             float buttonWidth = (width - totalHorizontalPadding) / (float)(amountOfCharacters + additionCharacterAccount);
             buttonWidths.add(buttonWidth);
@@ -100,43 +99,43 @@ public class Keyboard extends GameItem {
             float xp = this.x - (width / 2) + (buttonWidths.get(i) / 2) + padding;
             for (int j = 0; j < characterSet[i].length(); j++) {
 
-                //create null button
+                //create button reference
                 ButtonItem nextButton = null;
 
-                //delete
+                //create delete button if appropriate
                 if (i == deleteRow && !deleteAccountedFor) {
                     deleteAccountedFor = true;
                     ButtonItem deleteButton = new ButtonItem("del", font, longButtonTexture, selectedLongButtonTexture,
-                            textColor, textColor, Keyboard.DELETE_ACTION_CODE, 0.02f, buttonWidths.get(i) * Keyboard.DELETE_CHARACTER_WIDTH,
+                            textColor, textColor, Keyboard.DELETE_ACTION_CODE, 0.02f, buttonWidths.get(i) * Keyboard.DELETE_WIDTH,
                             buttonHeight);
                     deleteButton.setX(this.x + (width / 2) - padding - (deleteButton.getWidth() / 2));
                     deleteButton.setY(yp);
-                    this.buttons.add(new KeyboardButton(deleteButton, (char)0, (char)0));
+                    this.buttons.add(new KeyboardButton(deleteButton, NON_CHARACTER_SHIFT_VALUE, NON_CHARACTER_SHIFT_VALUE));
                 }
 
-                //shift
+                //create shift button if appropriate
                 boolean shift = false;
                 if (i == shiftRow && !shiftAccountedFor) {
                     shiftAccountedFor = true;
                     nextButton = new ButtonItem("shift", font, longButtonTexture, selectedLongButtonTexture,
-                            textColor, textColor, Keyboard.SHIFT_ACTION_CODE, 0.02f, buttonWidths.get(i) * Keyboard.SHIFT_CHARACTER_WIDTH,
+                            textColor, textColor, Keyboard.SHIFT_ACTION_CODE, 0.02f, buttonWidths.get(i) * Keyboard.SHIFT_WIDTH,
                             buttonHeight);
                     xp += nextButton.getWidth() / 2;
                     xp -= (buttonWidths.get(i) / 2);
-                    j--;
                     shift = true;
+                    j--;
                 }
 
-                //space
+                //create space button if appropriate
                 else if (characterSet[i].charAt(j) == ' ') {
                     nextButton = new ButtonItem(" ", font, longButtonTexture, selectedLongButtonTexture,
-                            textColor, textColor, characterSet[i].charAt(j), 0.02f, buttonWidths.get(i) * Keyboard.SPACE_BAR_CHARACTER_WIDTH,
+                            textColor, textColor, characterSet[i].charAt(j), 0.02f, buttonWidths.get(i) * Keyboard.SPACE_BAR_WIDTH,
                             buttonHeight);
                     xp += nextButton.getWidth() / 2;
                     xp -= (buttonWidths.get(i) / 2);
                 }
 
-                //other characters
+                //create any other type of button
                 else {
                     nextButton = new ButtonItem(Character.toString(characterSet[i].charAt(j)), font, buttonTexture, selectedButtonTexture,
                             textColor, textColor, characterSet[i].charAt(j), 0.02f, buttonWidths.get(i),
@@ -146,9 +145,10 @@ public class Keyboard extends GameItem {
                 //set button position and add button
                 nextButton.setX(xp);
                 nextButton.setY(yp);
-                this.buttons.add(new KeyboardButton(nextButton, shift ? (char)0 : characterSet[i].charAt(j), shift ? (char)0 : characterSet[i + shiftAdd].charAt(j)));
+                this.buttons.add(new KeyboardButton(nextButton, shift ? NON_CHARACTER_SHIFT_VALUE : characterSet[i].charAt(j),
+                        shift ? NON_CHARACTER_SHIFT_VALUE : characterSet[i + shiftAdd].charAt(j)));
 
-                //increment x position
+                //increment x position for next button
                 nextButton.setX(xp);
                 nextButton.setY(yp);
                 xp += (nextButton.getWidth() / 2) + padding + (buttonWidths.get(i) / 2);
@@ -162,34 +162,31 @@ public class Keyboard extends GameItem {
     /**
      * Updates the selection of each button on the keyboard.
      * @param e the MotionEvent to respond to
+     * @param touchPos the position of the touch in aspected space.
      * @return -1 if nothing is selected, the action code of the selected button if one is pressed
      */
-    public int updateSelections(MotionEvent e) {
+    public int updateSelections(MotionEvent e, Coord touchPos) {
 
         //loop through buttons
         int actionCode = -1;
         for (KeyboardButton item : this.buttons) {
             if (actionCode == -1) { //did not press current button in loop
-                actionCode = item.button.updateSelection(e);
+                actionCode = item.button.updateSelection(e, touchPos);
             } else if (actionCode == Keyboard.SHIFT_ACTION_CODE) { //pressed shift
                 this.toggleShift();
                 return -1;
             } else return actionCode; //found pressed button
         }
 
-        //return the found action code
+        //return the determined action code
         return actionCode;
     }
 
     /**
-     * Toggles the shift of this Keyboard.
+     * Toggles the shift variation of this Keyboard.
      */
     private void toggleShift() {
-
-        //invert shifted flag
         this.shifted = !this.shifted;
-
-        //toggle shift on all buttons
         for (KeyboardButton button : this.buttons) button.toggleShift(this.shifted);
     }
 
@@ -206,7 +203,7 @@ public class Keyboard extends GameItem {
         GLES20.glUniform1fv(shaderProgram.getUniformIndex("y"), 1,
                 new float[] { y }, 0);
 
-        //draw model
+        //draw model and each button
         this.model.render(shaderProgram);
         for (KeyboardButton item : this.buttons) item.button.render(shaderProgram);
     }
@@ -259,7 +256,7 @@ public class Keyboard extends GameItem {
          */
         public void toggleShift(boolean shift) {
             char toChangeTo = shift ? this.shifted : this.unshifted;
-            if (toChangeTo != (char)0) {
+            if (toChangeTo != NON_CHARACTER_SHIFT_VALUE) {
                 this.button.setText(Character.toString(toChangeTo));
                 this.button.setActionCode(toChangeTo);
             }

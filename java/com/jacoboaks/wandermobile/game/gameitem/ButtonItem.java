@@ -7,7 +7,6 @@ import com.jacoboaks.wandermobile.graphics.Material;
 import com.jacoboaks.wandermobile.graphics.Model;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
 import com.jacoboaks.wandermobile.graphics.Texture;
-import com.jacoboaks.wandermobile.graphics.Transformation;
 import com.jacoboaks.wandermobile.util.Bounds;
 import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Coord;
@@ -18,40 +17,46 @@ import com.jacoboaks.wandermobile.util.Coord;
 public class ButtonItem extends ButtonTextItem {
 
     //Data
-    private Texture unselectedT;
-    private Texture selectedT;
-    private GameItem underItem;
-    private float padding;
-    private float bwidth, bheight; //button width and height
+    private Texture deselectedTexture; //the texture this ButtonItem takes when deselected
+    private Texture selectedTexture; //the texture this ButtonItem takes when selected
+    private GameItem underItem; //the background GameItem underneath the text of this ButtonItem
+    private float padding; /* the amount of padding between the text and the edge of the texture
+                            of this ButtonItem. */
+    private float bwidth, bheight; /* the width and height of this entire ButtonItem (including
+                            the texture underneath */
 
     /**
      * Constructs this ButtonItem with the given information.
      * @param text the text to show on this ButtonItem
      * @param font the font to use for the text
-     * @param unselectedT the texture to use for this ButtonItem when it is not selected
-     * @param selectedT the texture to use for this ButtonItem when it is selected
+     * @param deselectedTexture the texture to use for this ButtonItem when it is not selected
+     * @param selectedTexture the texture to use for this ButtonItem when it is selected
      * @param unselectedC the color to use for the text of this ButtonItem when it is not selected
      * @param selectedC the color to use for the text of this ButtonItem when it is selected
      * @param actionCode the action code to return when this ButtonItem is pressed
      * @param padding how much space to put between the text and the edge of the button
      */
-    public ButtonItem(String text, Font font, Texture unselectedT, Texture selectedT, Color unselectedC,
+    public ButtonItem(String text, Font font, Texture deselectedTexture, Texture selectedTexture, Color unselectedC,
                       Color selectedC, int actionCode, float padding) {
         super(font, text, unselectedC, selectedC, actionCode);
-        this.unselectedT = unselectedT;
-        this.selectedT = selectedT;
+        this.deselectedTexture = deselectedTexture;
+        this.selectedTexture = selectedTexture;
         this.padding = padding;
         this.scale = 1.0f;
-        this.underItem = new GameItem(new Model(Model.getRectangleModelCoords(this.getTextWidth() + (this.padding * 2 * this.scale), this.getTextHeight() + (this.padding * 2 * this.scale)),
-                Model.STD_SQUARE_TEX_COORDS(), Model.STD_SQUARE_DRAW_ORDER(), new Material(this.unselectedT)), this.x, this.y);
+        this.underItem = new GameItem(new Model(Model.getRectangleModelCoords(this.getTextWidth()
+                + (this.padding * 2 * this.scale), this.getTextHeight() + (this.padding * 2 * this.scale)),
+                Model.STD_SQUARE_TEX_COORDS(), Model.STD_SQUARE_DRAW_ORDER(), new Material(this.deselectedTexture)),
+                this.x, this.y);
+        this.bwidth = this.underItem.getWidth();
+        this.bheight = this.underItem.getHeight();
     }
 
     /**
      * Constructs this ButtonItem with the given information.
      * @param text the text to show on this ButtonItem
      * @param font the font to use for the text
-     * @param unselectedT the texture to use for this ButtonItem when it is not selected
-     * @param selectedT the texture to use for this ButtonItem when it is selected
+     * @param unselectedTexture the texture to use for this ButtonItem when it is not selected
+     * @param selectedTexture the texture to use for this ButtonItem when it is selected
      * @param unselectedC the color to use for the text of this ButtonItem when it is not selected
      * @param selectedC the color to use for the text of this ButtonItem when it is selected
      * @param actionCode the action code to return when this ButtonItem is pressed
@@ -59,14 +64,14 @@ public class ButtonItem extends ButtonTextItem {
      * @param width how wide to make the button
      * @param height how tall to make the button
      */
-    public ButtonItem(String text, Font font, Texture unselectedT, Texture selectedT, Color unselectedC,
+    public ButtonItem(String text, Font font, Texture unselectedTexture, Texture selectedTexture, Color unselectedC,
                       Color selectedC, int actionCode, float padding, float width, float height) {
         super(font, text, unselectedC, selectedC, actionCode);
-        this.unselectedT = unselectedT;
-        this.selectedT = selectedT;
+        this.deselectedTexture = unselectedTexture;
+        this.selectedTexture = selectedTexture;
         this.padding = padding;
         this.underItem = new GameItem(new Model(Model.getRectangleModelCoords(width, height), Model.STD_SQUARE_TEX_COORDS(),
-                Model.STD_SQUARE_DRAW_ORDER(), new Material(this.unselectedT)), this.x, this.y);
+                Model.STD_SQUARE_DRAW_ORDER(), new Material(this.deselectedTexture)), this.x, this.y);
 
         //apply scale to text to fit within given box dimensions
         float sh = (height - (padding * 2)) / this.getTextHeight();
@@ -89,41 +94,44 @@ public class ButtonItem extends ButtonTextItem {
     /**
      * Will update this ButtonItemem based on the user's input.
      * @param e the MotionEvent generated by the user's actions
+     * @param touchPos the position of the user's touch in aspected space
      * @return this ButtonTextItem's action code if the user has pressed this ButtonTextItem, and
      * -1 otherwise
      */
     @Override
-    public int updateSelection(MotionEvent e) {
+    public int updateSelection(MotionEvent e, Coord touchPos) {
 
         //see if finger is over this button
-        Coord touchPos = new Coord(e.getX(), e.getY());
-        Transformation.screenToNormalized(touchPos);
-        Transformation.normalizedToAspected(touchPos);
-        Bounds bounds = this.getBounds();
-        boolean fingerOver = bounds.intersects(touchPos);
+        boolean fingerOver = this.getBounds().intersects(touchPos);
 
-        //set to appropriate color
+        //set to appropriate selection setting
         if (fingerOver) {
             if (e.getAction() == MotionEvent.ACTION_UP) { //check if they released on this finger
-                this.selected = false;
-                this.model.getMaterial().setColor(this.unselectedColor);
-                this.underItem.getModel().getMaterial().setTexture(this.unselectedT);
+                this.deselect();
                 return this.actionCode;
-            } else if (!this.selected) { //otherwise make sure appropriate color is texture_selected
-                this.model.getMaterial().setColor(this.selectedColor);
-                this.underItem.getModel().getMaterial().setTexture(this.selectedT);
-                this.selected = true;
-            }
-        } else {
-            if (this.selected) {
-                this.model.getMaterial().setColor(this.unselectedColor);
-                this.underItem.getModel().getMaterial().setTexture(this.unselectedT);
-                this.selected = false;
-            }
-        }
+            } else if (!this.selected) this.select();
+        } else if (this.selected) this.deselect();
 
         //return -1 if the user did not press the button
         return -1;
+    }
+
+    /**
+     * Undergoes the necessary actions to deselect this ButtonItem.
+     */
+    @Override
+    protected void deselect() {
+        super.deselect();
+        this.underItem.getModel().getMaterial().setTexture(this.deselectedTexture);
+    }
+
+    /**
+     * Undergoes the necessary actions to select this ButtonItem.
+     */
+    @Override
+    protected void select() {
+        super.select();
+        this.underItem.getModel().getMaterial().setTexture(this.selectedTexture);
     }
 
     /**
@@ -215,13 +223,5 @@ public class ButtonItem extends ButtonTextItem {
     public void moveY(float y) {
         super.moveY(y);
         this.underItem.moveY(y);
-    }
-
-    /**
-     * Sets the action code of this ButtonItem to the given code.
-     * @param actionCode the action code to assign to this ButtonItem.
-     */
-    public void setActionCode(int actionCode) {
-        this.actionCode = actionCode;
     }
 }

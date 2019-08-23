@@ -13,7 +13,6 @@ import com.jacoboaks.wandermobile.graphics.Transformation;
 import com.jacoboaks.wandermobile.util.Coord;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -172,13 +171,18 @@ public class HUD {
      */
     public int updateButtonSelections(MotionEvent e) {
 
+        //get touch position in aspected space
+        Coord touchPos = new Coord(e.getX(), e.getY());
+        Transformation.screenToNormalized(touchPos);
+        Transformation.normalizedToAspected(touchPos);
+
         //loop through buttons
         int actionCode = -1;
         for (String tag : this.gameItems.keySet()) {
             if (actionCode == -1) {
                 GameItem item = this.gameItems.get(tag);
-                if (item instanceof ButtonTextItem) actionCode = ((ButtonTextItem)item).updateSelection(e);
-                else if (item instanceof Keyboard) actionCode = ((Keyboard)item).updateSelections(e);
+                if (item instanceof ButtonTextItem) actionCode = ((ButtonTextItem)item).updateSelection(e, touchPos);
+                else if (item instanceof Keyboard) actionCode = ((Keyboard)item).updateSelections(e, touchPos);
             } else return actionCode;
         }
 

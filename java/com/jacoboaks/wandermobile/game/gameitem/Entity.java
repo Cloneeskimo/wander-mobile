@@ -5,6 +5,9 @@ import com.jacoboaks.wandermobile.graphics.Texture;
 import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Node;
 
+/**
+ * Represents a living Tile - one that can move, has a health value, and has a level.
+ */
 public class Entity extends Tile {
 
     //Data

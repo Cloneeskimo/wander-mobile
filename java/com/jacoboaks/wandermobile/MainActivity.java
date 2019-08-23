@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     //Game Version/Build
     public final static String WANDER_VERSION = "0.0";
     public final static String WANDER_STARTING_LOGIC = Util.MAIN_MENU_LOGIC_TAG;
-    public final static int WANDER_BUILD = 25;
+    public final static int WANDER_BUILD = 26;
 
     //Public Static Data
     public static boolean changeLogic = false; //flag for changing logic

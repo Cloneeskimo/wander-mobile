@@ -126,7 +126,7 @@ public class Model {
      * @param factor the factor by which to scale the model
      */
     public void scale(float factor) {
-        for (int i = 0; i < this.modelCoords.length; i++) this.modelCoords[i] = this.modelCoords[i] * factor;
+        for (int i = 0; i < this.modelCoords.length; i++) this.modelCoords[i] *= factor;
         this.updateBuffers();
         this.calculateWidthAndHeight();
     }

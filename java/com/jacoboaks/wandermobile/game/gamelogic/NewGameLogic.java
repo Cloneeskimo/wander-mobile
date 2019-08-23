@@ -8,10 +8,12 @@ import com.jacoboaks.wandermobile.MainActivity;
 import com.jacoboaks.wandermobile.R;
 import com.jacoboaks.wandermobile.game.HUD;
 import com.jacoboaks.wandermobile.game.gameitem.ButtonTextItem;
+import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.game.gameitem.Keyboard;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
+import com.jacoboaks.wandermobile.graphics.Model;
 import com.jacoboaks.wandermobile.graphics.Texture;
 import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Node;
@@ -26,6 +28,9 @@ public class NewGameLogic implements GameLogic {
     private HUD hud;
     private Font font;
     private Bundle savedData;
+    private float fadeTime = 0f;
+    private boolean fadingIn = true;
+    private String chosenName = null;
 
     //Static Data
     private static final int MAX_NAME_LENGTH = 12; //maximum length for a player name
@@ -63,13 +68,28 @@ public class NewGameLogic implements GameLogic {
         TextItem inputText = new TextItem(this.font, "", textMaterial, 0f, 0f);
         inputText.scale(0.2f);
         inputText.setText(this.savedData == null ? "" : this.savedData.getString("logic_inputText"));
-        this.hud.addItem("INPUT_TEXT", inputText, HUD.Placement.BELOW_LAST, 0.15f);
+        this.hud.addItem("INPUT_TEXT", inputText, HUD.Placement.BELOW_LAST, 0.12f);
+
+        //create notification text
+        TextItem notificationText = new TextItem(this.font, "Your name should be longer.",
+                textMaterial, 0f, 0f);
+        notificationText.scale(0.15f);
+        notificationText.setVisibility(false);
+        this.hud.addItem("NOTIFICATION_TEXT", notificationText, HUD.Placement.BELOW_LAST, 0.12f);
 
         //create done button
-        ButtonTextItem doneButton = new ButtonTextItem(this.font, "Done", new Color(0.0f, 0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f),
-                NewGameLogic.DONE_BUTTON_ACTION_CODE);
+        ButtonTextItem doneButton = new ButtonTextItem(this.font, "Done", new Color(1.0f, 1.0f, 1.0f, 1.0f),
+                new Color(0.0f, 0.0f, 0.0f, 0.0f), NewGameLogic.DONE_BUTTON_ACTION_CODE);
         doneButton.scale(0.2f);
         this.hud.addItem("DONE_BUTTON", doneButton, HUD.Placement.TOP_RIGHT, 0.07f);
+        doneButton.setY(keyboard.getY() + keyboard.getHeight() / 2 + 0.07f + doneButton.getHeight() / 2);
+
+        //create fading box
+        GameItem fadingBox = new GameItem(new Model(Model.getScreenBoxModelCoords(), Model.STD_SQUARE_TEX_COORDS(),
+                Model.STD_SQUARE_DRAW_ORDER(), new Material(new Color(0.6f, 0.6f, 0.6f, 1.0f))), 0f, 0f);
+        fadingBox.scale(4.0f);
+        this.hud.addItem("Z_FADING_BOX", fadingBox, HUD.Placement.MIDDLE, 0f);
+        this.fadeTime = Util.FADE_TIME;
     }
 
     //Data Loading Method
@@ -96,11 +116,14 @@ public class NewGameLogic implements GameLogic {
             //check for done button press
             } else if (actionCode == NewGameLogic.DONE_BUTTON_ACTION_CODE) {
 
-                //done giving name
+                //check if appropriate name, if so start fade
                 String name = ((TextItem) this.hud.getItem("INPUT_TEXT")).getText();
-                LogicChangeData lgd = new LogicChangeData(Util.WORLD_LOGIC_TAG, true, false);
-                MainActivity.initLogicChange(lgd, new Node(name, name));
-
+                if (name.length() > 2) {
+                    this.fadeTime = Util.FADE_TIME;
+                    this.chosenName = name;
+                } else {
+                    this.hud.getItem("NOTIFICATION_TEXT").setVisibility(true);
+                }
 
             //check for other button press
             } else {
@@ -123,6 +146,30 @@ public class NewGameLogic implements GameLogic {
 
     //Update Method
     public void update(float dt) {
+
+        //update fade
+        if (this.fadeTime > 0f) {
+
+            //if fading in
+            if (this.fadingIn) {
+                float alpha = this.fadeTime / Util.FADE_TIME;
+                this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
+                this.fadeTime -= dt;
+                if (this.fadeTime < 0f) this.fadingIn = false;
+
+            //if fading out
+            } else {
+                float alpha = 1f - (this.fadeTime / Util.FADE_TIME);
+                this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
+                this.fadeTime -= dt;
+
+                //change logics if fade over
+                if (this.fadeTime < 0f) {
+                    LogicChangeData lgd = new LogicChangeData(Util.WORLD_LOGIC_TAG, true, false);
+                    MainActivity.initLogicChange(lgd, new Node(chosenName, chosenName));
+                }
+            }
+        }
     }
 
     //Render Method

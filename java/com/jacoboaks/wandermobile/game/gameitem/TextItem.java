@@ -14,11 +14,11 @@ import java.util.List;
 public class TextItem extends GameItem {
 
     //Static Data
-    public static final String DEFAULT_TEXT = "N/A";
+    private static final String DEFAULT_TEXT = "N/A";
 
     //Data
     protected Font font; //the font_default used for the text
-    protected String text; //the text
+    private String text; //the text
     protected float scale; //the width, height, and scale of the text
 
     /**
@@ -163,6 +163,6 @@ public class TextItem extends GameItem {
     @Override
     public void scale(float factor) {
         super.scale(factor);
-        this.scale = factor;
+        this.scale *= factor;
     }
 }
