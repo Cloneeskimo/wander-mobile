@@ -28,12 +28,12 @@ public class NewGameLogic implements GameLogic {
     private HUD hud;
     private Font font;
     private Bundle savedData;
-    private float fadeTime = 0f;
-    private boolean fadingIn = true;
-    private String chosenName = null;
+    private float fadeTime;
+    private String chosenName;
 
     //Static Data
-    private static final int MAX_NAME_LENGTH = 12; //maximum length for a player name
+    private static final int MAX_NAME_LENGTH = 13; //maximum length for a player name
+    private static final int MIN_NAME_LENGTH = 3; //minimum length for a player name
     private static final int DONE_BUTTON_ACTION_CODE = 1000;
 
     //Initialization Method
@@ -46,6 +46,9 @@ public class NewGameLogic implements GameLogic {
         //create font and initialize HUD
         this.font = new Font(R.drawable.font_default, R.raw.fontcuttoffs_default,10, 10, ' ');
         this.initHUD();
+
+        //reload data
+        if (this.savedData != null) this.instateLoadedData();
     }
 
     //HUD Initialization Method
@@ -55,7 +58,7 @@ public class NewGameLogic implements GameLogic {
         //create keyboard
         Keyboard keyboard = new Keyboard(this.font, Keyboard.LETTER_ONLY_CHARACTER_SET, new Texture(R.drawable.texture_keyboardbutton),
                 new Texture(R.drawable.texture_keyboardbuttonpress), new Texture(R.drawable.texture_keyboardspacebutton),
-                new Texture(R.drawable.texture_keyboardspacebuttonpress), 3, 3, 0f, 0f, 1.9f, 0.8f, 0.025f);
+                new Texture(R.drawable.texture_keyboardspacebuttonpress), 2, 3, 0f, 0f, 1.9f, 0.8f, 0.025f);
         this.hud.addItem("KEYBOARD", keyboard, HUD.Placement.BOTTOM_MIDDLE, 0.05f);
 
         //create intro text
@@ -66,15 +69,15 @@ public class NewGameLogic implements GameLogic {
 
         //create input text
         TextItem inputText = new TextItem(this.font, "", textMaterial, 0f, 0f);
+        inputText.setText("");
         inputText.scale(0.2f);
-        inputText.setText(this.savedData == null ? "" : this.savedData.getString("logic_inputText"));
         this.hud.addItem("INPUT_TEXT", inputText, HUD.Placement.BELOW_LAST, 0.12f);
 
         //create notification text
         TextItem notificationText = new TextItem(this.font, "Your name should be longer.",
                 textMaterial, 0f, 0f);
         notificationText.scale(0.15f);
-        notificationText.setVisibility(this.savedData == null ? false : this.savedData.getString("logic_notification").equals("true") ? true : false);
+        notificationText.setVisibility(false);
         this.hud.addItem("NOTIFICATION_TEXT", notificationText, HUD.Placement.BELOW_LAST, 0.12f);
 
         //create done button
@@ -90,7 +93,29 @@ public class NewGameLogic implements GameLogic {
                 Model.STD_SQUARE_DRAW_ORDER(), new Material(new Color(0.6f, 0.6f, 0.6f, 1.0f))), 0f, 0f);
         fadingBox.scale(4.0f);
         this.hud.addItem("Z_FADING_BOX", fadingBox, HUD.Placement.MIDDLE, 0f);
-        this.fadeTime = Util.FADE_TIME;
+        this.fadeTime = Util.FADE_TIME * 2;
+    }
+
+    /**
+     * Loads any saved data.
+     */
+    private void instateLoadedData() {
+
+        //load data
+        ((TextItem)this.hud.getItem("INPUT_TEXT")).setText(this.savedData.getString("logic_inputText"));
+        this.hud.getItem("NOTIFICATION_TEXT").setVisibility(this.savedData.getString("logic_notification").equals("true") ? true : false);
+        this.fadeTime = Float.parseFloat(this.savedData.getString("logic_fadeTime"));
+        String cn = this.savedData.getString("logic_chosenName");
+        this.chosenName = (cn.equals("") ? null : cn);
+
+        //set appropriate fading alpha
+        if (this.fadeTime > Util.FADE_TIME) {
+            float alpha = (this.fadeTime - Util.FADE_TIME) / Util.FADE_TIME;
+            this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
+        } else if (this.fadeTime > 0f) {
+            float alpha = 1f - (this.fadeTime / Util.FADE_TIME);
+            this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
+        }
     }
 
     //Data Loading Method
@@ -119,7 +144,7 @@ public class NewGameLogic implements GameLogic {
 
                 //check if appropriate name, if so start fade
                 String name = ((TextItem) this.hud.getItem("INPUT_TEXT")).getText();
-                if (name.length() > 2) {
+                if (name.length() >= NewGameLogic.MIN_NAME_LENGTH) {
                     this.fadeTime = Util.FADE_TIME;
                     this.chosenName = name;
                 } else {
@@ -128,9 +153,16 @@ public class NewGameLogic implements GameLogic {
 
             //check for other button press
             } else {
+
+                //add input if less than maximum length
                 if (inputText.getText().length() < NewGameLogic.MAX_NAME_LENGTH) {
                     char c = (char) actionCode;
                     inputText.appendText(Character.toString(c));
+
+                    //update minimum length requirement notification text
+                    if (inputText.getText().length() >= NewGameLogic.MIN_NAME_LENGTH) {
+                        this.hud.getItem("NOTIFICATION_TEXT").setVisibility(false);
+                    }
                 }
             }
         }
@@ -148,27 +180,22 @@ public class NewGameLogic implements GameLogic {
     //Update Method
     public void update(float dt) {
 
-        //update fade
-        if (this.fadeTime > 0f) {
+        //if fading in
+        if (this.fadeTime > Util.FADE_TIME) {
+            float alpha = (this.fadeTime - Util.FADE_TIME) / Util.FADE_TIME;
+            this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
+            this.fadeTime -= dt;
 
-            //if fading in
-            if (this.fadingIn) {
-                float alpha = this.fadeTime / Util.FADE_TIME;
-                this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
-                this.fadeTime -= dt;
-                if (this.fadeTime < 0f) this.fadingIn = false;
+        //if fading out
+        } else if (this.fadeTime > 0f && this.chosenName != null) {
+            float alpha = 1f - (this.fadeTime / Util.FADE_TIME);
+            this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
+            this.fadeTime -= dt;
 
-            //if fading out
-            } else {
-                float alpha = 1f - (this.fadeTime / Util.FADE_TIME);
-                this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
-                this.fadeTime -= dt;
-
-                //change logics if fade over
-                if (this.fadeTime < 0f) {
-                    LogicChangeData lgd = new LogicChangeData(Util.WORLD_LOGIC_TAG, true, false);
-                    MainActivity.initLogicChange(lgd, new Node(chosenName, chosenName));
-                }
+            //change logics if fade over
+            if (this.fadeTime < 0f) {
+                LogicChangeData lgd = new LogicChangeData(Util.WORLD_LOGIC_TAG, true, false);
+                MainActivity.initLogicChange(lgd, new Node(chosenName, chosenName));
             }
         }
     }
@@ -185,6 +212,8 @@ public class NewGameLogic implements GameLogic {
         Node data = new Node("logic", Util.NEW_GAME_LOGIC_TAG);
         data.addChild(new Node("inputText", ((TextItem)this.hud.getItem("INPUT_TEXT")).getText()));
         data.addChild(new Node("notification", this.hud.getItem("NOTIFICATION_TEXT").isVisible() ? "true" : "false"));
+        data.addChild(new Node("fadeTime", Float.toString(this.fadeTime)));
+        data.addChild(new Node("chosenName", this.chosenName == null ? "" : this.chosenName));
         return data;
     }
 
