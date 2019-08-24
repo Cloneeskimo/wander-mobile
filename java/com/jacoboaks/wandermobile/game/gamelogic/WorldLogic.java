@@ -10,6 +10,7 @@ import com.jacoboaks.wandermobile.game.Area;
 import com.jacoboaks.wandermobile.game.HUD;
 import com.jacoboaks.wandermobile.game.World;
 import com.jacoboaks.wandermobile.game.gamecontrol.WorldControl;
+import com.jacoboaks.wandermobile.game.gameitem.ButtonTextItem;
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
@@ -17,6 +18,7 @@ import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
 import com.jacoboaks.wandermobile.graphics.Model;
 import com.jacoboaks.wandermobile.util.Color;
+import com.jacoboaks.wandermobile.util.Global;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
 
@@ -29,11 +31,13 @@ public class WorldLogic implements GameLogic {
     private World world;
     private HUD hud;
     private WorldControl control;
-    private Font font;
     private float fadeOutTime = 0f;
 
     //Saved Data
     private Bundle savedInstanceData;
+
+    //Static Data
+    private static final int SAVE_BUTTON_ACTION_CODE = 1;
 
     //Initialization Method
     @Override
@@ -58,7 +62,6 @@ public class WorldLogic implements GameLogic {
 
         //set clear color and create font_default
         GLES20.glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
-        this.font = new Font(R.drawable.font_default, R.raw.fontcuttoffs_default,10, 10, ' ');
     }
 
     /**
@@ -70,54 +73,60 @@ public class WorldLogic implements GameLogic {
         this.hud = new HUD();
 
         //create hud text material
-        Material textMaterial = new Material(font.getFontSheet(), new Color(1.0f, 1.0f, 1.0f, 1.0f), true);
+        Material textMaterial = new Material(Global.defaultFont.getFontSheet(), Global.black, true);
 
         //fps label
-        TextItem fpsLabel = new TextItem(this.font, "FPS: ", textMaterial, 0f, 0f);
+        TextItem fpsLabel = new TextItem(Global.defaultFont, "FPS: ", textMaterial, 0f, 0f);
         fpsLabel.scale(0.13f);
         this.hud.addItem("FPS_LABEL", fpsLabel, HUD.Placement.BOTTOM_LEFT, 0.02f);
 
         //fps counter
-        TextItem fpsCounter = new TextItem(this.font, "calculating...", textMaterial, 0f, 0f);
+        TextItem fpsCounter = new TextItem(Global.defaultFont, "calculating...", textMaterial, 0f, 0f);
         fpsCounter.scale(0.13f);
         this.hud.addItem("FPS_COUNTER", fpsCounter, HUD.Placement.RIGHT_OF_LAST, 0f);
 
         //wander title
-        TextItem title = new TextItem(this.font, "v" + MainActivity.WANDER_VERSION
+        TextItem title = new TextItem(Global.defaultFont, "v" + MainActivity.WANDER_VERSION
                 + "b" + MainActivity.WANDER_BUILD, textMaterial, 0f, 0f);
         title.scale(0.2f);
         this.hud.addItem("TITLE", title, HUD.Placement.BOTTOM_RIGHT, 0.02f);
 
         //selection
-        TextItem selection = new TextItem(this.font, "Selection:", textMaterial, 0f, 0f);
+        TextItem selection = new TextItem(Global.defaultFont, "Selection:", textMaterial, 0f, 0f);
         selection.scale(0.19f);
         selection.setVisibility(false);
         this.hud.addItem("SELECTION", selection, HUD.Placement.TOP_MIDDLE, 0.13f);
 
         //selection name
-        Material selectionInfoMaterial = new Material(font.getFontSheet(), new Color(1.0f, 1.0f, 1.0f, 1.0f), true);
-        TextItem selectionName = new TextItem(this.font, "", selectionInfoMaterial, 0f, 0f);
+        Material selectionInfoMaterial = new Material(Global.defaultFont.getFontSheet(), Global.black, true);
+        TextItem selectionName = new TextItem(Global.defaultFont, "", selectionInfoMaterial, 0f, 0f);
         selectionName.scale(0.155f);
         selectionName.setVisibility(false);
         this.hud.addItem("SELECTION_NAME", selectionName, HUD.Placement.BELOW_LAST, 0.02f);
 
         //entity selection level
-        TextItem selectionInfo = new TextItem(this.font, "", selectionInfoMaterial, 0f, 0f);
+        TextItem selectionInfo = new TextItem(Global.defaultFont, "", selectionInfoMaterial, 0f, 0f);
         selectionInfo.scale(0.126f);
         selectionInfo.setVisibility(false);
         this.hud.addItem("SELECTION_INFO", selectionInfo, HUD.Placement.BELOW_LAST, 0.02f);
 
         //entity selection health
-        Material healthMaterial = new Material(this.font.getFontSheet(), new Color(0.8f, 0.1f, 0.1f, 1.0f), true);
-        TextItem entitySelectionHealth = new TextItem(this.font, "", healthMaterial, 0f, 0f);
+        Material healthMaterial = new Material(Global.defaultFont.getFontSheet(), new Color(0.8f, 0.1f, 0.1f, 1.0f), true);
+        TextItem entitySelectionHealth = new TextItem(Global.defaultFont, "", healthMaterial, 0f, 0f);
         entitySelectionHealth.scale(0.126f);
         entitySelectionHealth.setVisibility(false);
         this.hud.addItem("ENTITY_SELECTION_HEALTH", entitySelectionHealth, HUD.Placement.BELOW_LAST, 0.02f);
 
         //area name
-        TextItem areaName = new TextItem(this.font, "", textMaterial, 0f, 0f);
+        TextItem areaName = new TextItem(Global.defaultFont, "", textMaterial, 0f, 0f);
         areaName.scale(0.20f);
         this.hud.addItem("AREA_NAME", areaName, HUD.Placement.BOTTOM_MIDDLE, 0.02f);
+
+        //save game button
+        ButtonTextItem saveGameButton = new ButtonTextItem(Global.defaultFont, "Save", Global.white,
+                Global.black, WorldLogic.SAVE_BUTTON_ACTION_CODE);
+        saveGameButton.scale(0.20f);
+        this.hud.addItem("SAVE_GAME_BUTTON", saveGameButton, HUD.Placement.TOP_LEFT, 0.02f);
 
         //fading box
         GameItem fadingBox = new GameItem(new Model(Model.getScreenBoxModelCoords(), Model.STD_SQUARE_TEX_COORDS(),
@@ -134,11 +143,11 @@ public class WorldLogic implements GameLogic {
 
         //create player
         Node transferData = MainActivity.getLogicTransferData();
-        Entity player = new Entity(transferData.getValue(), this.font, transferData.getValue().charAt(0),
+        Entity player = new Entity(transferData.getValue(), Global.defaultFont, transferData.getValue().charAt(0),
                 new Color(0.62f, 0.0f, 0.1f, 1.0f), 0, 0);
 
         //create area
-        Area area = Area.loadArea(R.raw.area_deepwoods, this.font);
+        Area area = Area.loadArea(R.raw.area_deepwoods, Global.defaultFont);
 
         //create world
         this.world = new World(area, player, this.hud);
@@ -175,8 +184,10 @@ public class WorldLogic implements GameLogic {
     //Input Method
     @Override
     public boolean input(MotionEvent e) {
-
-        return this.control.input(e, this.world); }
+        int actionCode = this.hud.updateButtonSelections(e);
+        if (actionCode == -1) return this.control.input(e, this.world);
+        else return true;
+    }
 
     //Scale Input Method
     @Override

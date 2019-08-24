@@ -16,14 +16,12 @@ public class LoadGameLogic implements GameLogic {
     @Override
     public void init() {
         LogicChangeData lgd = new LogicChangeData(Util.WORLD_LOGIC_TAG, true, false);
-        MainActivity.initLogicChange(lgd, new Node("load game", "load game"));
+        MainActivity.initLogicChange(lgd, new Node("quick jump", "quick jump"));
     }
 
     //Data Loading Method
     @Override
-    public void loadData(Bundle savedInstanceData) {
-
-    }
+    public void loadData(Bundle savedInstanceData) { }
 
     //Input Method
     @Override
