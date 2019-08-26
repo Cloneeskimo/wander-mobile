@@ -19,6 +19,9 @@ import com.jacoboaks.wandermobile.graphics.GameRenderer;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,13 +33,14 @@ public class MainActivity extends AppCompatActivity {
     //Game Version/Build
     public final static String WANDER_VERSION = "0.0";
     public final static String WANDER_STARTING_LOGIC = Util.MAIN_MENU_LOGIC_TAG;
-    public final static int WANDER_BUILD = 30;
+    public final static int WANDER_BUILD = 31;
 
     //Public Static Data
     public static boolean changeLogic = false; //flag for changing logic
     public static GameLogic currentLogic; //reference to current running logic
+    public static File appDir; //reference to the file directory of the app
 
-    //Private
+    //Private Static Data
     private static LogicChangeData logicChangeData; //saved static data for logic changing
     private static Resources resources; //reference to resources for resource loading
     private static Map<String, Bundle> savedLogics; //data from saved previous logic instances
@@ -53,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //ensure directories
+        this.ensureDirectories();
 
         //set context reference
         if (MainActivity.resources == null) MainActivity.resources = this.getResources();
@@ -167,6 +174,14 @@ public class MainActivity extends AppCompatActivity {
      */
     public static void logicChangeProcessed() {
         MainActivity.changeLogic = false;
+    }
+
+    /**
+     * Ensures proper directories and files are created and present for functionality of
+     * the app.
+     */
+    private void ensureDirectories() {
+        MainActivity.appDir = this.getFilesDir();
     }
 
     //Static Accessors

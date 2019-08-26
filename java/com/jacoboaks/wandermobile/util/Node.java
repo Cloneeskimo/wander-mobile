@@ -2,6 +2,12 @@ package com.jacoboaks.wandermobile.util;
 
 import android.os.Bundle;
 
+import com.jacoboaks.wandermobile.MainActivity;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -179,6 +185,34 @@ public class Node {
     }
 
     /**
+     * Reads a node from a file
+     * @param path the path to read the Node from. Will throw an error if does not exist or cannot be opened
+     * @return the read Node
+     */
+    public static Node readNode(String path) {
+
+        //create node
+        Node node = new Node();
+
+        //open file
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(MainActivity.appDir + "/" + path));
+            List<String> fileContents = new ArrayList<>();
+
+            //put file into an ArrayList and then recursively parse it
+            while (in.ready()) fileContents.add(in.readLine());
+            readNodeR(node, fileContents, 0, 0);
+
+            //catch any errors
+        } catch (Exception e) {
+            throw Util.fatalError("Node.java", "readNode(String)", e.getMessage());
+        }
+
+        //return node
+        return node;
+    }
+
+    /**
      * Recursively reads a Node from a given list of strings.
      * @param node the current Node in focus
      * @param fileContents the recursively static file contents
@@ -241,5 +275,49 @@ public class Node {
         node.setValue(curr.getValue());
         node.addChildren(curr.getChildren());
         return i;
+    }
+
+    /**
+     * Writes a node to a file
+     * @param node the Node to write
+     * @param path the path to write the Node to. Will throw an error if doesn't exit or cannot open
+     */
+    public static void writeNode(Node node, String path) {
+
+        //try to open file to print
+        try {
+            PrintWriter out = new PrintWriter(new File(MainActivity.appDir, path));
+
+            //recursively save node then close file
+            Node.writeNodeR(out, node, new StringBuilder());
+            out.close();
+
+            //catch errors
+        } catch (Exception e) {
+            throw Util.fatalError("Node.java", "writeNode(Node, String)", e.getMessage());
+        }
+    }
+
+    /**
+     * Recursively write a node to a file
+     * @param out the PrintWriter to use for writing
+     * @param node the current node in focus
+     * @param indent the current indent to use
+     */
+    private static void writeNodeR(PrintWriter out, Node node, StringBuilder indent) {
+
+        //print name and date
+        String indentString = indent.toString();
+        out.print(indentString + (node.hasName() ? node.getName() : "") + Node.DIVIDER_CHAR + " ");
+        out.println(node.hasValue() ? node.getValue() : "");
+
+        //print children
+        if (node.hasChildren()) {
+            out.println(indentString + "{");
+            indent.append(Node.INDENT_CHAR);
+            for (Node child : node.getChildren()) writeNodeR(out, child, indent);
+            indent.deleteCharAt(indent.length() - 1);
+            out.println(indentString + "}");
+        }
     }
 }
