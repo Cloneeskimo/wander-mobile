@@ -13,5 +13,6 @@ public class Global {
     public static final Color black = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 
     //Other Data
-    public static Font defaultFont = new Font(R.drawable.font_default, R.raw.fontcuttoffs_default, 10, 10, ' ');
+    public static int defaultFontID = R.drawable.font_default;
+    public static int defaultFontCuttoffsID = R.raw.fontcuttoffs_default;
 }

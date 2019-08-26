@@ -25,6 +25,7 @@ public class MainMenuLogic implements GameLogic {
 
     //Data
     private HUD hud;
+    private Font font;
     private float fadeOutTime = 0f;
     private int chosenAction;
 
@@ -40,7 +41,8 @@ public class MainMenuLogic implements GameLogic {
         //set clear color
         GLES20.glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
 
-        //create hud
+        //create font and hud
+        this.font = new Font(Global.defaultFontID, Global.defaultFontCuttoffsID, 10, 10, ' ');
         this.initHUD();
     }
 
@@ -51,32 +53,32 @@ public class MainMenuLogic implements GameLogic {
         this.hud = new HUD();
 
         //create title and add to hud
-        TextItem title = new TextItem(Global.defaultFont, "Wander Mobile", new Material(Global.defaultFont.getFontSheet(),
+        TextItem title = new TextItem(this.font, "Wander Mobile", new Material(this.font.getFontSheet(),
                 Global.black, true), 0f, 0f);
         title.scale(0.42f);
         this.hud.addItem("TITLE", title, HUD.Placement.TOP_MIDDLE, 0.19f);
 
         //add version and build tag
-        TextItem bvTag = new TextItem(Global.defaultFont, "v" + MainActivity.WANDER_VERSION + "b" + MainActivity.WANDER_BUILD,
+        TextItem bvTag = new TextItem(this.font, "v" + MainActivity.WANDER_VERSION + "b" + MainActivity.WANDER_BUILD,
                 title.getModel().getMaterial(), 0f, 0f);
         bvTag.scale(0.16f);
         this.hud.addItem("BUILD_VERSION_TAG", bvTag, HUD.Placement.BELOW_LAST, 0.0f);
         bvTag.moveX(-(title.getWidth() / 2 - bvTag.getWidth() / 2));
 
         //create new game button and add to hud
-        ButtonTextItem newGameButton = new ButtonTextItem(Global.defaultFont, "New Game",
+        ButtonTextItem newGameButton = new ButtonTextItem(this.font, "New Game",
                 Global.white, Global.black, MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE);
         newGameButton.scale(0.26f);
         this.hud.addItem("NEW_GAME_BUTTON", newGameButton, HUD.Placement.MIDDLE, 0.0f);
 
         //create load game button and add to hud
-        ButtonTextItem loadGameButton = new ButtonTextItem(Global.defaultFont, "Load Game",
+        ButtonTextItem loadGameButton = new ButtonTextItem(this.font, "Load Game",
                 Global.white, Global.black, MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE);
         loadGameButton.scale(0.26f);
         this.hud.addItem("LOAD_GAME_BUTTON", loadGameButton, HUD.Placement.BELOW_LAST, 0.1f);
 
         //create exit button and add to hud
-        ButtonTextItem exitButton = new ButtonTextItem(Global.defaultFont, "Exit",
+        ButtonTextItem exitButton = new ButtonTextItem(this.font, "Exit",
                 Global.white, Global.black, MainMenuLogic.EXIT_BUTTON_ACTION_CODE);
         exitButton.scale(0.26f);
         this.hud.addItem("EXIT_BUTTON", exitButton, HUD.Placement.BELOW_LAST, 0.1f);
@@ -159,8 +161,7 @@ public class MainMenuLogic implements GameLogic {
     //Data Requesting Method
     @Override
     public Node requestData() {
-        Node data = new Node("logic", Util.MAIN_MENU_LOGIC_TAG);
-        return data;
+        return new Node("logic", Util.MAIN_MENU_LOGIC_TAG);
     }
 
     //Cleanup Method

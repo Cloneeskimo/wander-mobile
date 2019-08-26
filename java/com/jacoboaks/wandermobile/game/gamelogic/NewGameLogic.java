@@ -27,9 +27,10 @@ public class NewGameLogic implements GameLogic {
 
     //Data
     private HUD hud;
+    private Font font;
     private Bundle savedData;
-    private float fadeTime;
     private String chosenName;
+    private float fadeTime;
 
     //Static Data
     private static final int MAX_NAME_LENGTH = 13; //maximum length for a player name
@@ -43,7 +44,8 @@ public class NewGameLogic implements GameLogic {
         //set clear color
         GLES20.glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
 
-        //initialize HUD
+        //create font and hud
+        this.font = new Font(Global.defaultFontID, Global.defaultFontCuttoffsID, 10, 10, ' ');
         this.initHUD();
 
         //reload data
@@ -55,32 +57,32 @@ public class NewGameLogic implements GameLogic {
         this.hud = new HUD();
 
         //create keyboard
-        Keyboard keyboard = new Keyboard(Global.defaultFont, Keyboard.LETTER_ONLY_CHARACTER_SET, new Texture(R.drawable.texture_keyboardbutton),
+        Keyboard keyboard = new Keyboard(this.font, Keyboard.LETTER_ONLY_CHARACTER_SET, new Texture(R.drawable.texture_keyboardbutton),
                 new Texture(R.drawable.texture_keyboardbuttonpress), new Texture(R.drawable.texture_keyboardspacebutton),
                 new Texture(R.drawable.texture_keyboardspacebuttonpress), 2, 3, 0f, 0f, 1.9f, 0.8f, 0.025f);
         this.hud.addItem("KEYBOARD", keyboard, HUD.Placement.BOTTOM_MIDDLE, 0.05f);
 
         //create intro text
-        Material textMaterial = new Material(Global.defaultFont.getFontSheet(), Global.white, true);
-        TextItem introText = new TextItem(Global.defaultFont, "Enter a name:", textMaterial, 0f, 0f);
+        Material textMaterial = new Material(this.font.getFontSheet(), Global.white, true);
+        TextItem introText = new TextItem(this.font, "Enter a name:", textMaterial, 0f, 0f);
         introText.scale(0.3f);
         this.hud.addItem("INTRO_TEXT", introText, HUD.Placement.TOP_MIDDLE, 0.15f);
 
         //create input text
-        TextItem inputText = new TextItem(Global.defaultFont, "", textMaterial, 0f, 0f);
+        TextItem inputText = new TextItem(this.font, "", textMaterial, 0f, 0f);
         inputText.setText("");
         inputText.scale(0.2f);
         this.hud.addItem("INPUT_TEXT", inputText, HUD.Placement.BELOW_LAST, 0.12f);
 
         //create notification text
-        TextItem notificationText = new TextItem(Global.defaultFont, "Your name should be longer.",
+        TextItem notificationText = new TextItem(this.font, "Your name should be longer.",
                 textMaterial, 0f, 0f);
         notificationText.scale(0.15f);
         notificationText.setVisibility(false);
         this.hud.addItem("NOTIFICATION_TEXT", notificationText, HUD.Placement.BELOW_LAST, 0.12f);
 
         //create done button
-        ButtonTextItem doneButton = new ButtonTextItem(Global.defaultFont, "Done", Global.black,
+        ButtonTextItem doneButton = new ButtonTextItem(this.font, "Done", Global.black,
                 Global.white, NewGameLogic.DONE_BUTTON_ACTION_CODE);
         doneButton.scale(0.2f);
         this.hud.addItem("DONE_BUTTON", doneButton, HUD.Placement.TOP_RIGHT, 0.07f);
