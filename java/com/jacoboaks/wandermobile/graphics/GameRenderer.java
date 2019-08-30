@@ -12,6 +12,7 @@ import com.jacoboaks.wandermobile.game.gamelogic.LoadGameLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.LogicChangeData;
 import com.jacoboaks.wandermobile.game.gamelogic.MainMenuLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.NewGameLogic;
+import com.jacoboaks.wandermobile.game.gamelogic.SaveSlotChoiceLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.WorldLogic;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
@@ -171,6 +172,8 @@ public class GameRenderer implements GLSurfaceView.Renderer {
             this.logic = new LoadGameLogic();
         } else if (logicTag.equals(Util.WORLD_LOGIC_TAG)) {
             this.logic = new WorldLogic();
+        } else if (logicTag.equals(Util.SAVE_SLOT_CHOICE_LOGIC_TAG)) {
+            this.logic = new SaveSlotChoiceLogic();
         } else {
             if (Util.DEBUG) Log.i(Util.getLogTag("GameRenderer.java", "changeLogic(String, boolean)"),
                     "unable to discern logic tag: " + logicTag + ", defaulting to MainMenuLogic");
@@ -182,8 +185,9 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         //load data
         if (newLogicData != null) this.logic.loadData(newLogicData);
 
-        //initialize new logic
+        //initialize new logic and instate saved instance data
         this.logic.init();
+        this.logic.instateSavedInstanceData();
     }
 
     /**
@@ -212,6 +216,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
 
         //initialize logic
         this.logic.init();
+        this.logic.instateSavedInstanceData();
 
         //log initialization of logic
         if (Util.DEBUG) Log.i(Util.getLogTag("GameRenderer.java",

@@ -28,9 +28,8 @@ public class NewGameLogic implements GameLogic {
     //Data
     private HUD hud;
     private Font font;
-    private Bundle savedData;
+    private Bundle savedInstanceData;
     private String chosenName;
-    private float fadeTime;
 
     //Static Data
     private static final int MAX_NAME_LENGTH = 13; //maximum length for a player name
@@ -47,14 +46,11 @@ public class NewGameLogic implements GameLogic {
         //create font and hud
         this.font = new Font(Global.defaultFontID, Global.defaultFontCuttoffsID, 10, 10, ' ');
         this.initHUD();
-
-        //reload data
-        if (this.savedData != null) this.instateLoadedData();
     }
 
     //HUD Initialization Method
     private void initHUD() {
-        this.hud = new HUD();
+        this.hud = new HUD(true);
 
         //create keyboard
         Keyboard keyboard = new Keyboard(this.font, Keyboard.LETTER_ONLY_CHARACTER_SET, new Texture(R.drawable.texture_keyboardbutton),
@@ -88,41 +84,23 @@ public class NewGameLogic implements GameLogic {
         this.hud.addItem("DONE_BUTTON", doneButton, HUD.Placement.TOP_RIGHT, 0.07f);
         doneButton.setY(keyboard.getY() + keyboard.getHeight() / 2 + 0.07f + doneButton.getHeight() / 2);
         doneButton.setX(keyboard.getX() + keyboard.getWidth() / 2 - doneButton.getWidth() / 2);
-
-        //create fading box
-        GameItem fadingBox = new GameItem(new Model(Model.getScreenBoxModelCoords(), Model.STD_SQUARE_TEX_COORDS(),
-                Model.STD_SQUARE_DRAW_ORDER(), new Material(new Color(0.6f, 0.6f, 0.6f, 1.0f))), 0f, 0f);
-        fadingBox.scale(4.0f);
-        this.hud.addItem("Z_FADING_BOX", fadingBox, HUD.Placement.MIDDLE, 0f);
-        this.fadeTime = Util.FADE_TIME * 2;
     }
 
-    /**
-     * Loads any saved data.
-     */
-    private void instateLoadedData() {
-
-        //load data
-        ((TextItem)this.hud.getItem("INPUT_TEXT")).setText(this.savedData.getString("logic_inputText"));
-        this.hud.getItem("NOTIFICATION_TEXT").setVisibility(this.savedData.getString("logic_notification").equals("true") ? true : false);
-        this.fadeTime = Float.parseFloat(this.savedData.getString("logic_fadeTime"));
-        String cn = this.savedData.getString("logic_chosenName");
-        this.chosenName = (cn.equals("") ? null : cn);
-
-        //set appropriate fading alpha
-        if (this.fadeTime > Util.FADE_TIME) {
-            float alpha = (this.fadeTime - Util.FADE_TIME) / Util.FADE_TIME;
-            this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
-        } else if (this.fadeTime > 0f) {
-            float alpha = 1f - (this.fadeTime / Util.FADE_TIME);
-            this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
+    //Saved Instance Data Instating Method
+    public void instateSavedInstanceData() {
+        if (this.savedInstanceData != null) {
+            ((TextItem) this.hud.getItem("INPUT_TEXT")).setText(this.savedInstanceData.getString("logic_inputText"));
+            this.hud.getItem("NOTIFICATION_TEXT").setVisibility(this.savedInstanceData.getString("logic_notification").equals("true") ? true : false);
+            this.hud.instateSavedInstanceData(this.savedInstanceData);
+            String cn = this.savedInstanceData.getString("logic_chosenName");
+            this.chosenName = (cn.equals("") ? null : cn);
         }
     }
 
     //Data Loading Method
     @Override
     public void loadData(Bundle savedInstanceData) {
-        this.savedData = savedInstanceData;
+        this.savedInstanceData = savedInstanceData;
     }
 
     //Input Method
@@ -146,7 +124,7 @@ public class NewGameLogic implements GameLogic {
                 //check if appropriate name, if so start fade
                 String name = ((TextItem) this.hud.getItem("INPUT_TEXT")).getText();
                 if (name.length() >= NewGameLogic.MIN_NAME_LENGTH) {
-                    this.fadeTime = Util.FADE_TIME;
+                    this.hud.fadeOut();
                     this.chosenName = name;
                 } else {
                     this.hud.getItem("NOTIFICATION_TEXT").setVisibility(true);
@@ -181,23 +159,16 @@ public class NewGameLogic implements GameLogic {
     //Update Method
     public void update(float dt) {
 
-        //if fading in
-        if (this.fadeTime > Util.FADE_TIME) {
-            float alpha = (this.fadeTime - Util.FADE_TIME) / Util.FADE_TIME;
-            this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
-            this.fadeTime -= dt;
+        //update hud
+        this.hud.update(dt);
 
-        //if fading out
-        } else if (this.fadeTime > 0f && this.chosenName != null) {
-            float alpha = 1f - (this.fadeTime / Util.FADE_TIME);
-            this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
-            this.fadeTime -= dt;
-
-            //change logics if fade over
-            if (this.fadeTime < 0f) {
-                LogicChangeData lgd = new LogicChangeData(Util.WORLD_LOGIC_TAG, true, false);
-                MainActivity.initLogicChange(lgd, new Node(chosenName, chosenName));
-            }
+        //change logic if fade over
+        if (this.hud.fadeOutCompleted()) {
+            LogicChangeData lgd = new LogicChangeData(Util.SAVE_SLOT_CHOICE_LOGIC_TAG, true, false);
+            Node transferData = new Node();
+            transferData.addChild("chosenName", chosenName);
+            transferData.addChild("neworload", "new");
+            MainActivity.initLogicChange(lgd, transferData);
         }
     }
 
@@ -213,14 +184,12 @@ public class NewGameLogic implements GameLogic {
         Node data = new Node("logic", Util.NEW_GAME_LOGIC_TAG);
         data.addChild(new Node("inputText", ((TextItem)this.hud.getItem("INPUT_TEXT")).getText()));
         data.addChild(new Node("notification", this.hud.getItem("NOTIFICATION_TEXT").isVisible() ? "true" : "false"));
-        data.addChild(new Node("fadeTime", Float.toString(this.fadeTime)));
         data.addChild(new Node("chosenName", this.chosenName == null ? "" : this.chosenName));
+        data.addChild(this.hud.requestData());
         return data;
     }
 
     //Cleanup Method
     @Override
-    public void cleanup() {
-        this.hud.cleanup();
-    }
+    public void cleanup() { this.hud.cleanup(); }
 }

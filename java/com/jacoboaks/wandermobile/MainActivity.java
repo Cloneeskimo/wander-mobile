@@ -14,6 +14,7 @@ import com.jacoboaks.wandermobile.game.gamelogic.LoadGameLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.LogicChangeData;
 import com.jacoboaks.wandermobile.game.gamelogic.MainMenuLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.NewGameLogic;
+import com.jacoboaks.wandermobile.game.gamelogic.SaveSlotChoiceLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.WorldLogic;
 import com.jacoboaks.wandermobile.graphics.GameRenderer;
 import com.jacoboaks.wandermobile.util.Node;
@@ -33,12 +34,13 @@ public class MainActivity extends AppCompatActivity {
     //Game Version/Build
     public final static String WANDER_VERSION = "0.0";
     public final static String WANDER_STARTING_LOGIC = Util.MAIN_MENU_LOGIC_TAG;
-    public final static int WANDER_BUILD = 31;
+    public final static int WANDER_BUILD = 32;
 
     //Public Static Data
     public static boolean changeLogic = false; //flag for changing logic
     public static GameLogic currentLogic; //reference to current running logic
     public static File appDir; //reference to the file directory of the app
+    public static boolean[] saveSlots; //which save slots are in use
 
     //Private Static Data
     private static LogicChangeData logicChangeData; //saved static data for logic changing
@@ -58,8 +60,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //ensure directories
+        //ensure directories and check for files
         this.ensureDirectories();
+        this.checkSaveSlots();
 
         //set context reference
         if (MainActivity.resources == null) MainActivity.resources = this.getResources();
@@ -91,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
             logic = new LoadGameLogic();
         } else if (logicToLoad.equals(Util.WORLD_LOGIC_TAG)) {
             logic = new WorldLogic();
+        } else if (logicToLoad.equals(Util.SAVE_SLOT_CHOICE_LOGIC_TAG)) {
+            logic = new SaveSlotChoiceLogic();
         } else {
             if (Util.DEBUG) Log.i(Util.getLogTag("MainActivity.java", "initGameLogic(Bundle)"),
                     "failed to load previous logic - reverting to main menu logic");
@@ -181,7 +186,31 @@ public class MainActivity extends AppCompatActivity {
      * the app.
      */
     private void ensureDirectories() {
+
+        //find app directory
         MainActivity.appDir = this.getFilesDir();
+
+        //create saves directory
+        File saveDir = new File(MainActivity.appDir, "data/saves");
+        boolean result = saveDir.mkdirs();
+        if (!result) {
+            if (Util.DEBUG) Log.i(Util.getLogTag("MainActivity.java", "ensureDirectories()"),
+                    "failed to make saves directory, assuming it already exists.");
+        }
+    }
+
+    /**
+     * Sees which save slots are in use
+     */
+    private void checkSaveSlots() {
+        String[] allAppFiles = this.fileList();
+        MainActivity.saveSlots = new boolean[] { false, false, false };
+        for (String file : allAppFiles) {
+            if (file.contains("saveslot")) {
+                int saveSlot = Integer.parseInt(Character.toString(file.charAt(file.length() - 1)));
+                MainActivity.saveSlots[saveSlot] = true;
+            }
+        }
     }
 
     //Static Accessors

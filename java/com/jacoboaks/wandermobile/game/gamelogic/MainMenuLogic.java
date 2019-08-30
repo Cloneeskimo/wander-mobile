@@ -26,8 +26,8 @@ public class MainMenuLogic implements GameLogic {
     //Data
     private HUD hud;
     private Font font;
-    private float fadeOutTime = 0f;
     private int chosenAction;
+    private Bundle savedInstanceData;
 
     //Button Data
     private static final int NEW_GAME_BUTTON_ACTION_CODE = 1;
@@ -46,15 +46,20 @@ public class MainMenuLogic implements GameLogic {
         this.initHUD();
     }
 
+    //Saved Instance Data Instating Method
+    public void instateSavedInstanceData() {
+        if (this.savedInstanceData != null) this.hud.instateSavedInstanceData(savedInstanceData);
+    }
+
     /**
      * Initializes and populates this logic's HUD.
      */
     private void initHUD() {
-        this.hud = new HUD();
+        this.hud = new HUD(true);
 
         //create title and add to hud
         TextItem title = new TextItem(this.font, "Wander Mobile", new Material(this.font.getFontSheet(),
-                Global.black, true), 0f, 0f);
+                Global.white, true), 0f, 0f);
         title.scale(0.42f);
         this.hud.addItem("TITLE", title, HUD.Placement.TOP_MIDDLE, 0.19f);
 
@@ -67,34 +72,26 @@ public class MainMenuLogic implements GameLogic {
 
         //create new game button and add to hud
         ButtonTextItem newGameButton = new ButtonTextItem(this.font, "New Game",
-                Global.white, Global.black, MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE);
+                Global.black, Global.white, MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE);
         newGameButton.scale(0.26f);
         this.hud.addItem("NEW_GAME_BUTTON", newGameButton, HUD.Placement.MIDDLE, 0.0f);
 
         //create load game button and add to hud
         ButtonTextItem loadGameButton = new ButtonTextItem(this.font, "Load Game",
-                Global.white, Global.black, MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE);
+                Global.black, Global.white, MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE);
         loadGameButton.scale(0.26f);
         this.hud.addItem("LOAD_GAME_BUTTON", loadGameButton, HUD.Placement.BELOW_LAST, 0.1f);
 
         //create exit button and add to hud
         ButtonTextItem exitButton = new ButtonTextItem(this.font, "Exit",
-                Global.white, Global.black, MainMenuLogic.EXIT_BUTTON_ACTION_CODE);
+                Global.black, Global.white, MainMenuLogic.EXIT_BUTTON_ACTION_CODE);
         exitButton.scale(0.26f);
         this.hud.addItem("EXIT_BUTTON", exitButton, HUD.Placement.BELOW_LAST, 0.1f);
-
-        //create fading box
-        GameItem fadingBox = new GameItem(new Model(Model.getScreenBoxModelCoords(), Model.STD_SQUARE_TEX_COORDS(),
-                Model.STD_SQUARE_DRAW_ORDER(), new Material(new Color(0.6f, 0.6f, 0.6f, 0.0f))), 0f, 0f);
-        fadingBox.scale(4.0f);
-        this.hud.addItem("Z_FADING_BOX", fadingBox, HUD.Placement.MIDDLE, 0f);
     }
 
     //Data Loading Method
     @Override
-    public void loadData(Bundle savedInstanceData) {
-
-    }
+    public void loadData(Bundle savedInstanceData) { this.savedInstanceData = savedInstanceData; }
 
     //Input Handling Method
     @Override
@@ -106,11 +103,11 @@ public class MainMenuLogic implements GameLogic {
         //check if button was pressed and switch to world logic if so
         switch(actionCode) {
             case MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE:
-                this.fadeOutTime = Util.FADE_TIME;
+                this.hud.fadeOut();
                 this.chosenAction = actionCode;
                 break;
             case MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE:
-                this.fadeOutTime = Util.FADE_TIME;
+                this.hud.fadeOut();
                 this.chosenAction = actionCode;
                 break;
             case MainMenuLogic.EXIT_BUTTON_ACTION_CODE:
@@ -134,21 +131,17 @@ public class MainMenuLogic implements GameLogic {
     @Override
     public void update(float dt) {
 
-        //fade out at end
-        if (this.fadeOutTime > 0f) {
-            float alpha = 1f - (this.fadeOutTime / Util.FADE_TIME);
-            this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
-            this.fadeOutTime -= dt;
+        //update hud
+        this.hud.update(dt);
 
-            //switch logic if fade transition is over
-            if (this.fadeOutTime < 0f) {
-                LogicChangeData lgd = null;
-                if (this.chosenAction == MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE)
-                    lgd = new LogicChangeData(Util.NEW_GAME_LOGIC_TAG, true, false);
-                else if (this.chosenAction == MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE)
-                    lgd = new LogicChangeData(Util.LOAD_GAME_LOGIC_TAG, true, false);
-                MainActivity.initLogicChange(lgd, null);
-            }
+        //switch logic if fade completed
+        if (this.hud.fadeOutCompleted()) {
+            LogicChangeData lgd = null;
+            if (this.chosenAction == MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE)
+                lgd = new LogicChangeData(Util.NEW_GAME_LOGIC_TAG, true, false);
+            else if (this.chosenAction == MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE)
+                lgd = new LogicChangeData(Util.LOAD_GAME_LOGIC_TAG, true, false);
+            MainActivity.initLogicChange(lgd, null);
         }
     }
 
@@ -161,12 +154,12 @@ public class MainMenuLogic implements GameLogic {
     //Data Requesting Method
     @Override
     public Node requestData() {
-        return new Node("logic", Util.MAIN_MENU_LOGIC_TAG);
+        Node node = new Node("logic", Util.MAIN_MENU_LOGIC_TAG);
+        node.addChild(this.hud.requestData());
+        return node;
     }
 
     //Cleanup Method
     @Override
-    public void cleanup() {
-        this.hud.cleanup();;
-    }
+    public void cleanup() { this.hud.cleanup(); }
 }

@@ -17,7 +17,8 @@ public final class Util {
     //Logic Tags
     public final static String MAIN_MENU_LOGIC_TAG = "mainmenulogic";
     public final static String NEW_GAME_LOGIC_TAG = "newgamelogic";
-    public final static String LOAD_GAME_LOGIC_TAG = "laodgamelogic";
+    public final static String LOAD_GAME_LOGIC_TAG = "loadgamelogic";
+    public final static String SAVE_SLOT_CHOICE_LOGIC_TAG = "saveslotchoicelogic";
     public final static String WORLD_LOGIC_TAG = "worldlogic";
     public final static float FADE_TIME = 1000f;
 

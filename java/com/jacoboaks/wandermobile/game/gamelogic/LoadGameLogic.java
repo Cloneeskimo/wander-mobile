@@ -23,6 +23,10 @@ public class LoadGameLogic implements GameLogic {
     @Override
     public void loadData(Bundle savedInstanceData) { }
 
+    //Saved Instance Data Instating Method
+    @Override
+    public void instateSavedInstanceData() {}
+
     //Input Method
     @Override
     public boolean input(MotionEvent e) {
@@ -49,10 +53,7 @@ public class LoadGameLogic implements GameLogic {
 
     //Data Requesting Node
     @Override
-    public Node requestData() {
-        Node data = new Node("logic", Util.LOAD_GAME_LOGIC_TAG);
-        return data;
-    }
+    public Node requestData() { return new Node("logic", Util.LOAD_GAME_LOGIC_TAG); }
 
     //Cleanup Node
     @Override

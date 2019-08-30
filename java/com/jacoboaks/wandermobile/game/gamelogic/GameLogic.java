@@ -25,6 +25,14 @@ public interface GameLogic {
     void loadData(Bundle savedInstanceData);
 
     /**
+     * Will be called after init() to load any saved instance data that was saved during loadData().
+     * Should re-implement any important data after initialization has occurred. It is the responsibility
+     * of the logic to check if the savedInstanceData is null in this method before trying to
+     * instate it.
+     */
+    void instateSavedInstanceData();
+
+    /**
      * Is called whenever a MotionEvent from the GameView has occurred.
      * @param e the MotionEvent to handle
      * @return whether or not the MotionEvent was handled

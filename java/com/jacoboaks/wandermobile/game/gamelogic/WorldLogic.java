@@ -8,6 +8,7 @@ import com.jacoboaks.wandermobile.MainActivity;
 import com.jacoboaks.wandermobile.R;
 import com.jacoboaks.wandermobile.game.Area;
 import com.jacoboaks.wandermobile.game.HUD;
+import com.jacoboaks.wandermobile.game.SaveData;
 import com.jacoboaks.wandermobile.game.World;
 import com.jacoboaks.wandermobile.game.gamecontrol.WorldControl;
 import com.jacoboaks.wandermobile.game.gameitem.ButtonTextItem;
@@ -32,10 +33,10 @@ public class WorldLogic implements GameLogic {
     private HUD hud;
     private Font font;
     private WorldControl control;
-    private float fadeOutTime = 0f;
 
     //Saved Data
     private Bundle savedInstanceData;
+    private SaveData saveData;
 
     //Static Data
     private static final int SAVE_BUTTON_ACTION_CODE = 1;
@@ -47,6 +48,9 @@ public class WorldLogic implements GameLogic {
         //create font
         this.font = new Font(Global.defaultFontID, Global.defaultFontCuttoffsID, 10, 10, ' ');
 
+        //set save data reference
+        this.saveData = new SaveData(MainActivity.getLogicTransferData().getChild("savedata"), this.font);
+
         //initialize graphics and objects
         this.initGraphics();
         this.initHUD();
@@ -54,9 +58,6 @@ public class WorldLogic implements GameLogic {
 
         //create controls
         this.control = new WorldControl();
-
-        //load data if there is any to load
-        if (this.savedInstanceData != null) this.instateLoadedData();
     }
 
     /**
@@ -74,7 +75,7 @@ public class WorldLogic implements GameLogic {
     private void initHUD() {
 
         //create HUD
-        this.hud = new HUD();
+        this.hud = new HUD(true);
 
         //create hud text material
         Material textMaterial = new Material(this.font.getFontSheet(), Global.black, true);
@@ -131,13 +132,6 @@ public class WorldLogic implements GameLogic {
                 Global.black, WorldLogic.SAVE_BUTTON_ACTION_CODE);
         saveGameButton.scale(0.20f);
         this.hud.addItem("SAVE_GAME_BUTTON", saveGameButton, HUD.Placement.TOP_LEFT, 0.02f);
-
-        //fading box
-        GameItem fadingBox = new GameItem(new Model(Model.getScreenBoxModelCoords(), Model.STD_SQUARE_TEX_COORDS(),
-                Model.STD_SQUARE_DRAW_ORDER(), new Material(new Color(0.6f, 0.6f, 0.6f, 1.0f))), 0f, 0f);
-        fadingBox.scale(4.0f);
-        this.hud.addItem("Z_FADING_BOX", fadingBox, HUD.Placement.MIDDLE, 0f);
-        this.fadeOutTime = Util.FADE_TIME;
     }
 
     /**
@@ -146,9 +140,7 @@ public class WorldLogic implements GameLogic {
     private void initWorld() {
 
         //create player
-        Node transferData = MainActivity.getLogicTransferData();
-        Entity player = new Entity(transferData.getValue(), this.font, transferData.getValue().charAt(0),
-                new Color(0.62f, 0.0f, 0.1f, 1.0f), 0, 0);
+        Entity player = this.saveData.getPlayer();
 
         //create area
         Area area = Area.loadArea(R.raw.area_deepwoods, this.font);
@@ -160,14 +152,13 @@ public class WorldLogic implements GameLogic {
     /**
      * Reinstates saved bundle data from a previous instance of this logic.
      */
-    private void instateLoadedData() {
-
-        //load saved data
-        this.world.instateLoadedData(this.savedInstanceData);
-        this.world.getPlayer().setX(Float.parseFloat(this.savedInstanceData.getString("logic_playerx")));
-        this.world.getPlayer().setY(Float.parseFloat(this.savedInstanceData.getString("logic_playery")));
-        this.fadeOutTime = Float.parseFloat(this.savedInstanceData.getString("logic_fadeOutTime"));
-        this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(this.fadeOutTime / Util.FADE_TIME);
+    public void instateSavedInstanceData() {
+        if (this.savedInstanceData != null) {
+            this.world.instateLoadedData(this.savedInstanceData);
+            this.world.getPlayer().setX(Float.parseFloat(this.savedInstanceData.getString("logic_playerx")));
+            this.world.getPlayer().setY(Float.parseFloat(this.savedInstanceData.getString("logic_playery")));
+            this.hud.instateSavedInstanceData(this.savedInstanceData);
+        }
     }
 
     /**
@@ -203,11 +194,7 @@ public class WorldLogic implements GameLogic {
     public void update(float dt) {
 
         //fade in
-        if (this.fadeOutTime > 0f) {
-            this.fadeOutTime -= dt;
-            float alpha = this.fadeOutTime / Util.FADE_TIME;
-            this.hud.getItem("Z_FADING_BOX").getModel().getMaterial().getColor().setA(alpha);
-        }
+        this.hud.update(dt);
 
         //update world
         this.world.update(dt);
@@ -229,7 +216,8 @@ public class WorldLogic implements GameLogic {
         this.world.requestData(data);
         data.addChild(new Node("playerx", Float.toString(this.world.getPlayer().getX())));
         data.addChild(new Node("playery", Float.toString(this.world.getPlayer().getY())));
-        data.addChild(new Node("fadeOutTime", Float.toString(this.fadeOutTime)));
+        data.addChild(this.hud.requestData());
+        data.addChild(this.saveData.toNode());
         return data;
     }
 

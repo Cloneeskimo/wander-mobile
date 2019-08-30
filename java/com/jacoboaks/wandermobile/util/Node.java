@@ -91,6 +91,16 @@ public class Node {
     }
 
     /**
+     * Adds a child Node to this Node with the given information.
+     * @param name the name of the child
+     * @param value the value of the child
+     */
+    public void addChild(String name, String value) {
+        this.addChild(new Node(name, value));
+    }
+
+
+    /**
      * Adds multiple children to this Node.
      * @param children the List of Nodes to add as children to this Node
      */
@@ -185,8 +195,8 @@ public class Node {
     }
 
     /**
-     * Reads a node from a file
-     * @param path the path to read the Node from. Will throw an error if does not exist or cannot be opened
+     * Reads a node at the given file path relative to the app's file path.
+     * @param path the path to read the Node from
      * @return the read Node
      */
     public static Node readNode(String path) {

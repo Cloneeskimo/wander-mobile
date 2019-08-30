@@ -1,6 +1,7 @@
 package com.jacoboaks.wandermobile.game;
 
 import android.opengl.GLES20;
+import android.os.Bundle;
 import android.view.MotionEvent;
 
 import com.jacoboaks.wandermobile.R;
@@ -8,9 +9,14 @@ import com.jacoboaks.wandermobile.game.gameitem.ButtonTextItem;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
 import com.jacoboaks.wandermobile.game.gameitem.Keyboard;
 import com.jacoboaks.wandermobile.graphics.GameRenderer;
+import com.jacoboaks.wandermobile.graphics.Material;
+import com.jacoboaks.wandermobile.graphics.Model;
 import com.jacoboaks.wandermobile.graphics.ShaderProgram;
 import com.jacoboaks.wandermobile.graphics.Transformation;
+import com.jacoboaks.wandermobile.util.Color;
 import com.jacoboaks.wandermobile.util.Coord;
+import com.jacoboaks.wandermobile.util.Node;
+import com.jacoboaks.wandermobile.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,13 +31,26 @@ public class HUD {
     private Map<String, GameItem> gameItems;
     private ShaderProgram shaderProgram;
     private GameItem lastAdded;
+    private GameItem fadeBox;
+    private FadeState fadeState;
 
     /**
      * Constructs this HUD.
      */
-    public HUD() {
+    public HUD(boolean fadeIn) {
         this.gameItems = new HashMap<>();
         this.initShaderProgram();
+        this.initFading(fadeIn);
+    }
+
+    /**
+     * Initializes the fading capabilities of the HUD.
+     */
+    private void initFading(boolean fadeIn) {
+        this.fadeState = new FadeState(fadeIn ? 0 : 1);
+        this.fadeBox = new GameItem(new Model(Model.getScreenBoxModelCoords(), Model.STD_SQUARE_TEX_COORDS(),
+                Model.STD_SQUARE_DRAW_ORDER(), new Material(new Color(0.6f, 0.6f, 0.6f, fadeIn ? 1f : 0f))), 0f, 0f);
+        this.fadeBox.scale(4.0f);
     }
 
     /**
@@ -54,6 +73,40 @@ public class HUD {
         this.shaderProgram.registerUniform("textureSampler");
         this.shaderProgram.registerUniform("colorOverride");
         this.shaderProgram.registerUniform("isTextured");
+    }
+
+    //Update Method
+    public void update(float dt) {
+        this.fadeState.update(dt);
+        if (this.fadeState.stage != 1) {
+            this.fadeBox.getModel().getMaterial().getColor().setA(this.fadeState.getAlpha());
+        }
+    }
+
+    /**
+     * Initiates a fade in
+     */
+    public void fadeIn() {
+        this.fadeState.setStage(0);
+        float alpha = this.fadeState.timeLeft / Util.FADE_TIME;
+        this.fadeBox.getModel().getMaterial().getColor().setA(alpha);
+    }
+
+    /**
+     * Initiates a fade out
+     */
+    public void fadeOut() {
+        this.fadeState.setStage(2);
+        float alpha = 1f - (this.fadeState.timeLeft / Util.FADE_TIME);
+        this.fadeBox.getModel().getMaterial().getColor().setA(alpha);
+    }
+
+    /**
+     * Checks whether or not a fade has been completed.
+     * @return whether or not the fade has been completed.
+     */
+    public boolean fadeOutCompleted() {
+        return this.fadeState.fadeOutCompleted();
     }
 
     /**
@@ -171,6 +224,9 @@ public class HUD {
      */
     public int updateButtonSelections(MotionEvent e) {
 
+        //disallow input if fading
+        if (this.fading()) return -1;
+
         //get touch position in aspected space
         Coord touchPos = new Coord(e.getX(), e.getY());
         Transformation.screenToNormalized(touchPos);
@@ -213,6 +269,9 @@ public class HUD {
         }
         if (lastRender != null) lastRender.render(this.shaderProgram);
 
+        //render fadebox
+        this.fadeBox.render(this.shaderProgram);
+
         //unbind shader program
         this.shaderProgram.unbind();
     }
@@ -244,8 +303,30 @@ public class HUD {
 
     //Accessors
     public GameItem getItem(String tag) { return this.gameItems.get(tag); }
+    public boolean fading() { return this.fadeState.stage != 1; }
 
-    public Set<String> getTags() { return this.gameItems.keySet(); }
+    //Data Requesting Method
+    public Node requestData() {
+        Node node = new Node("hud");
+        node.addChild("fadestage", Integer.toString(this.fadeState.stage));
+        node.addChild("fadetime", Float.toString(this.fadeState.timeLeft));
+        return node;
+    }
+
+    /**
+     * Instates any saved data related to the HUD.
+     * @param data the data to instate
+     */
+    public void instateSavedInstanceData(Bundle data) {
+        this.fadeState.stage = Integer.parseInt(data.getString("logic_hud_fadestage"));
+        this.fadeState.timeLeft = Float.parseFloat(data.getString("logic_hud_fadetime"));
+        this.fadeBox.getModel().getMaterial().getColor().setA(this.fadeState.getAlpha());
+    }
+
+    //Cleanup Method
+    public void cleanup() {
+        this.shaderProgram.cleanup();
+    }
 
     /**
      * Represents some possible placements for an item to go when added to the HUD
@@ -264,8 +345,69 @@ public class HUD {
         BELOW_LAST
     }
 
-    //Cleanup Method
-    public void cleanup() {
-        this.shaderProgram.cleanup();
+    /**
+     * Represents the state of fading in the HUD that owns it.
+     */
+    private static class FadeState {
+
+        //Data
+        private int stage; //0 - fading in; 1 - no fade; 2 - fading out;
+        private float timeLeft;
+
+        /**
+         * Constructs this FadeState starting at the given stage.
+         * @param stage the stage to set this FadeState to
+         */
+        private FadeState(int stage) {
+            this.stage = stage;
+            if (this.stage != 1) {
+                this.timeLeft = Util.FADE_TIME;
+            }
+        }
+
+        /**
+         * Sets the stage of this FadeState and updates the timeLeft accordingly.
+         * @param stage the stage to set this FadeState to
+         */
+        private void setStage(int stage) {
+            this.stage = stage;
+            if (this.stage != 1) this.timeLeft = Util.FADE_TIME;
+        }
+
+        /**
+         * Updates this FadeState. If fading in and fade is over, the stage will be automatically
+         * updated. If fading out and the fade is over, the stage will not be updated until done()
+         * is called.
+         * @param dt the amount of passed time since the last update call
+         */
+        private void update(float dt) {
+            this.timeLeft -= dt;
+            if (this.timeLeft <= 0f && this.stage == 0) {
+                this.stage = 1;
+            }
+        }
+
+        /**
+         * Checks if this FadeState is representative of a completed fade. If so, the stage is switched
+         * appropriately.
+         * @return whether this FadeState represents a completed fade.
+         */
+        private boolean fadeOutCompleted() {
+            if (this.stage != 1 && this.timeLeft <= 0f) {
+                this.stage = 1;
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Calculates the appropriate alpha for a fade box given the current stage and time left.
+         * @return the calculated alpha
+         */
+        private float getAlpha() {
+            if (this.stage == 0) return this.timeLeft / Util.FADE_TIME;
+            else if (this.stage == 2) return 1f - (this.timeLeft / Util.FADE_TIME);
+            return 0f;
+        }
     }
 }

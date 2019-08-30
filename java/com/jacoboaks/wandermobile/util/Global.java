@@ -9,8 +9,9 @@ import com.jacoboaks.wandermobile.graphics.Font;
 public class Global {
 
     //Colors
-    public static final Color white = new Color(0.0f, 0.0f, 0.0f, 1.0f);
-    public static final Color black = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+    public static final Color white = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+    public static final Color black = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+    public static final Color yellow = new Color(1.0f, 1.0f, 0f, 1.0f);
 
     //Other Data
     public static int defaultFontID = R.drawable.font_default;
