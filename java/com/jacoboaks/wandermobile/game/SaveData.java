@@ -26,10 +26,20 @@ public class SaveData {
     /**
      * Constructs this SaveData with the given Node.
      * @param node the node to use for constructing this SaveData
+     * @param font the font to use for construction
      */
     public SaveData(Node node, Font font) {
         this.saveSlot = Integer.parseInt(node.getChild("saveSlot").getValue());
         this.player = Entity.nodeToEntity(node.getChild("Entity"), font);
+    }
+
+    /**
+     * Constructs this SaveData by loading the data at the given slot.
+     * @param saveSlot the slot to load the data from.
+     * @param font the font to use for construction
+     */
+    public SaveData(int saveSlot, Font font) {
+        this(Node.readNode("saveslot" + saveSlot), font);
     }
 
     /**
@@ -47,7 +57,8 @@ public class SaveData {
      * Saves the data of this SaveData into the appropriate slot.
      */
     public void save() {
-
+        Node node = this.toNode();
+        Node.writeNode(node, "saveslot" + this.saveSlot);
     }
 
     //Accessors

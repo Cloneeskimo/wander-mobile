@@ -46,11 +46,6 @@ public class MainMenuLogic implements GameLogic {
         this.initHUD();
     }
 
-    //Saved Instance Data Instating Method
-    public void instateSavedInstanceData() {
-        if (this.savedInstanceData != null) this.hud.instateSavedInstanceData(savedInstanceData);
-    }
-
     /**
      * Initializes and populates this logic's HUD.
      */
@@ -92,6 +87,14 @@ public class MainMenuLogic implements GameLogic {
     //Data Loading Method
     @Override
     public void loadData(Bundle savedInstanceData) { this.savedInstanceData = savedInstanceData; }
+
+    //Saved Instance Data Instating Method
+    public void instateSavedInstanceData() {
+        if (this.savedInstanceData != null) {
+            this.hud.instateSavedInstanceData(savedInstanceData);
+            if (this.hud.fadingOut()) this.chosenAction = Integer.parseInt(this.savedInstanceData.getString("logic_chosenAction"));
+        }
+    }
 
     //Input Handling Method
     @Override
@@ -137,11 +140,15 @@ public class MainMenuLogic implements GameLogic {
         //switch logic if fade completed
         if (this.hud.fadeOutCompleted()) {
             LogicChangeData lgd = null;
+            Node transferData = new Node("transferData");
             if (this.chosenAction == MainMenuLogic.NEW_GAME_BUTTON_ACTION_CODE)
                 lgd = new LogicChangeData(Util.NEW_GAME_LOGIC_TAG, true, false);
-            else if (this.chosenAction == MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE)
-                lgd = new LogicChangeData(Util.LOAD_GAME_LOGIC_TAG, true, false);
-            MainActivity.initLogicChange(lgd, null);
+            else if (this.chosenAction == MainMenuLogic.LOAD_GAME_BUTTON_ACTION_CODE) {
+                lgd = new LogicChangeData(Util.SAVE_SLOT_CHOICE_LOGIC_TAG, true, false);
+                transferData.addChild("chosenName", "");
+                transferData.addChild("neworload", "load");
+            }
+            MainActivity.initLogicChange(lgd, transferData);
         }
     }
 
@@ -155,6 +162,7 @@ public class MainMenuLogic implements GameLogic {
     @Override
     public Node requestData() {
         Node node = new Node("logic", Util.MAIN_MENU_LOGIC_TAG);
+        if (this.hud.fadingOut()) node.addChild("chosenAction", Integer.toString(this.chosenAction));
         node.addChild(this.hud.requestData());
         return node;
     }

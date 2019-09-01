@@ -149,6 +149,12 @@ public class WorldLogic implements GameLogic {
         this.world = new World(area, player, this.hud);
     }
 
+    //Data Loading Method
+    @Override
+    public void loadData(Bundle savedInstanceData) {
+        this.savedInstanceData = savedInstanceData;
+    }
+
     /**
      * Reinstates saved bundle data from a previous instance of this logic.
      */
@@ -159,21 +165,6 @@ public class WorldLogic implements GameLogic {
             this.world.getPlayer().setY(Float.parseFloat(this.savedInstanceData.getString("logic_playery")));
             this.hud.instateSavedInstanceData(this.savedInstanceData);
         }
-    }
-
-    /**
-     * Updates any FPS tracker or any logic based on FPS
-     * @param FPS the current FPS
-     */
-    public void onFPSUpdate(float FPS) {
-        TextItem fpsCounter = (TextItem)this.hud.getItem("FPS_COUNTER");
-        fpsCounter.setText(Float.toString(FPS));
-    }
-
-    //Data Loading Method
-    @Override
-    public void loadData(Bundle savedInstanceData) {
-        this.savedInstanceData = savedInstanceData;
     }
 
     //Input Method
@@ -198,6 +189,15 @@ public class WorldLogic implements GameLogic {
 
         //update world
         this.world.update(dt);
+    }
+
+    /**
+     * Updates any FPS tracker or any logic based on FPS
+     * @param FPS the current FPS
+     */
+    public void onFPSUpdate(float FPS) {
+        TextItem fpsCounter = (TextItem)this.hud.getItem("FPS_COUNTER");
+        fpsCounter.setText(Float.toString(FPS));
     }
 
     //Render Method

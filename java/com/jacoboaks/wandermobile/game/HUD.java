@@ -304,6 +304,7 @@ public class HUD {
     //Accessors
     public GameItem getItem(String tag) { return this.gameItems.get(tag); }
     public boolean fading() { return this.fadeState.stage != 1; }
+    public boolean fadingOut() { return this.fadeState.stage == 2; }
 
     //Data Requesting Method
     public Node requestData() {

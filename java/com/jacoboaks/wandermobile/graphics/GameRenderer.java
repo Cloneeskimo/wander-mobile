@@ -8,7 +8,6 @@ import android.view.MotionEvent;
 
 import com.jacoboaks.wandermobile.MainActivity;
 import com.jacoboaks.wandermobile.game.gamelogic.GameLogic;
-import com.jacoboaks.wandermobile.game.gamelogic.LoadGameLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.LogicChangeData;
 import com.jacoboaks.wandermobile.game.gamelogic.MainMenuLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.NewGameLogic;
@@ -168,8 +167,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
             this.logic = new MainMenuLogic();
         } else if (logicTag.equals(Util.NEW_GAME_LOGIC_TAG)) {
             this.logic = new NewGameLogic();
-        } else if (logicTag.equals(Util.LOAD_GAME_LOGIC_TAG)) {
-            this.logic = new LoadGameLogic();
         } else if (logicTag.equals(Util.WORLD_LOGIC_TAG)) {
             this.logic = new WorldLogic();
         } else if (logicTag.equals(Util.SAVE_SLOT_CHOICE_LOGIC_TAG)) {

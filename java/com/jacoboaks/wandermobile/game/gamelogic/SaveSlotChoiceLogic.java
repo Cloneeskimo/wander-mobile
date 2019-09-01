@@ -67,8 +67,23 @@ public class SaveSlotChoiceLogic implements GameLogic {
             //create slot title
             ButtonTextItem slotTitle = new ButtonTextItem(this.font, "Slot " + i + " (" +
                     (MainActivity.saveSlots[i] ? "in use)" : "empty)"), Global.black, Global.yellow, i);
-            slotTitle.scale(0.16f);
+            slotTitle.scale(0.17f);
             this.hud.addItem("SLOT_TITLE_" + i, slotTitle, 0f, 0f + ((i - 1) * 0.3f));
+
+            //create extras
+            if (MainActivity.saveSlots[i]) {
+
+                //player name
+                SaveData data = new SaveData(i, this.font);
+                TextItem playerName = new TextItem(this.font, data.getPlayer().getName(), textMaterial, 0f, 0f);
+                playerName.scale(0.14f);
+                this.hud.addItem("PLAYER_NAME_" + i, playerName, HUD.Placement.BELOW_LAST, 0.02f);
+
+                //player level
+                TextItem playerLevel = new TextItem(this.font, "lv. " + data.getPlayer().getLevel(), textMaterial, 0f, 0f);
+                playerLevel.scale(0.14f);
+                this.hud.addItem("PLAYER_LEVEL_" + i, playerLevel, HUD.Placement.BELOW_LAST, 0.02f);
+            }
         }
     }
 
@@ -82,6 +97,9 @@ public class SaveSlotChoiceLogic implements GameLogic {
     @Override
     public void instateSavedInstanceData() {
         if (this.savedInstanceData != null) this.hud.instateSavedInstanceData(this.savedInstanceData);
+        if (this.hud.fadingOut()) {
+            this.loadGame(Integer.parseInt(this.savedInstanceData.getString("logic_chosenSlot")));
+        }
     }
 
     //Input Method
@@ -103,17 +121,6 @@ public class SaveSlotChoiceLogic implements GameLogic {
     }
 
     /**
-     * Loads a previous game from the given save slot.
-     * @param saveSlot the save slot to load the previous game from.
-     */
-    private void loadGame(int saveSlot) {
-        Node saveDataNode = Node.readNode("saveslot" + saveSlot);
-        this.transferData = new Node("transferdata");
-        this.transferData.addChild(saveDataNode);
-        this.hud.fadeOut();
-    }
-
-    /**
      * Creates a new game in the given save slot.
      * @param saveSlot the save slot to put the new game into.
      */
@@ -124,6 +131,17 @@ public class SaveSlotChoiceLogic implements GameLogic {
         saveData.save();
         this.transferData = new Node("transferdata");
         this.transferData.addChild(saveData.toNode());
+        this.hud.fadeOut();
+    }
+
+    /**
+     * Loads a previous game from the given save slot.
+     * @param saveSlot the save slot to load the previous game from.
+     */
+    private void loadGame(int saveSlot) {
+        Node saveDataNode = Node.readNode("saveslot" + saveSlot);
+        this.transferData = new Node("transferdata");
+        this.transferData.addChild(saveDataNode);
         this.hud.fadeOut();
     }
 
@@ -154,6 +172,7 @@ public class SaveSlotChoiceLogic implements GameLogic {
     public Node requestData() {
         Node node = new Node("logic", Util.SAVE_SLOT_CHOICE_LOGIC_TAG);
         node.addChild(this.hud.requestData());
+        if (this.hud.fadingOut()) node.addChild("chosenSlot", this.transferData.getChild("savedata").getChild("saveSlot").getValue());
         return node;
     }
 

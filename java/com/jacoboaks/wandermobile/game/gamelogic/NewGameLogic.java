@@ -86,6 +86,12 @@ public class NewGameLogic implements GameLogic {
         doneButton.setX(keyboard.getX() + keyboard.getWidth() / 2 - doneButton.getWidth() / 2);
     }
 
+    //Data Loading Method
+    @Override
+    public void loadData(Bundle savedInstanceData) {
+        this.savedInstanceData = savedInstanceData;
+    }
+
     //Saved Instance Data Instating Method
     public void instateSavedInstanceData() {
         if (this.savedInstanceData != null) {
@@ -95,12 +101,6 @@ public class NewGameLogic implements GameLogic {
             String cn = this.savedInstanceData.getString("logic_chosenName");
             this.chosenName = (cn.equals("") ? null : cn);
         }
-    }
-
-    //Data Loading Method
-    @Override
-    public void loadData(Bundle savedInstanceData) {
-        this.savedInstanceData = savedInstanceData;
     }
 
     //Input Method

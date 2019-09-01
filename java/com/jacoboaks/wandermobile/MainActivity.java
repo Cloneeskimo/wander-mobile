@@ -10,7 +10,6 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
 import com.jacoboaks.wandermobile.game.gamelogic.GameLogic;
-import com.jacoboaks.wandermobile.game.gamelogic.LoadGameLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.LogicChangeData;
 import com.jacoboaks.wandermobile.game.gamelogic.MainMenuLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.NewGameLogic;
@@ -21,8 +20,6 @@ import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     //Game Version/Build
     public final static String WANDER_VERSION = "0.0";
     public final static String WANDER_STARTING_LOGIC = Util.MAIN_MENU_LOGIC_TAG;
-    public final static int WANDER_BUILD = 32;
+    public final static int WANDER_BUILD = 33;
 
     //Public Static Data
     public static boolean changeLogic = false; //flag for changing logic
@@ -90,8 +87,6 @@ public class MainActivity extends AppCompatActivity {
             logic = new MainMenuLogic();
         } else if (logicToLoad.equals(Util.NEW_GAME_LOGIC_TAG)) {
             logic = new NewGameLogic();
-        } else if (logicToLoad.equals(Util.LOAD_GAME_LOGIC_TAG)) {
-            logic = new LoadGameLogic();
         } else if (logicToLoad.equals(Util.WORLD_LOGIC_TAG)) {
             logic = new WorldLogic();
         } else if (logicToLoad.equals(Util.SAVE_SLOT_CHOICE_LOGIC_TAG)) {
@@ -197,6 +192,9 @@ public class MainActivity extends AppCompatActivity {
             if (Util.DEBUG) Log.i(Util.getLogTag("MainActivity.java", "ensureDirectories()"),
                     "failed to make saves directory, assuming it already exists.");
         }
+
+        String[] files = this.fileList();
+        System.out.println(files);
     }
 
     /**
