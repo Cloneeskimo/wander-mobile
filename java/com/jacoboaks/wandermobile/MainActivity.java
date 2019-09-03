@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
+import com.jacoboaks.wandermobile.game.gamelogic.DeleteSlotLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.GameLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.LogicChangeData;
 import com.jacoboaks.wandermobile.game.gamelogic.MainMenuLogic;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     //Game Version/Build
     public final static String WANDER_VERSION = "0.0";
     public final static String WANDER_STARTING_LOGIC = Util.MAIN_MENU_LOGIC_TAG;
-    public final static int WANDER_BUILD = 33;
+    public final static int WANDER_BUILD = 34;
 
     //Public Static Data
     public static boolean changeLogic = false; //flag for changing logic
@@ -91,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
             logic = new WorldLogic();
         } else if (logicToLoad.equals(Util.SAVE_SLOT_CHOICE_LOGIC_TAG)) {
             logic = new SaveSlotChoiceLogic();
+        } else if (logicToLoad.equals(Util.DELETE_SLOT_LOGIC_TAG)) {
+            logic = new DeleteSlotLogic();
         } else {
             if (Util.DEBUG) Log.i(Util.getLogTag("MainActivity.java", "initGameLogic(Bundle)"),
                     "failed to load previous logic - reverting to main menu logic");
@@ -185,6 +188,8 @@ public class MainActivity extends AppCompatActivity {
         //find app directory
         MainActivity.appDir = this.getFilesDir();
 
+        String[] files = this.fileList();
+
         //create saves directory
         File saveDir = new File(MainActivity.appDir, "data/saves");
         boolean result = saveDir.mkdirs();
@@ -193,7 +198,6 @@ public class MainActivity extends AppCompatActivity {
                     "failed to make saves directory, assuming it already exists.");
         }
 
-        String[] files = this.fileList();
         System.out.println(files);
     }
 

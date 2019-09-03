@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import com.jacoboaks.wandermobile.MainActivity;
+import com.jacoboaks.wandermobile.game.gamelogic.DeleteSlotLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.GameLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.LogicChangeData;
 import com.jacoboaks.wandermobile.game.gamelogic.MainMenuLogic;
@@ -171,6 +172,8 @@ public class GameRenderer implements GLSurfaceView.Renderer {
             this.logic = new WorldLogic();
         } else if (logicTag.equals(Util.SAVE_SLOT_CHOICE_LOGIC_TAG)) {
             this.logic = new SaveSlotChoiceLogic();
+        } else if (logicTag.equals(Util.DELETE_SLOT_LOGIC_TAG)) {
+            this.logic = new DeleteSlotLogic();
         } else {
             if (Util.DEBUG) Log.i(Util.getLogTag("GameRenderer.java", "changeLogic(String, boolean)"),
                     "unable to discern logic tag: " + logicTag + ", defaulting to MainMenuLogic");
