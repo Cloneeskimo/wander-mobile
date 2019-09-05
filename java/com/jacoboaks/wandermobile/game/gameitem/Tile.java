@@ -22,12 +22,12 @@ public class Tile extends GameItem {
 
     //Data
     private String name; //name of the tile
-    private int igx, igy; //delta impending grid position
     private float impendingMovementTime; //time until an impending move is undergone
     private float tgtX = 0, tgtY = 0; //target x and y (of movement animation) - in world coordinates
-    private boolean symbolTile; //whether or not this tile is a symbol tile (true) or texture (false)
-    private boolean isMoving = false; //whether or not the tile is currently undergoing a moving animation
+    private int igx, igy; //delta impending grid position
     private char symbol; //symbol of the tile
+    private boolean isMoving = false; //whether or not the tile is currently undergoing a moving animation
+    private boolean symbolTile; //whether or not this tile is a symbol tile (true) or texture (false)
 
     /**
      * Constructs this Tile using a colored character.

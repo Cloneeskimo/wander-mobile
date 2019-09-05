@@ -29,10 +29,10 @@ public class HUD {
 
     //Data
     private Map<String, GameItem> gameItems;
-    private ShaderProgram shaderProgram;
-    private GameItem lastAdded;
     private GameItem fadeBox;
+    private GameItem lastAdded;
     private FadeState fadeState;
+    private ShaderProgram shaderProgram;
 
     /**
      * Constructs this HUD.

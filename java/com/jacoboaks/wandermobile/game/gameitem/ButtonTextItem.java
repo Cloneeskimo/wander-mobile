@@ -14,9 +14,9 @@ import com.jacoboaks.wandermobile.util.Coord;
 public class ButtonTextItem extends TextItem {
 
     //Data
-    protected boolean selected = false;
-    protected int actionCode;
     private Color deselectedColor, selectedColor;
+    protected int actionCode;
+    protected boolean selected = false;
 
     /**
      * Constructs this ButtonTextItem with the given information.

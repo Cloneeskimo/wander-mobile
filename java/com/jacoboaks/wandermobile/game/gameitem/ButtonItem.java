@@ -20,10 +20,10 @@ public class ButtonItem extends ButtonTextItem {
     private Texture deselectedTexture; //the texture this ButtonItem takes when deselected
     private Texture selectedTexture; //the texture this ButtonItem takes when selected
     private GameItem underItem; //the background GameItem underneath the text of this ButtonItem
-    private float padding; /* the amount of padding between the text and the edge of the texture
-                            of this ButtonItem. */
     private float bwidth, bheight; /* the width and height of this entire ButtonItem (including
                             the texture underneath */
+    private float padding; /* the amount of padding between the text and the edge of the texture
+                            of this ButtonItem. */
 
     /**
      * Constructs this ButtonItem with the given information.

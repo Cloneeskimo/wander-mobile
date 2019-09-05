@@ -22,9 +22,9 @@ import java.util.Map;
 public class Area {
 
     //Data
-    private String name;
-    private List<StaticTile> staticTiles;
     private List<Entity> entities;
+    private List<StaticTile> staticTiles;
+    private String name;
     private Coord spawn;
 
     /**
@@ -46,6 +46,20 @@ public class Area {
         this.staticTiles = staticTiles;
         this.entities = entities;
         this.spawn = spawn;
+    }
+
+    //Node Constructor
+    public Area(Node node, Font font) {
+        this.name = node.getChild("name").getValue();
+        this.spawn = new Coord(node.getChild("spawn"));
+        this.staticTiles = new ArrayList<>();
+        for (Node st : node.getChild("statictiles").getChildren()) {
+            this.staticTiles.add(StaticTile.nodeToStaticTile(st, font));
+        }
+        this.entities = new ArrayList<>();
+        for (Node e : node.getChild("entities").getChildren()) {
+            this.entities.add(Entity.nodeToEntity(e, font));
+        }
     }
 
     //Update Method
@@ -181,5 +195,24 @@ public class Area {
 
         //create and return area
         return new Area(areaData.getChild("name").getValue(), st, e, spawn);
+    }
+
+    //Node Converter
+    public Node toNode() {
+        Node node = new Node("area");
+        node.addChild("name", this.name);
+        Node layout = new Node("statictiles");
+        for (StaticTile t : this.staticTiles) {
+            layout.addChild(t.toNode());
+        }
+        node.addChild(layout);
+        Node entities = new Node("entities");
+        for (Entity e : this.entities) {
+            entities.addChild(e.toNode());
+        }
+        Node spawn = this.spawn.toNode();
+        spawn.setName("spawn");
+        node.addChild(spawn);
+        return node;
     }
 }

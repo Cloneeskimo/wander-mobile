@@ -25,16 +25,16 @@ import com.jacoboaks.wandermobile.util.Util;
  */
 public class NewGameLogic implements GameLogic {
 
-    //Data
-    private HUD hud;
-    private Font font;
-    private Bundle savedInstanceData;
-    private String chosenName;
-
     //Static Data
     private static final int MAX_NAME_LENGTH = 13; //maximum length for a player name
     private static final int MIN_NAME_LENGTH = 3; //minimum length for a player name
     private static final int DONE_BUTTON_ACTION_CODE = 1000;
+
+    //Instance Data
+    private String chosenName;
+    private Font font;
+    private HUD hud;
+    private Bundle savedInstanceData;
 
     //Initialization Method
     @Override

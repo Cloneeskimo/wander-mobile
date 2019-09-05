@@ -19,8 +19,8 @@ public class Texture {
 
     //Data
     private int id[];
-    private int width, height;
     private int resourceID;
+    private int width, height;
 
     /**
      * Constructs this texture.

@@ -16,7 +16,7 @@ public class TextItem extends GameItem {
     //Static Data
     private static final String DEFAULT_TEXT = "N/A";
 
-    //Data
+    //Instance Data
     protected Font font; //the font_default used for the text
     private String text; //the text
     protected float scale; //the width, height, and scale of the text

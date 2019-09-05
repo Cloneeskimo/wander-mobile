@@ -19,8 +19,8 @@ import java.util.Map;
 public class ShaderProgram {
 
     //Data
-    private int programID;
     private final Map<String, Integer> uniforms;
+    private int programID;
 
     /**
      * Constructs this ShaderProgram.

@@ -14,8 +14,7 @@ public class GameItem {
 
     //Data
     protected Model model; //model
-    protected float x, y; //position in aspected or world space
-    protected float vx = 0, vy = 0; //velocity in aspected or world space
+    protected float x, y, vx, vy; //position and velocity in aspected or world space
     protected boolean visible; //visibility
 
     /**
@@ -28,6 +27,7 @@ public class GameItem {
         this.model = model;
         this.x = x;
         this.y = y;
+        this.vx = this.vy = 0f;
         this.visible = true;
     }
 

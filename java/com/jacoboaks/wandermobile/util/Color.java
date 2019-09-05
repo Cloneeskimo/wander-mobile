@@ -6,10 +6,7 @@ package com.jacoboaks.wandermobile.util;
 public class Color {
 
     //Data
-    private float r;
-    private float g;
-    private float b;
-    private float a;
+    private float r, g, b, a; //rgba
 
     /**
      * Constructs this color as the default color (white).

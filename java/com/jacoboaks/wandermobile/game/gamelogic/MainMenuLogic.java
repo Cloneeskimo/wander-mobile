@@ -24,12 +24,12 @@ import com.jacoboaks.wandermobile.util.Util;
 public class MainMenuLogic implements GameLogic {
 
     //Data
-    private HUD hud;
     private Font font;
-    private int chosenAction;
+    private HUD hud;
     private Bundle savedInstanceData;
+    private int chosenAction;
 
-    //Button Data
+    //Action Codes
     private static final int NEW_GAME_BUTTON_ACTION_CODE = 1;
     private static final int LOAD_GAME_BUTTON_ACTION_CODE = 2;
     private static final int EXIT_BUTTON_ACTION_CODE = 3;

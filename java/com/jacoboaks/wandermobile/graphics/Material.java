@@ -9,8 +9,8 @@ import com.jacoboaks.wandermobile.util.Color;
 public class Material {
 
     //Data
-    private Texture texture;
     private Color color;
+    private Texture texture;
     private boolean colorOverride;
 
     /**

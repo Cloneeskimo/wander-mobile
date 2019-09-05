@@ -22,16 +22,16 @@ public class WorldControl {
 
     //Data
     private Coord fingerPos; //the current finger position. set to null if the finger leaves the screen
-    private boolean substantialPanningDetected; //whether or not substantial panning has been detected
-    private boolean listenForPanning; //whether or not panning should be listened for
     private boolean currentlyScaling; //whether or not the user is currently scaling
     private boolean justScaledOrPanned; //whether or not the user has just scaled or panned
+    private boolean listenForPanning; //whether or not panning should be listened for
+    private boolean substantialPanningDetected; //whether or not substantial panning has been detected
 
     //Default Constructor
     public WorldControl() {
-        this.substantialPanningDetected = false;
-        this.listenForPanning = true;
         this.currentlyScaling = false;
+        this.listenForPanning = true;
+        this.substantialPanningDetected = false;
     }
 
     /**

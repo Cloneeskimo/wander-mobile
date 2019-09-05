@@ -27,16 +27,16 @@ public class Keyboard extends GameItem {
 
     //Static Keyboard Data
     private static Color backgroundColor = new Color(0.4f, 0.4f, 0.4f, 0.8f);
-    private static final int SPACE_BAR_WIDTH = 3;
-    private static final int SHIFT_WIDTH = 2;
     private static final int DELETE_WIDTH = 2;
+    private static final int SHIFT_WIDTH = 2;
+    private static final int SPACE_BAR_WIDTH = 3;
     private static final char NON_CHARACTER_SHIFT_VALUE = (char)0;
 
     //Action Codes
-    private static final int SHIFT_ACTION_CODE = 1;
     public static final int DELETE_ACTION_CODE = 2;
+    private static final int SHIFT_ACTION_CODE = 1;
 
-    //Data
+    //Instance Data
     private List<KeyboardButton> buttons;
     private boolean shifted;
 

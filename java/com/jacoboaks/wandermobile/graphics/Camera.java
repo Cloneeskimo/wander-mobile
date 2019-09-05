@@ -14,9 +14,8 @@ public class Camera {
     private final static float DEFAULT_ZOOM = 0.7f;
 
     //Data
-    float x, y; //position
-    float vx, vy; //velocity
-    float zoom;
+    protected float x, y, vx, vy; //position and velocity
+    private float zoom;
 
     /**
      * Constructs this Camera with all of its information.

@@ -6,10 +6,8 @@ package com.jacoboaks.wandermobile.util;
 public class Bounds {
 
     //Data
-    public float blx; //bottom-left (aspected or world space)
-    public float bly; //bottom-left (aspected or world space)
-    public float w; //width (aspected or world space)
-    public float h; //height (aspected or world space)
+    private float blx, bly; //bottom-left x, y (aspected or world space)
+    private float w, h; //width, height (aspected or world space)
 
     /**
      * Constructs these Bounds using the given information.

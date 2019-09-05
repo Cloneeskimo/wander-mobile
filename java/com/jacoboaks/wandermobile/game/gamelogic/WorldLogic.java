@@ -28,18 +28,18 @@ import com.jacoboaks.wandermobile.util.Util;
  */
 public class WorldLogic implements GameLogic {
 
-    //Logic Data
-    private World world;
-    private HUD hud;
-    private Font font;
-    private WorldControl control;
-
-    //Saved Data
-    private Bundle savedInstanceData;
-    private SaveData saveData;
-
     //Static Data
     private static final int SAVE_BUTTON_ACTION_CODE = 1;
+
+    //Logic Data
+    private WorldControl control;
+    private Font font;
+    private HUD hud;
+    private World world;
+
+    //Saved Data
+    private SaveData saveData;
+    private Bundle savedInstanceData;
 
     //Initialization Method
     @Override

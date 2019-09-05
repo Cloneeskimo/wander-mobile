@@ -30,24 +30,24 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     //Game Version/Build
-    public final static String WANDER_VERSION = "0.0";
     public final static String WANDER_STARTING_LOGIC = Util.MAIN_MENU_LOGIC_TAG;
-    public final static int WANDER_BUILD = 34;
+    public final static String WANDER_VERSION = "0.0";
+    public final static int WANDER_BUILD = 35;
 
     //Public Static Data
-    public static boolean changeLogic = false; //flag for changing logic
-    public static GameLogic currentLogic; //reference to current running logic
     public static File appDir; //reference to the file directory of the app
+    public static GameLogic currentLogic; //reference to current running logic
     public static boolean[] saveSlots; //which save slots are in use
+    public static boolean changeLogic = false; //flag for changing logic
 
     //Private Static Data
     private static LogicChangeData logicChangeData; //saved static data for logic changing
-    private static Resources resources; //reference to resources for resource loading
-    private static Map<String, Bundle> savedLogics; //data from saved previous logic instances
-    private static Bundle savedBundle; //saved data from when app is paused
     private static Node logicTransferData; //data to transfer between logic when switching
+    private static Resources resources; //reference to resources for resource loading
+    private static Bundle savedBundle; //saved data from when app is paused
+    private static Map<String, Bundle> savedLogics; //data from saved previous logic instances
 
-    //Data
+    //Instance Data
     private GameView view; //view
 
     /**
@@ -58,8 +58,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //ensure directories and check for files
-        this.ensureDirectories();
+        //find app directory and check for files
+        MainActivity.appDir = this.getFilesDir();
         this.checkSaveSlots();
 
         //set context reference
@@ -180,38 +180,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Ensures proper directories and files are created and present for functionality of
-     * the app.
-     */
-    private void ensureDirectories() {
-
-        //find app directory
-        MainActivity.appDir = this.getFilesDir();
-
-        String[] files = this.fileList();
-
-        //create saves directory
-        File saveDir = new File(MainActivity.appDir, "data/saves");
-        boolean result = saveDir.mkdirs();
-        if (!result) {
-            if (Util.DEBUG) Log.i(Util.getLogTag("MainActivity.java", "ensureDirectories()"),
-                    "failed to make saves directory, assuming it already exists.");
-        }
-
-        System.out.println(files);
-    }
-
-    /**
      * Sees which save slots are in use
      */
     private void checkSaveSlots() {
-        String[] allAppFiles = this.fileList();
         MainActivity.saveSlots = new boolean[] { false, false, false };
-        for (String file : allAppFiles) {
-            if (file.contains("saveslot")) {
-                int saveSlot = Integer.parseInt(Character.toString(file.charAt(file.length() - 1)));
-                MainActivity.saveSlots[saveSlot] = true;
-            }
+        for (int i = 0; i < 3; i++) {
+            File savefile = new File(MainActivity.appDir, "data/saves/saveslot" + i + "/savedata.wdr");
+            MainActivity.saveSlots[i] = savefile.exists();
         }
     }
 

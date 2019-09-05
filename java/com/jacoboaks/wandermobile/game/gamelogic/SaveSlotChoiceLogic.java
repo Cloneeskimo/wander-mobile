@@ -23,14 +23,18 @@ import com.jacoboaks.wandermobile.util.Util;
  */
 public class SaveSlotChoiceLogic implements GameLogic {
 
-    //Data
+    //Action Codes
+    private static final int RETURN_BUTTON_ACTION_CODE = 10;
+
+    //Instance Data
+    private String chosenName;
+    private Font font;
+    private HUD hud;
     private Bundle savedInstanceData;
     private Node transferData;
-    private HUD hud;
-    private Font font;
-    private String chosenName;
-    private boolean load;
     private int deletingSlot = -1;
+    private boolean load;
+    private boolean returnPressed = false;
 
     //Initialization Method
     @Override
@@ -70,11 +74,24 @@ public class SaveSlotChoiceLogic implements GameLogic {
         this.hud = new HUD(true);
         Material textMaterial = new Material(this.font.getFontSheet(), Global.white, true);
 
+        //return button
+        ButtonTextItem returnButton = new ButtonTextItem(this.font, "Return", Global.black, Global.white,
+                SaveSlotChoiceLogic.RETURN_BUTTON_ACTION_CODE);
+        returnButton.scale(0.15f);
+        this.hud.addItem("RETURN_BUTTON", returnButton, HUD.Placement.BOTTOM_LEFT, 0.05f);
+
         //screen title
         TextItem screenTitle = new TextItem(this.font, this.load ? "Choose a slot to load" :
                 "Choose a slot for " + this.chosenName, textMaterial, 0f, 0f);
         screenTitle.scale(0.19f);
         this.hud.addItem("SCREEN_TITLE", screenTitle, HUD.Placement.TOP_MIDDLE, 0.2f);
+
+        //notification text
+        TextItem notification = new TextItem(this.font, "That slot is already in use", textMaterial,
+                0f, 0f);
+        notification.scale(0.16f);
+        notification.setVisibility(false);
+        this.hud.addItem("NOTIFICATION", notification, HUD.Placement.BELOW_LAST, 0.15f);
 
         //create hud for each slot
         for (int i = 0; i < 3; i++) {
@@ -90,7 +107,7 @@ public class SaveSlotChoiceLogic implements GameLogic {
 
                 //player info
                 SaveData data = new SaveData(i, this.font);
-                TextItem playerInfo = new TextItem(this.font, data.getPlayer().getName() + "(lv." +
+                TextItem playerInfo = new TextItem(this.font, data.getPlayer().getName() + " (lv." +
                         data.getPlayer().getLevel() + ")", textMaterial, 0f, 0f);
                 playerInfo.scale(0.14f);
                 this.hud.addItem("PLAYER_INFO_" + i, playerInfo, HUD.Placement.BELOW_LAST, 0.02f);
@@ -113,9 +130,12 @@ public class SaveSlotChoiceLogic implements GameLogic {
     //Saved Data Instating Method
     @Override
     public void instateSavedInstanceData() {
-        if (this.savedInstanceData != null) this.hud.instateSavedInstanceData(this.savedInstanceData);
-        if (this.hud.fadingOut()) {
-            this.loadGame(Integer.parseInt(this.savedInstanceData.getString("logic_chosenSlot")));
+        if (this.savedInstanceData != null) {
+            this.hud.instateSavedInstanceData(this.savedInstanceData);
+            this.hud.getItem("NOTIFICATION").setVisibility(Boolean.parseBoolean(this.savedInstanceData.getString("logic_notificationVisibility")));
+            if (this.hud.fadingOut()) {
+                this.loadGame(Integer.parseInt(this.savedInstanceData.getString("logic_chosenSlot")));
+            }
         }
     }
 
@@ -131,7 +151,11 @@ public class SaveSlotChoiceLogic implements GameLogic {
             if (this.load) {
                 if (MainActivity.saveSlots[actionCode]) this.loadGame(actionCode);
 
-            //new game
+            //new game in occupied slot
+            } else if (MainActivity.saveSlots[actionCode]) {
+                this.hud.getItem("NOTIFICATION").setVisibility(true);
+
+            //new game in free slot
             } else this.newGame(actionCode);
 
         //player has chosen to delete a slot
@@ -140,7 +164,16 @@ public class SaveSlotChoiceLogic implements GameLogic {
             //fade out and flag for deletion
             this.hud.fadeOut();
             this.deletingSlot = actionCode - 3;
+
+        //player has chosen to return
+        } else if (actionCode == SaveSlotChoiceLogic.RETURN_BUTTON_ACTION_CODE) {
+
+            //fade out and flag for return
+            this.returnPressed = true;
+            this.hud.fadeOut();
         }
+
+        //return
         return (actionCode != -1);
     }
 
@@ -163,7 +196,7 @@ public class SaveSlotChoiceLogic implements GameLogic {
      * @param saveSlot the save slot to load the previous game from.
      */
     private void loadGame(int saveSlot) {
-        Node saveDataNode = Node.readNode("saveslot" + saveSlot);
+        Node saveDataNode = Node.readNode(SaveData.getSaveSlotDir(saveSlot));
         this.transferData = new Node("transferdata");
         this.transferData.addChild(saveDataNode);
         this.hud.fadeOut();
@@ -183,8 +216,14 @@ public class SaveSlotChoiceLogic implements GameLogic {
         //switch logic if fade completed
         if (this.hud.fadeOutCompleted()) {
 
+            //if player chose to return
+            if (this.returnPressed) {
+                LogicChangeData lcd = new LogicChangeData(Util.MAIN_MENU_LOGIC_TAG, true, false);
+                MainActivity.initLogicChange(lcd, null);
+            }
+
             //if player chose to delete
-            if (this.deletingSlot >= 0) {
+            else if (this.deletingSlot >= 0) {
                 Node tData = new Node("transferData");
                 tData.addChild("slot", Integer.toString( this.deletingSlot));
                 LogicChangeData lcd = new LogicChangeData(Util.DELETE_SLOT_LOGIC_TAG, true, true);
@@ -211,6 +250,7 @@ public class SaveSlotChoiceLogic implements GameLogic {
         if (this.hud.fadingOut()) node.addChild("chosenSlot", this.transferData.getChild("savedata").getChild("saveSlot").getValue());
         node.addChild("load", Boolean.toString(this.load));
         node.addChild("chosenName", this.chosenName);
+        node.addChild("notificationVisibility", Boolean.toString(this.hud.getItem("NOTIFICATION").isVisible()));
         return node;
     }
 

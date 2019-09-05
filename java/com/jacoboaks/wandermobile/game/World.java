@@ -23,13 +23,13 @@ import com.jacoboaks.wandermobile.util.Node;
 public class World {
 
     //Data
-    private Entity player;
     private Area area;
-    private ShaderProgram shaderProgram;
     private FollowingCamera camera;
-    private boolean tileSelected = false;
-    private Tile selectionTile;
     private HUD hud;
+    private Entity player;
+    private Tile selectionTile;
+    private ShaderProgram shaderProgram;
+    private boolean tileSelected = false;
 
     /**
      * Constructs this World.

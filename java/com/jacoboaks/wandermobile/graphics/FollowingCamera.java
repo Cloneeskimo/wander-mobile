@@ -14,12 +14,12 @@ public class FollowingCamera extends Camera {
     private static final float STD_REPAN_ANIMATION_SPEED = 0.093f; /* the speed at which the
         repanning animation should occur */
 
-    //Data
+    //Instance Data
+    private GameItem followee; //the game item to follow
+    private boolean brokeAway; //whether the player has broken away the camera following
+    private boolean isRepanning; //whether re-panning is occurring currently
     private boolean panLocked; //whether panning is locked or not
     private boolean recentlyPanned; //whether panning has recently occurred or not
-    private boolean isRepanning; //whether re-panning is occurring currently
-    private boolean brokeAway; //whether the player has broken away the camera following
-    private GameItem followee; //the game item to follow
     private float timeUntilReturn; //the time after the last pan until the camera should return to its followee
 
     /**

@@ -17,13 +17,13 @@ import java.util.List;
 public class Node {
 
     //Static Data
-    private static char INDENT_CHAR = '\t';
     private static char DIVIDER_CHAR = ':';
+    private static char INDENT_CHAR = '\t';
 
     //Data
+    private List<Node> children;
     private String name;
     private String value;
-    private List<Node> children;
 
     /**
      * Constructs this Node by giving it all of its properties upfront.
@@ -296,6 +296,7 @@ public class Node {
 
         //try to open file to print
         try {
+            Node.makeAppropriateDirs(path);
             PrintWriter out = new PrintWriter(new File(MainActivity.appDir, path));
 
             //recursively save node then close file
@@ -305,6 +306,22 @@ public class Node {
             //catch errors
         } catch (Exception e) {
             throw Util.fatalError("Node.java", "writeNode(Node, String)", e.getMessage());
+        }
+    }
+
+    /**
+     * Makes the appropriate directories for a given path
+     * @param path the path whose directories to make
+     */
+    public static void makeAppropriateDirs(String path) {
+        int lastSlash = -1;
+        for (int i = 0; i < path.length(); i++) {
+            if (path.charAt(i) == '/') lastSlash = i;
+        }
+        if (lastSlash > -1) {
+            String dirs = path.substring(0, lastSlash);
+            File dir = new File(MainActivity.appDir, dirs);
+            boolean result = dir.mkdirs();
         }
     }
 

@@ -27,15 +27,15 @@ import javax.microedition.khronos.opengles.GL10;
 public class GameRenderer implements GLSurfaceView.Renderer {
 
     //Static Surface Data
-    public static int surfaceWidth = 0, surfaceHeight = 0;
     public static float surfaceAspectRatio = 0;
+    public static int surfaceWidth = 0, surfaceHeight = 0;
     public static boolean surfaceAspectRatioAction = false;
 
     //Timekeeping Properties
-    private long lastSecond;
     private long lastCycle;
-    private int frameCount;
+    private long lastSecond;
     private int FPS;
+    private int frameCount;
 
     //GameLogic
     private GameLogic logic;

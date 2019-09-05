@@ -11,8 +11,7 @@ import com.jacoboaks.wandermobile.util.Node;
 public class Entity extends Tile {
 
     //Data
-    private int health;
-    private int maxHealth;
+    private int health, maxHealth;
     private int level;
 
     /**

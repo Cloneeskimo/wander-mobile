@@ -14,11 +14,11 @@ import java.util.Map;
 public class Font {
 
     //Data
+    private Map<Character, Integer> letterCutoffs;
     private Texture fontSheet;
-    private char startingChar;
     private int charsPerRow, charsPerColumn;
     private int standardLetterCutoff;
-    private Map<Character, Integer> letterCutoffs;
+    private char startingChar;
 
     /**
      * Constructs this font_default with the given information.

@@ -21,16 +21,16 @@ import java.io.File;
  */
 public class DeleteSlotLogic implements GameLogic {
 
-    //Data
-    private HUD hud;
-    private Font font;
-    private Bundle savedInstanceData;
-    private int slot;
-    private boolean yesChosen = false;
-
     //Static Data
     private static final int YES_ACTION_CODE = 0;
     private static final int NO_ACTION_CODE = 1;
+
+    //Instance Data
+    private Font font;
+    private HUD hud;
+    private Bundle savedInstanceData;
+    private int slot;
+    private boolean yesChosen = false;
 
     //Initialization Method
     @Override

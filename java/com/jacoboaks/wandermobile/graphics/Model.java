@@ -19,16 +19,16 @@ public class Model {
     //Static Data
     private static final int COORDS_PER_VERTEX = 3;
 
-    //Data
+    //Instance Data
     private Material material;
-    private float width, height;
     private float[] modelCoords;
     private float[] textureCoords;
+    private float width, height;
     private int[] drawPath;
 
     //Buffer Data
-    private FloatBuffer vertexBuffer;
     private FloatBuffer textureCoordsBuffer;
+    private FloatBuffer vertexBuffer;
     private IntBuffer drawPathBuffer;
 
     /**

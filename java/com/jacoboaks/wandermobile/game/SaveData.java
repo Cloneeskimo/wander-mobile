@@ -39,7 +39,7 @@ public class SaveData {
      * @param font the font to use for construction
      */
     public SaveData(int saveSlot, Font font) {
-        this(Node.readNode("saveslot" + saveSlot), font);
+        this(Node.readNode(SaveData.getSaveSlotDir(saveSlot)), font);
     }
 
     /**
@@ -58,7 +58,16 @@ public class SaveData {
      */
     public void save() {
         Node node = this.toNode();
-        Node.writeNode(node, "saveslot" + this.saveSlot);
+        Node.writeNode(node, SaveData.getSaveSlotDir(this.saveSlot));
+    }
+
+    /**
+     * Finds and returns the directory for the save data of the given save slot.
+     * @param slot the slot whose directory to retrieve
+     * @return the directory for the given save slot
+     */
+    public static String getSaveSlotDir(int slot) {
+        return "data/saves/saveslot" + slot + "/savedata.wdr";
     }
 
     //Accessors
