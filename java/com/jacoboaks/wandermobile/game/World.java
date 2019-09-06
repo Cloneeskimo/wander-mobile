@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.jacoboaks.wandermobile.R;
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
+import com.jacoboaks.wandermobile.game.gameitem.Player;
 import com.jacoboaks.wandermobile.game.gameitem.StaticTile;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.game.gameitem.Tile;
@@ -26,7 +27,7 @@ public class World {
     private Area area;
     private FollowingCamera camera;
     private HUD hud;
-    private Entity player;
+    private Player player;
     private Tile selectionTile;
     private ShaderProgram shaderProgram;
     private boolean tileSelected = false;
@@ -37,7 +38,7 @@ public class World {
      * @param player the player to be rendered in this World
      * @param hud a reference to the corresponding HUD for this World
      */
-    public World(Area area, Entity player, HUD hud) {
+    public World(Area area, Player player, HUD hud) {
 
         //initialize graphics and shader program
         this.initGraphics(player);
@@ -47,8 +48,6 @@ public class World {
         this.area = area;
         this.player = player;
         this.selectionTile = new Tile("Selection", new Texture(R.drawable.texture_selected), 0, 0);
-        Coord spawn = this.area.getSpawn();
-        this.player.setGridPosition((int)spawn.x, (int)spawn.y);
 
         //set hud reference, update area name in hud
         this.hud = hud;
@@ -207,8 +206,9 @@ public class World {
     }
 
     //Accessors
-    public Entity getPlayer() { return this.player; }
+    public Player getPlayer() { return this.player; }
     public FollowingCamera getCamera() { return this.camera; }
+    public Area getArea() { return this.area; }
 
     //Data Requesting Method
     public void requestData(Node data) {

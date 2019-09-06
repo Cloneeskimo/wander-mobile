@@ -1,8 +1,11 @@
 package com.jacoboaks.wandermobile.game;
 
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
+import com.jacoboaks.wandermobile.game.gameitem.Player;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.util.Node;
+
+import java.util.List;
 
 /**
  * Encompasses all useful data for game saving/loading.
@@ -10,7 +13,7 @@ import com.jacoboaks.wandermobile.util.Node;
 public class SaveData {
 
     //Data
-    private Entity player;
+    private Player player;
     private int saveSlot;
 
     /**
@@ -18,7 +21,7 @@ public class SaveData {
      * @param player the player to save
      * @param saveSlot the slot that this data corresponds to
      */
-    public SaveData(Entity player, int saveSlot) {
+    public SaveData(Player player, int saveSlot) {
         this.player = player;
         this.saveSlot = saveSlot;
     }
@@ -30,7 +33,7 @@ public class SaveData {
      */
     public SaveData(Node node, Font font) {
         this.saveSlot = Integer.parseInt(node.getChild("saveSlot").getValue());
-        this.player = Entity.nodeToEntity(node.getChild("Entity"), font);
+        this.player = Player.nodeToPlayer(node.getChild("Player"), font);
     }
 
     /**
@@ -46,18 +49,31 @@ public class SaveData {
      * Converts this SaveData into a Node.
      * @return
      */
-    public Node toNode() {
+    public Node toNode(Area currentArea) {
         Node data = new Node("savedata");
         data.addChild("saveSlot", Integer.toString(this.saveSlot));
         data.addChild(player.toNode());
+        data.addChild("currentArea", currentArea.getName());
         return data;
     }
 
     /**
      * Saves the data of this SaveData into the appropriate slot.
+     * @param currentArea the current Area in use
      */
-    public void save() {
-        Node node = this.toNode();
+    public void save(Area currentArea) {
+        Node node = this.toNode(currentArea);
+        Node.writeNode(node, SaveData.getSaveSlotDir(this.saveSlot));
+        Node currentAreaNode = currentArea.toNode();
+        Node.writeNode(currentAreaNode, SaveData.getSaveSlotSlotAreaDir(this.saveSlot, currentArea.getFilename()));
+    }
+
+    /**
+     * Saves the given Area data to this save slot.
+     * @param area the Area to save
+     */
+    public void saveArea(Area area) {
+        Node node = area.toNode();
         Node.writeNode(node, SaveData.getSaveSlotDir(this.saveSlot));
     }
 
@@ -67,10 +83,28 @@ public class SaveData {
      * @return the directory for the given save slot
      */
     public static String getSaveSlotDir(int slot) {
-        return "data/saves/saveslot" + slot + "/savedata.wdr";
+        return SaveData.getSaveSlotFolderDir(slot) + "/savedata.wdr";
+    }
+
+    /**
+     * Finds and returns the directory for the areas of the save data of the given save slot.
+     * @param slot the slot whose area data to retrieve
+     * @return the directory for the given save slot saved area
+     */
+    public static String getSaveSlotSlotAreaDir(int slot, String areaFilename) {
+        return SaveData.getSaveSlotFolderDir(slot) + "/areas/" + areaFilename + ".wdr";
+    }
+
+    public static String getSaveSlotFolderDir(int slot) {
+        return "data/saves/saveslot" + slot;
+    }
+
+    //Mutators
+    public void updatePlayer(Player player) {
+        this.player = player;
     }
 
     //Accessors
-    public Entity getPlayer() { return this.player; }
+    public Player getPlayer() { return this.player; }
     public int getSaveSlot() { return this.saveSlot; }
 }

@@ -2,6 +2,7 @@ area:
 {
 	loadType: row listing
 	name: Deep Woods
+	filename: area_deepwoods
 	spawnx: 3
 	spawny: -5
 	layout:

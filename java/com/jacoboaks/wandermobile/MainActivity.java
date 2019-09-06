@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
+import com.jacoboaks.wandermobile.game.SaveData;
 import com.jacoboaks.wandermobile.game.gamelogic.DeleteSlotLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.GameLogic;
 import com.jacoboaks.wandermobile.game.gamelogic.LogicChangeData;
@@ -32,7 +33,8 @@ public class MainActivity extends AppCompatActivity {
     //Game Version/Build
     public final static String WANDER_STARTING_LOGIC = Util.MAIN_MENU_LOGIC_TAG;
     public final static String WANDER_VERSION = "0.0";
-    public final static int WANDER_BUILD = 35;
+    public final static int WANDER_BUILD = 36;
+    public final static int STARTING_ZONE = R.raw.area_deepwoods;
 
     //Public Static Data
     public static File appDir; //reference to the file directory of the app

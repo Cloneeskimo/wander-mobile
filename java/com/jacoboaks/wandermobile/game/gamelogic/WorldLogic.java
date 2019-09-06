@@ -14,6 +14,7 @@ import com.jacoboaks.wandermobile.game.gamecontrol.WorldControl;
 import com.jacoboaks.wandermobile.game.gameitem.ButtonTextItem;
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
 import com.jacoboaks.wandermobile.game.gameitem.GameItem;
+import com.jacoboaks.wandermobile.game.gameitem.Player;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
@@ -30,12 +31,14 @@ public class WorldLogic implements GameLogic {
 
     //Static Data
     private static final int SAVE_BUTTON_ACTION_CODE = 1;
+    private static final int EXIT_BUTTON_ACTION_CODE = 2;
 
-    //Logic Data
+    //Instance Data
     private WorldControl control;
     private Font font;
     private HUD hud;
     private World world;
+    private float saveNotificationTime = -1f;
 
     //Saved Data
     private SaveData saveData;
@@ -58,6 +61,8 @@ public class WorldLogic implements GameLogic {
 
         //create controls
         this.control = new WorldControl();
+        this.control.addNullInputBounds(this.hud.getItem("SAVE_GAME_BUTTON").getBounds());
+        this.control.addNullInputBounds(this.hud.getItem("EXIT_GAME_BUTTON").getBounds());
     }
 
     /**
@@ -131,7 +136,19 @@ public class WorldLogic implements GameLogic {
         ButtonTextItem saveGameButton = new ButtonTextItem(this.font, "Save", Global.white,
                 Global.black, WorldLogic.SAVE_BUTTON_ACTION_CODE);
         saveGameButton.scale(0.20f);
-        this.hud.addItem("SAVE_GAME_BUTTON", saveGameButton, HUD.Placement.TOP_LEFT, 0.02f);
+        this.hud.addItem("SAVE_GAME_BUTTON", saveGameButton, HUD.Placement.TOP_LEFT, 0.04f);
+
+        //exit game button
+        ButtonTextItem exitGameButton = new ButtonTextItem(this.font, "Exit", Global.white,
+                Global.black, WorldLogic.EXIT_BUTTON_ACTION_CODE);
+        exitGameButton.scale(0.20f);
+        this.hud.addItem("EXIT_GAME_BUTTON", exitGameButton, HUD.Placement.BELOW_LAST, 0.04f);
+
+        //game saved notification
+        TextItem saveNotification = new TextItem(this.font, "Game Saved!", textMaterial, 0f, 0f);
+        saveNotification.scale(0.15f);
+        saveNotification.setVisibility(false);
+        this.hud.addItem("SAVE_NOTIFICATION", saveNotification, 0f, 0f);
     }
 
     /**
@@ -140,7 +157,7 @@ public class WorldLogic implements GameLogic {
     private void initWorld() {
 
         //create player
-        Entity player = this.saveData.getPlayer();
+        Player player = this.saveData.getPlayer();
 
         //create area
         Area area = Area.loadArea(R.raw.area_deepwoods, this.font);
@@ -170,9 +187,18 @@ public class WorldLogic implements GameLogic {
     //Input Method
     @Override
     public boolean input(MotionEvent e) {
-        int actionCode = this.hud.updateButtonSelections(e);
-        if (actionCode == -1) return this.control.input(e, this.world);
-        else return true;
+        int actionCode = this.hud != null ? this.hud.updateButtonSelections(e) : -1;
+        if (actionCode == -1) {
+            if (this.control != null) return this.control.input(e, this.world);
+        } else if (actionCode == WorldLogic.SAVE_BUTTON_ACTION_CODE) {
+            this.saveData.updatePlayer(this.world.getPlayer());
+            this.saveData.save(this.world.getArea());
+            this.hud.getItem("SAVE_NOTIFICATION").setVisibility(true);
+            this.saveNotificationTime = 1000f;
+        } else if (actionCode == WorldLogic.EXIT_BUTTON_ACTION_CODE) {
+            this.hud.fadeOut();
+        }
+        return actionCode != -1;
     }
 
     //Scale Input Method
@@ -186,6 +212,18 @@ public class WorldLogic implements GameLogic {
 
         //fade in
         this.hud.update(dt);
+
+        //update notification text
+        if (this.saveNotificationTime >= 0f) {
+            this.saveNotificationTime -= dt;
+            if (this.saveNotificationTime < 0f) this.hud.getItem("SAVE_NOTIFICATION").setVisibility(false);
+        }
+
+        //check for exit
+        if (this.hud.fadeOutCompleted()) {
+            LogicChangeData lcd = new LogicChangeData(Util.MAIN_MENU_LOGIC_TAG, true, false);
+            MainActivity.initLogicChange(lcd, null);
+        }
 
         //update world
         this.world.update(dt);
@@ -217,7 +255,7 @@ public class WorldLogic implements GameLogic {
         data.addChild(new Node("playerx", Float.toString(this.world.getPlayer().getX())));
         data.addChild(new Node("playery", Float.toString(this.world.getPlayer().getY())));
         data.addChild(this.hud.requestData());
-        data.addChild(this.saveData.toNode());
+        data.addChild(this.saveData.toNode(this.world.getArea()));
         return data;
     }
 

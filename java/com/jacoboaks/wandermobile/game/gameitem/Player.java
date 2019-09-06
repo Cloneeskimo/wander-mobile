@@ -39,7 +39,10 @@ public class Player extends Entity {
         this.experience = 0;
     }
 
-    //Copy Constructor
+    /**
+     * Constructs this Player by copying another one.
+     * @param other the other Player to copy
+     */
     public Player(Player other) {
         super(other);
         this.experience = other.experience;
@@ -62,6 +65,20 @@ public class Player extends Entity {
     protected Player(Node data) {
         super(data);
         this.experience = Integer.parseInt(data.getChild("experience").getValue());
+    }
+
+    /**
+     * Creates a Player with the given data.
+     * @param data the data to use when constructing this Player
+     * @param font the font to use if this Player is a symbol tile
+     * @return the constructed Player
+     */
+    public static Player nodeToPlayer(Node data, Font font) {
+        if (Boolean.parseBoolean(data.getChild("symbolTile").getValue())) {
+            return new Player(data, font);
+        } else {
+            return new Player(data);
+        }
     }
 
     //Node Converter

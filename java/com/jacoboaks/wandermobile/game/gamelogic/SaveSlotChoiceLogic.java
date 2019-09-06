@@ -5,14 +5,18 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 
 import com.jacoboaks.wandermobile.MainActivity;
+import com.jacoboaks.wandermobile.R;
+import com.jacoboaks.wandermobile.game.Area;
 import com.jacoboaks.wandermobile.game.HUD;
 import com.jacoboaks.wandermobile.game.SaveData;
 import com.jacoboaks.wandermobile.game.gameitem.ButtonTextItem;
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
+import com.jacoboaks.wandermobile.game.gameitem.Player;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.graphics.Font;
 import com.jacoboaks.wandermobile.graphics.Material;
 import com.jacoboaks.wandermobile.util.Color;
+import com.jacoboaks.wandermobile.util.Coord;
 import com.jacoboaks.wandermobile.util.Global;
 import com.jacoboaks.wandermobile.util.Node;
 import com.jacoboaks.wandermobile.util.Util;
@@ -142,7 +146,7 @@ public class SaveSlotChoiceLogic implements GameLogic {
     //Input Method
     @Override
     public boolean input(MotionEvent e) {
-        int actionCode = this.hud.updateButtonSelections(e);
+        int actionCode = this.hud != null ? this.hud.updateButtonSelections(e) : -1;
 
         //player has selected a slot
         if (actionCode >= 0 && actionCode <= 2) {
@@ -182,12 +186,22 @@ public class SaveSlotChoiceLogic implements GameLogic {
      * @param saveSlot the save slot to put the new game into.
      */
     private void newGame(int saveSlot) {
-        Entity player = new Entity(this.chosenName, this.font, this.chosenName.charAt(0),
+
+        //create player
+        Player player = new Player(this.chosenName, this.font, this.chosenName.charAt(0),
                 new Color(0.62f, 0.0f, 0.1f, 1.0f), 0, 0);
         SaveData saveData = new SaveData(player, saveSlot);
-        saveData.save();
+
+        //create area and set player position to spawn
+        Area area = Area.loadArea(MainActivity.STARTING_ZONE, this.font);
+        Coord spawn = area.getSpawn();
+        player.setGridPosition((int)spawn.x, (int)spawn.y);
+
+        //save data and transfer to world logic
+        saveData.save(area);
         this.transferData = new Node("transferdata");
-        this.transferData.addChild(saveData.toNode());
+        this.transferData.addChild(saveData.toNode(area));
+        MainActivity.saveSlots[saveSlot] = true;
         this.hud.fadeOut();
     }
 

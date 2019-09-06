@@ -101,7 +101,7 @@ public class MainMenuLogic implements GameLogic {
     public boolean input(MotionEvent e) {
 
         //figure out the action code
-        int actionCode = this.hud.updateButtonSelections(e);
+        int actionCode = this.hud != null ? this.hud.updateButtonSelections(e) : -1;
 
         //check if button was pressed and switch to world logic if so
         switch(actionCode) {

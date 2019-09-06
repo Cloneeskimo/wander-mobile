@@ -25,24 +25,28 @@ public class Area {
     private List<Entity> entities;
     private List<StaticTile> staticTiles;
     private String name;
+    private String filename;
     private Coord spawn;
 
     /**
      * Constructs this Area with only a name.
      * @param name the name of the zone
+     * @param filename the filename of the zone
      */
-    public Area(String name) {
-        this(name, new ArrayList<StaticTile>(), new ArrayList<Entity>(), new Coord(0, 0));
+    public Area(String name, String filename) {
+        this(name, filename, new ArrayList<StaticTile>(), new ArrayList<Entity>(), new Coord(0, 0));
     }
 
     /**
      * Constructs this Area with a name and a list of tiles and entities.
      * @param name the name of the zone
+     * @param filename the filename of the zone
      * @param staticTiles the list of static tiles of the zone
      * @param entities the list of entities of the zone
      */
-    public Area(String name, List<StaticTile> staticTiles, List<Entity> entities, Coord spawn) {
+    public Area(String name, String filename, List<StaticTile> staticTiles, List<Entity> entities, Coord spawn) {
         this.name = name;
+        this.filename = filename;
         this.staticTiles = staticTiles;
         this.entities = entities;
         this.spawn = spawn;
@@ -102,6 +106,7 @@ public class Area {
 
     //Accessor
     public String getName() { return this.name; }
+    public String getFilename() { return this.filename; }
     public Coord getSpawn() { return this.spawn; }
 
     /**
@@ -194,13 +199,14 @@ public class Area {
         }
 
         //create and return area
-        return new Area(areaData.getChild("name").getValue(), st, e, spawn);
+        return new Area(areaData.getChild("name").getValue(), areaData.getChild("filename").getValue(), st, e, spawn);
     }
 
     //Node Converter
     public Node toNode() {
         Node node = new Node("area");
         node.addChild("name", this.name);
+        node.addChild("filename", this.filename);
         Node layout = new Node("statictiles");
         for (StaticTile t : this.staticTiles) {
             layout.addChild(t.toNode());

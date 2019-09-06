@@ -108,7 +108,7 @@ public class NewGameLogic implements GameLogic {
     public boolean input(MotionEvent e) {
 
         //get action code input
-        int actionCode = this.hud.updateButtonSelections(e);
+        int actionCode = this.hud != null ? this.hud.updateButtonSelections(e) : -1;
         if (actionCode != -1) {
 
             //get input text handle

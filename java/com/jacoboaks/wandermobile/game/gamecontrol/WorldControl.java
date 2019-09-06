@@ -6,7 +6,12 @@ import com.jacoboaks.wandermobile.game.World;
 import com.jacoboaks.wandermobile.game.gameitem.Entity;
 import com.jacoboaks.wandermobile.graphics.Camera;
 import com.jacoboaks.wandermobile.graphics.GameRenderer;
+import com.jacoboaks.wandermobile.graphics.Transformation;
+import com.jacoboaks.wandermobile.util.Bounds;
 import com.jacoboaks.wandermobile.util.Coord;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * WorldControl Class
@@ -22,6 +27,7 @@ public class WorldControl {
 
     //Data
     private Coord fingerPos; //the current finger position. set to null if the finger leaves the screen
+    private List<Bounds> nullInputBounds; //collection of bounds to ignore input for (for buttons) in aspected space
     private boolean currentlyScaling; //whether or not the user is currently scaling
     private boolean justScaledOrPanned; //whether or not the user has just scaled or panned
     private boolean listenForPanning; //whether or not panning should be listened for
@@ -29,6 +35,7 @@ public class WorldControl {
 
     //Default Constructor
     public WorldControl() {
+        this.nullInputBounds = new ArrayList<>();
         this.currentlyScaling = false;
         this.listenForPanning = true;
         this.substantialPanningDetected = false;
@@ -41,6 +48,12 @@ public class WorldControl {
      * @return whether the input was handled in any way
      */
     public boolean input(MotionEvent e, World world) {
+
+        //check for null input bounds
+        Coord touchPosAspected = new Coord(e.getX(), e.getY());
+        Transformation.screenToNormalized(touchPosAspected);
+        Transformation.normalizedToAspected(touchPosAspected);
+        for (Bounds bounds : this.nullInputBounds) if (bounds.intersects(touchPosAspected)) return false;
 
         //handle touch
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
@@ -135,6 +148,14 @@ public class WorldControl {
 
         //return that input was not handled
         return false;
+    }
+
+    /**
+     * Adds a given bounds to the list of null input bounds to avoid when detecting control input.
+     * @param bounds the bounds to add
+     */
+    public void addNullInputBounds(Bounds bounds) {
+        this.nullInputBounds.add(bounds);
     }
 
     /**

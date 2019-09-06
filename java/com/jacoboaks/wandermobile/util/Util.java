@@ -5,6 +5,7 @@ import android.util.Log;
 import com.jacoboaks.wandermobile.MainActivity;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public final class Util {
     public final static String SAVE_SLOT_CHOICE_LOGIC_TAG = "saveslotchoicelogic";
     public final static String DELETE_SLOT_LOGIC_TAG = "deleteslotlogic";
     public final static String WORLD_LOGIC_TAG = "worldlogic";
-    public final static float FADE_TIME = 1000f;
+    public final static float FADE_TIME = 600f;
 
     //Data
     public final static boolean DEBUG = true;
@@ -132,5 +133,24 @@ public final class Util {
         int[] a = new int[size];
         for (int i = 0; i < size; i++) a[i] = list.get(i);
         return a;
+    }
+
+    /**
+     * Will delete a directory and all of its contents.
+     * @param file the directory to delete
+     */
+    public static void deleteDirectory(File file) {
+        if (file.isDirectory()) {
+            File[] entries = file.listFiles();
+            if (entries != null) {
+                for (File entry : entries) {
+                    deleteDirectory(entry);
+                }
+            }
+        }
+        if (!file.delete()) {
+            throw Util.fatalError("Util.java", "deleteDirectory(File)",
+                    "Failed to delete " + file);
+        }
     }
 }

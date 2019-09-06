@@ -6,6 +6,7 @@ import android.view.MotionEvent;
 
 import com.jacoboaks.wandermobile.MainActivity;
 import com.jacoboaks.wandermobile.game.HUD;
+import com.jacoboaks.wandermobile.game.SaveData;
 import com.jacoboaks.wandermobile.game.gameitem.ButtonTextItem;
 import com.jacoboaks.wandermobile.game.gameitem.TextItem;
 import com.jacoboaks.wandermobile.graphics.Font;
@@ -85,7 +86,7 @@ public class DeleteSlotLogic implements GameLogic {
     public boolean input(MotionEvent e) {
 
         //check if yes or no pressed
-        int actionCode = this.hud.updateButtonSelections(e);
+        int actionCode = this.hud != null ? this.hud.updateButtonSelections(e) : -1;
         if (actionCode == YES_ACTION_CODE) {
             this.yesChosen = true;
             this.hud.fadeOut();
@@ -115,8 +116,8 @@ public class DeleteSlotLogic implements GameLogic {
             //delete
             if (this.yesChosen) {
 
-                File saveFile = new File(MainActivity.appDir, "saveslot" + this.slot);
-                saveFile.delete();
+                File saveFolder = new File(MainActivity.appDir, SaveData.getSaveSlotFolderDir(this.slot));
+                Util.deleteDirectory(saveFolder);
                 MainActivity.saveSlots[this.slot] = false;
                 LogicChangeData lcd = new LogicChangeData(Util.SAVE_SLOT_CHOICE_LOGIC_TAG, true, false);
                 MainActivity.initLogicChange(lcd, null);
